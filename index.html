@@ -1,19 +1,305 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta charset="utf-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>Love Questionnaire</title>
-	<link rel="icon" type="image/x-icon" href="https://cdn.discordapp.com/attachments/1088030718875156501/1136882396797616128/favicon.ico">
-	<link rel="stylesheet" href="style.css">
+    <title>Love Questionnaire</title>
+    <style>
+        @font-face {
+        font-family: 'PinkBlue'; /* Define a name for your custom font */
+        src: url('fonts/PinkBlue.otf') format('opentype'); /* Replace 'path/to/' with the actual path to your font file */
+        /* You can specify other font formats like woff, woff2, eot if needed */
+        }
+        @font-face {
+        font-family: 'LoveTrust'; /* Define a name for your custom font */
+        src: url('fonts/LoveTrust.ttf') format('truetype'); /* Replace 'path/to/' with the actual path to your font file */
+        /* You can specify other font formats like woff, woff2, eot if needed */
+        }
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: pink;
+        }
+        h1 {
+        margin-top: 15px;
+        margin-bottom: 10px; /* Add margin to create space below the title */
+        font-size: 72px; /* Set the font size to make it larger */
+        font-family: 'PinkBlue', Arial, sans-serif; /* Use 'PinkBlue' as the font and fallback to Arial and sans-serif fonts */
+        background: linear-gradient(90deg, red, darkred); /* Gradient background */
+        -webkit-background-clip: text; /* Clip text to the gradient */
+        color: transparent; /* Make text color transparent */
+        display: inline-block; /* Inline block for gradient effect */
+        }
+        h2 {
+        font-family: 'LoveTrust', Arial, sans-serif;
+        font-size: 36px;
+        color: #ff4d4d;
+        }
+        .question {
+            margin-bottom: 10px;
+        }
+        .question label {
+            font-family: 'LoveTrust', Arial, sans-serif; /* Use 'LoveTrust' as the font and fallback to Arial and sans-serif fonts */
+            display: block;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        .radio-group {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: -10px; /* Adjust this value as needed */
+        }
+        .radio-group label {
+            margin-right: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+        .radio-button {
+            display: none;
+        }
+        .custom-radio-button {
+            width: 24px;
+            height: 24px;
+            background-color: #fff;
+            border: 2px solid #ff4d4d;
+            border-radius: 50%;
+            position: relative;
+            margin-right: 8px;
+        }
+        .custom-radio-button::after {
+            content: "";
+            width: 10px;
+            height: 10px;
+            background-color: #ff4d4d;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+        }
+        .radio-button:checked + .custom-radio-button::after {
+            display: block;
+        }
+        .incorrect {
+            color: red;
+        }
+        .hearts {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            overflow: hidden;
+        }
+        .heart {
+            position: absolute;
+            top: -50px;
+            animation: fall 5s linear infinite;
+        }
+        @keyframes fall {
+            to { top: 100%; }
+        }
+        input[type="submit"] {
+            background-color: #ff4d4d;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #ff3333;
+        }
+    </style>
 </head>
 <body>
-	<div class="container">
-		<div class="love">
-			<h2>Do you still <span>love</span> me?</h2>
-			<a id="no" href="no.html">No</a>
-			<a id="yes" href="yes.html">Yes</a>
-		</div>
-	</div>
+    <h1>Love Questionnaire</h1>
+    <form id="questionnaire">
+        <div class="question">
+            <label>Do you love me?</label>
+            <div class="radio-group">
+                <label>
+                    <input type="radio" class="radio-button" name="q1" value="yes">
+                    <span class="custom-radio-button"></span>
+                    Yes
+                </label>
+                <label>
+                    <input type="radio" class="radio-button" name="q1" value="no">
+                    <span class="custom-radio-button"></span>
+                    No
+                </label>
+            </div>
+        </div>
+        <div class="question">
+            <label>Will you eventually marry me?</label>
+            <div class="radio-group">
+                <label>
+                    <input type="radio" class="radio-button" name="q2" value="yes">
+                    <span class="custom-radio-button"></span>
+                    Yes
+                </label>
+                <label>
+                    <input type="radio" class="radio-button" name="q2" value="no">
+                    <span class="custom-radio-button"></span>
+                    No
+                </label>
+            </div>
+        </div>
+        <div class="question">
+            <label>Do you want to grow old with me?</label>
+            <div class="radio-group">
+                <label>
+                    <input type="radio" class="radio-button" name="q3" value="yes">
+                    <span class="custom-radio-button"></span>
+                    Yes
+                </label>
+                <label>
+                    <input type="radio" class="radio-button" name="q3" value="no">
+                    <span class="custom-radio-button"></span>
+                    No
+                </label>
+            </div>
+        </div>
+        <div class="question">
+            <label>Do you want to have children with me?</label>
+            <div class="radio-group">
+                <label>
+                    <input type="radio" class="radio-button" name="q4" value="yes">
+                    <span class="custom-radio-button"></span>
+                    Yes
+                </label>
+                <label>
+                    <input type="radio" class="radio-button" name="q4" value="no">
+                    <span class="custom-radio-button"></span>
+                    No
+                </label>
+            </div>
+        </div>
+        <!-- Additional Questions -->
+        <div class="question">
+            <label>Do you enjoy spending time together?</label>
+            <div class="radio-group">
+                <label>
+                    <input type="radio" class="radio-button" name="q5" value="yes">
+                    <span class="custom-radio-button"></span>
+                    Yes
+                </label>
+                <label>
+                    <input type="radio" class="radio-button" name="q5" value="no">
+                    <span class="custom-radio-button"></span>
+                    No
+                </label>
+            </div>
+        </div>
+        <div class="question">
+            <label>Do we support each other's dreams?</label>
+            <div class="radio-group">
+                <label>
+                    <input type="radio" class="radio-button" name="q6" value="yes">
+                    <span class="custom-radio-button"></span>
+                    Yes
+                </label>
+                <label>
+                    <input type="radio" class="radio-button" name="q6" value="no">
+                    <span class="custom-radio-button"></span>
+                    No
+                </label>
+            </div>
+        </div>
+        <div class="question">
+            <label>Do we communicate openly with each other?</label>
+            <div class="radio-group">
+                <label>
+                    <input type="radio" class="radio-button" name="q7" value="yes">
+                    <span class="custom-radio-button"></span>
+                    Yes
+                </label>
+                <label>
+                    <input type="radio" class="radio-button" name="q7" value="no">
+                    <span class="custom-radio-button"></span>
+                    No
+                </label>
+            </div>
+        </div>
+        <input type="submit" value="Submit">
+    </form>
+    <div id="congratulations" style="display:none;">
+        <h2>Congratulations! You answered all of the questions correctly!</h2>
+        <div class="hearts"></div>
+    </div>
+    <script>
+        // define correct answers
+        var correctAnswers = {
+            q1: "yes",
+            q2: "yes",
+            q3: "yes",
+            q4: "yes",
+            q5: "yes",
+            q6: "yes",
+            q7: "yes"
+        };
+        
+        // handle form submission
+        document.getElementById("questionnaire").addEventListener("submit", function(event) {
+            event.preventDefault();
+            
+            // check answers
+            var allCorrect = true;
+            for (var key in correctAnswers) {
+                var radioButtons = document.getElementsByName(key);
+                var userAnswer = null;
+                for (var i = 0; i < radioButtons.length; i++) {
+                    if (radioButtons[i].checked) {
+                        userAnswer = radioButtons[i].value;
+                        break;
+                    }
+                }
+                if (userAnswer !== correctAnswers[key]) {
+                    allCorrect = false;
+                    radioButtons[0].parentNode.classList.add("incorrect");
+                } else {
+                    radioButtons[0].parentNode.classList.remove("incorrect");
+                }
+            }
+            
+            // show congratulations if all answers are correct
+            if (allCorrect) {
+                document.getElementById("congratulations").style.display = "block";
+                
+                // add falling hearts animation
+                var heartsContainer = document.querySelector(".hearts");
+                for (var i = 0; i < 50; i++) {
+                    var heart = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                    heart.setAttribute("class", "heart");
+                    heart.setAttribute("width", "50");
+                    heart.setAttribute("height", "50");
+                    heart.setAttribute("viewBox", "0 0 342 315");
+                    heart.innerHTML = '<use xlink:href="#heart" fill="#ff4d4d" transform="rotate(225,150,121)"/>';
+                    heart.style.left = Math.random() * window.innerWidth + "px";
+                    heart.style.animationDelay = Math.random() * 5 + "s";
+                    heartsContainer.appendChild(heart);
+                }
+                
+                // disable form
+                var radioButtons = document.querySelectorAll("#questionnaire .radio-button");
+                for (var i = 0; i < radioButtons.length; i++) {
+                    radioButtons[i].disabled = true;
+                }
+                
+                // scroll to congratulations
+                window.scrollTo(0, 0); // Scroll to the top of the page
+            }
+        });
+    </script>
+    
+
+    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" height="315" width="342">
+        <defs>
+            <g id="heart">
+                <path d="M0 200 v-200 h200 a100,100 90 0,1 0,200 a100,100 90 0,1 -200,0 z"/>
+            </g>
+        </defs>
+    </svg>
 </body>
 </html>
