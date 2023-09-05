@@ -95,10 +95,14 @@
         .heart {
             position: absolute;
             top: -50px;
-            animation: fall 5s linear infinite;
+            animation: fall 5s linear infinite, fade-out 5s linear infinite;
         }
         @keyframes fall {
             to { top: 100%; }
+        }
+        @keyframes fade-out {
+            0% { opacity: 1; }
+            100% { opacity: 0; }
         }
         input[type="submit"] {
             background-color: #ff4d4d;
