@@ -5,4 +5,4 @@ That's why it's worth keeping track of each second.
 
 Happy Valentine's Day, my love!
 
-[Click Me!]([URL](https://trik-clan.github.io/)https://trik-clan.github.io/)
+[Click Me!](https://trik-clan.github.io/)
