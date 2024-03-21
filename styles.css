@@ -1,0 +1,167 @@
+@font-face {
+    font-family: 'Dutch Tulips';
+    src: url('fonts/Dutch Tulips.ttf') format('truetype');
+  }
+  
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Dutch Tulips', sans-serif;
+    background-color: #000;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  
+  .container {
+    text-align: center;
+  }
+  
+  .content {
+    margin-bottom: 30px;
+  }
+  
+  .text h1 {
+    font-size: 60px;
+    margin-bottom: 10px;
+  }
+  
+  .text p {
+    font-size: 30px;
+    margin-bottom: 40px;
+  }
+  
+  .buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .button-85:hover {
+    transform: scale(1.05); /* Increase size by 5% */
+  }
+  
+  .button-85 {
+    padding: .6em 1.5em; /* Adjusted padding to make the buttons larger */
+    margin: 0 30px;
+    border: none;
+    outline: none;
+    color: rgb(255, 255, 255);
+    background: #111;
+    cursor: pointer;
+    position: relative;
+    z-index: 0;
+    border-radius: 10px;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    font-family: 'Dutch Tulips', sans-serif; /* Use the Dutch Tulips font */
+    font-size: 20px;
+  }
+  
+  .button-85:before {
+    content: "";
+    background: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000);
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    background-size: 400%;
+    z-index: -1;
+    filter: blur(5px);
+    -webkit-filter: blur(5px);
+    width: calc(100% + 4px);
+    height: calc(100% + 4px);
+    animation: glowing-button-85 20s linear infinite;
+    transition: opacity 0.3s ease-in-out;
+    border-radius: 10px;
+  }
+  
+  @keyframes glowing-button-85 {
+    0% {
+      background-position: 0 0;
+    }
+    50% {
+      background-position: 400% 0;
+    }
+    100% {
+      background-position: 0 0;
+    }
+  }
+  
+  .button-85:after {
+    z-index: -1;
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: #222;
+    left: 0;
+    top: 0;
+    border-radius: 10px;
+  }
+  
+  .stars {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      overflow: hidden; /* Ensure stars do not overflow the viewport */
+    }
+    
+    .shooting-stars-container,
+    .twinkling-stars-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+    
+    .shooting-star,
+    .twinkling-star {
+      position: absolute;
+      background: transparent;
+      width: 2px;
+      height: 2px;
+      border-radius: 50%;
+      opacity: 0; /* Initially hide the stars */
+    }
+    
+    .shooting-star {
+        background-color: white;
+        animation: shooting-star-animation linear infinite;
+        --randomTopEnd: 0%; /* Default value */
+    }
+    
+    .twinkling-star {
+      background-color: rgba(255, 255, 255, 0.5);
+      animation: twinkling-star-animation alternate infinite;
+    }
+    
+    @keyframes shooting-star-animation {
+        from {
+          left: 0%; /* Start the shooting star animation from the left edge */
+          opacity: 1; /* Fade in the shooting star */
+        }
+        to {
+          left: 100%; /* Move the shooting star to the right edge */
+          top: var(--randomTopEnd); /* Use the random end position set in JavaScript */
+          opacity: 0; /* Fade out the shooting star */
+        }
+    }
+    
+    @keyframes twinkling-star-animation {
+      0% {
+        opacity: 0.2;
+      }
+      50% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0.2;
+      }
+    }
