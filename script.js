@@ -60,10 +60,26 @@ function createProblem(container, text, correctAnswer) {
         }
     });
 
+    input.addEventListener("keydown", (event) => {
+        if (event.key === "Tab") {
+            event.preventDefault();
+            focusNextInput(input);
+        }
+    });
+
     problemDiv.appendChild(label);
     problemDiv.appendChild(input);
     problemDiv.appendChild(button);
     container.appendChild(problemDiv);
+}
+
+// Focus Next Input Field
+function focusNextInput(currentInput) {
+    const inputs = Array.from(document.querySelectorAll("input[type='text']"));
+    const currentIndex = inputs.indexOf(currentInput);
+    if (currentIndex >= 0 && currentIndex < inputs.length - 1) {
+        inputs[currentIndex + 1].focus();
+    }
 }
 
 // Factorial Calculation
