@@ -1,3 +1,13 @@
+// Play Sound Function
+function playSound(id, volume = 0.5) {
+    const sound = document.getElementById(id);
+    if (sound) {
+        sound.volume = volume;
+        sound.currentTime = 0;
+        sound.play();
+    }
+}
+
 // Populate Factorials
 const factorialsContainer = document.getElementById("factorials");
 for (let i = 1; i <= 10; i++) {
@@ -36,9 +46,11 @@ function createProblem(container, text, correctAnswer) {
 
         if (userAnswer === correctAnswer) {
             input.classList.add("correct");
+            playSound("correct-sound", 0.1);
             checkAllAnswers();
         } else {
             input.classList.add("incorrect");
+            playSound("wrong-sound", 0.1);
         }
     });
 
@@ -67,6 +79,7 @@ function checkAllAnswers() {
     );
 
     if (allCorrect) {
+        playSound("cheer-sound", 0.1);
         launchConfetti();
     }
 }
