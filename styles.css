@@ -1,66 +1,140 @@
 @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;700&display=swap');
 
+/* Basic Reset and Body Styles */
+html {
+    box-sizing: border-box;
+    font-size: 16px;
+}
+
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+
 body {
     font-family: 'Lexend', sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f5f5f5;
+    background-color: #f0f2f5;
     color: #333;
-    text-align: center;
+    min-width: 320px;
 }
 
 header {
     background-color: #4caf50;
     color: white;
-    padding: 20px;
+    padding: 15px 20px;
+    margin-bottom: 20px;
+    text-align: center;
 }
 
 header h1 {
-    font-size: 3rem;
+    font-size: 2.5rem;
     margin: 0;
 }
 
 main {
-    max-width: 800px;
-    margin: 0 auto;
+    width: 100%;
     padding: 20px;
+    margin: 0;
 }
 
+/* Main Layout Grid for Sections */
+.problem-columns-container {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr); /* Desktop: 6-column base */
+    gap: 10px; /* Further reduced gap between sections */
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Section Styling */
 section {
-    margin-bottom: 40px;
-}
-
-h2 {
-    margin-bottom: 15px;
-    color: #4caf50;
-    font-size: 2rem;
-}
-
-#factorials, #powers, #squares {
+    background-color: #ffffff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.08);
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 20px;
 }
 
+section h2 {
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #4caf50;
+    font-size: 1.6rem;
+    width: 100%;
+}
+
+/* --- Desktop First: Section Spanning in the 6-column Grid --- */
+.problem-columns-container > section:nth-child(1), /* Factorials */
+.problem-columns-container > section:nth-child(2)  /* Powers of 2 */ {
+    grid-column: span 3;
+}
+
+.problem-columns-container > section:nth-child(3), /* Cubes */
+.problem-columns-container > section:nth-child(4), /* Reciprocals */
+.problem-columns-container > section:nth-child(5)  /* Square Roots */ {
+    grid-column: span 2;
+}
+
+.problem-columns-container > section:nth-child(6), /* Squares */
+.problem-columns-container > section:nth-child(7)  /* Multiplication */ {
+    grid-column: span 6;
+}
+
+/* Problem List Containers Styling */
+/* Default for single-column centered problem lists */
+#factorials, #powers, #cubes, #fractions, #square-roots {
+    display: flex;
+    flex-direction: column;
+    gap: 5px; /* Reduced vertical gap */
+    align-items: center;
+    width: 100%;
+}
+
+/* Squares section's problem list: Default 4 columns (for desktop) */
+#squares {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* Changed to 4 columns */
+    gap: 5px; /* Reduced gap between problems */
+    width: 100%;
+    justify-items: center;
+}
+
+/* Multiplication section's problem list: Default 4 columns (for desktop) */
+#multiplication {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 5px; /* Reduced gap between problems */
+    width: 100%;
+    justify-items: center;
+}
+
+/* Individual Problem Styling */
 .problem {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    width: auto;
+    gap: 8px;
+    width: 100%;
+    max-width: 340px;
+    padding: 5px 0;
 }
 
-.problem span {
-    font-size: 1.5rem;
+.problem span { /* Problem label */
+    font-size: 1.1rem;
     text-align: right;
-    width: 80px;
+    min-width: 70px;
     flex-shrink: 0;
+    margin-right: 5px;
 }
 
 input[type="text"] {
-    width: 180px;
-    padding: 10px;
+    flex-grow: 1;
+    max-width: 140px;
+    padding: 8px;
     font-size: 1rem;
     border: 2px solid #ccc;
     border-radius: 5px;
@@ -78,6 +152,7 @@ button {
     border-radius: 5px;
     cursor: pointer;
     flex-shrink: 0;
+    transition: background-color 0.2s;
 }
 
 button:hover {
@@ -92,4 +167,109 @@ button:hover {
 .incorrect {
     border-color: #f44336 !important;
     background-color: #ffebee;
+}
+
+
+/* === Media Queries for Responsiveness === */
+
+/* Medium Screens / Tablets (e.g., up to 991px) */
+@media (max-width: 991px) {
+    header h1 { font-size: 2.2rem; }
+    section h2 { font-size: 1.5rem; }
+    .problem-columns-container {
+        gap: 10px; /* Keep reduced gap */
+    }
+
+    .problem-columns-container > section:not(:nth-child(6)):not(:nth-child(7)) {
+        grid-column: span 3;
+    }
+    .problem-columns-container > section:nth-child(6),
+    .problem-columns-container > section:nth-child(7) {
+        grid-column: span 6;
+    }
+
+    #squares {
+        grid-template-columns: repeat(3, 1fr); /* Squares: 3 cols on tablet */
+        gap: 5px;
+    }
+    #multiplication {
+        grid-template-columns: repeat(3, 1fr); /* Multiplication: 3 cols on tablet */
+        gap: 5px;
+    }
+    .problem { max-width: 300px; }
+}
+
+/* Small Screens / Mobile (e.g., up to 599px) */
+@media (max-width: 599px) {
+    header h1 { font-size: 1.8rem; }
+    section h2 { font-size: 1.3rem; margin-bottom: 10px;}
+    main { padding: 10px; }
+    .problem-columns-container {
+        gap: 5px; /* Further reduced gap for tighter mobile layout */
+        max-width: 100%;
+    }
+    section { padding: 10px; }
+
+    .problem-columns-container > section {
+        grid-column: span 6 !important; /* All sections stack */
+    }
+
+    #squares {
+        grid-template-columns: repeat(2, 1fr); /* Squares: 2 cols on mobile */
+        gap: 5px;
+    }
+    #multiplication {
+        grid-template-columns: repeat(2, 1fr); /* Multiplication: 2 cols on mobile */
+        gap: 5px;
+    }
+
+    .problem {
+        max-width: 100%;
+        gap: 5px;
+    }
+    .problem span {
+        font-size: 0.9rem;
+        min-width: 50px;
+        margin-right: 3px;
+    }
+    input[type="text"] {
+        font-size: 0.85rem;
+        padding: 6px;
+        max-width: 100px;
+    }
+    button {
+        font-size: 0.85rem;
+        padding: 6px 8px;
+    }
+}
+
+/* Very Small Screens (e.g., up to 420px) - Stack items within .problem */
+@media (max-width: 420px) {
+    #squares {
+        grid-template-columns: 1fr; /* Squares: 1 column */
+    }
+    #multiplication {
+        grid-template-columns: 1fr; /* Multiplication: 1 column */
+    }
+
+    .problem {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 5px;
+        padding: 8px 0;
+    }
+    .problem span {
+        text-align: center;
+        min-width: auto;
+        margin-right: 0;
+        margin-bottom: 5px;
+    }
+    input[type="text"] {
+        max-width: 100%;
+        margin-bottom: 5px;
+        text-align: center;
+    }
+    button {
+        width: 100%;
+    }
 }
