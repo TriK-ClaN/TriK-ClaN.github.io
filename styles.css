@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;700&display=swap');
 
-/* Basic Reset and Body Styles */
+/* Basic Reset And Body Styles */
 html {
     box-sizing: border-box;
     font-size: 16px;
@@ -17,9 +17,10 @@ body {
     background-color: #f0f2f5;
     color: #333;
     min-width: 320px;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Ensure form elements and buttons inherit the body font */
+/* Font Inheritance For Form Elements */
 input,
 button,
 select,
@@ -27,6 +28,190 @@ textarea {
     font-family: inherit;
 }
 
+/* Theme Switch Styles */
+.theme-switch-wrapper {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1001;
+    display: flex;
+    align-items: center;
+}
+
+.theme-switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+.theme-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #abce9f;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+}
+
+input:checked + .slider {
+    background-color: #3182CE;
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 1px #3182CE;
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+
+/* Dark Mode Styles */
+body.dark-mode {
+    background-color: #1A202C;
+    color: #E2E8F0;
+}
+
+body.dark-mode header {
+    background-color: #2C5282;
+    color: #E2E8F0;
+}
+
+body.dark-mode #practiceModeContainer section {
+    background-color: #2D3748;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.25);
+}
+
+body.dark-mode #practiceModeContainer section h2 {
+    color: #63B3ED;
+}
+
+body.dark-mode .problem input[type="text"] {
+    background-color: #4A5568;
+    color: #E2E8F0;
+    border-color: #718096;
+}
+
+body.dark-mode .problem input[type="text"]::placeholder {
+    color: #A0AEC0;
+}
+
+
+body.dark-mode .problem button {
+    background-color: #3182CE;
+    color: white;
+}
+body.dark-mode .problem button:hover {
+    background-color: #2B6CB0;
+}
+
+body.dark-mode .correct {
+    border-color: #68D391 !important;
+    background-color: #2F855A !important;
+    color: #F0FFF4;
+}
+body.dark-mode .incorrect {
+    border-color: #FC8181 !important;
+    background-color: #C53030 !important;
+    color: #FFF5F5;
+}
+
+body.dark-mode #suddenDeathProblemArea .problem {
+    background-color: #2D3748;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.25);
+}
+
+body.dark-mode #suddenDeathProblemArea .correct-answer-display {
+    background-color: #2F855A;
+    color: #F0FFF4;
+    border-color: #38A169;
+}
+
+body.dark-mode #suddenDeathProblemArea .game-over-message {
+    background-color: #742A2A;
+    color: #FED7D7;
+    border-color: #C53030;
+}
+
+body.dark-mode .score-popup {
+    background-color: rgba(74, 85, 104, 0.95);
+    color: #E2E8F0;
+}
+
+body.dark-mode .header-button.sudden-death-button {
+    background-color: #E53E3E;
+    color: white;
+}
+body.dark-mode .header-button.sudden-death-button:hover {
+    background-color: #C53030;
+}
+
+body.dark-mode .header-button.practice-mode-button,
+body.dark-mode #startSuddenDeathCustomBtn {
+    background-color: #3182CE;
+    color: white;
+}
+body.dark-mode .header-button.practice-mode-button:hover,
+body.dark-mode #startSuddenDeathCustomBtn:hover {
+    background-color: #2B6CB0;
+}
+
+
+body.dark-mode .category-selector {
+    background-color: #2D3748;
+    border-color: #4A5568;
+}
+body.dark-mode .category-selector h4 {
+    color: #90CDF4;
+}
+body.dark-mode .category-toggle label {
+    color: #E2E8F0;
+}
+
+body.dark-mode .category-toggle input[type="checkbox"] {
+    border-color: #718096;
+}
+body.dark-mode .category-toggle input[type="checkbox"]:checked {
+    background-color: #3182CE;
+    border-color: #3182CE;
+}
+body.dark-mode .category-toggle input[type="checkbox"]:checked::before {
+    color: #E2E8F0;
+}
+body.dark-mode .error-message {
+    color: #FEB2B2;
+}
+
+
+/* Header Styles */
 header {
     background-color: #4caf50;
     color: white;
@@ -38,6 +223,7 @@ header {
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: background-color 0.3s ease;
 }
 
 header h1 {
@@ -46,6 +232,7 @@ header h1 {
     flex-grow: 1;
 }
 
+/* Header Button Base Styles */
 .header-button {
     border: none;
     padding: 8px 12px;
@@ -54,14 +241,26 @@ header h1 {
     cursor: pointer;
     transition: background-color 0.2s;
     color: white;
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
+}
+/* Specific Button Styles */
+#startSuddenDeathCustomBtn {
+    background-color: #2196F3;
+    display: block;
+    margin: 15px auto 10px;
+    padding: 10px 20px;
+    font-size: 1rem;
+}
+#startSuddenDeathCustomBtn:hover {
+    background-color: #1976D2;
 }
 
+/* Header Buttons Positioning */
 .sudden-death-button {
     background-color: red;
+    position: absolute;
     right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
 }
 .sudden-death-button:hover {
     background-color: darkred;
@@ -69,29 +268,32 @@ header h1 {
 
 .practice-mode-button {
     background-color: #007bff;
+    position: absolute;
     right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
 }
 .practice-mode-button:hover {
     background-color: #0056b3;
 }
 
-
-main { /* Applies to both practice and sudden death main containers */
+/* Main Container Styling */
+main {
     width: 100%;
     padding: 20px;
     margin: 0;
 }
 
-/* Main Layout Grid for Sections (Practice Mode) */
+/* Practice Mode Grid Layout */
 #practiceModeContainer .problem-columns-container {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
-    gap: 10px; /* Reduced gap */
+    gap: 10px;
     max-width: 1400px;
     margin: 0 auto;
 }
 
-/* Section Styling (Practice Mode) */
+/* Practice Mode Section Styling */
 #practiceModeContainer section {
     background-color: #ffffff;
     padding: 15px;
@@ -100,6 +302,7 @@ main { /* Applies to both practice and sudden death main containers */
     display: flex;
     flex-direction: column;
     align-items: center;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 #practiceModeContainer section h2 {
@@ -109,9 +312,10 @@ main { /* Applies to both practice and sudden death main containers */
     color: #4caf50;
     font-size: 1.6rem;
     width: 100%;
+    transition: color 0.3s ease;
 }
 
-/* Section Spanning (Practice Mode) */
+/* Practice Mode Section Spanning */
 #practiceModeContainer .problem-columns-container > section:nth-child(1),
 #practiceModeContainer .problem-columns-container > section:nth-child(2) {
     grid-column: span 3;
@@ -126,30 +330,30 @@ main { /* Applies to both practice and sudden death main containers */
     grid-column: span 6;
 }
 
-/* Problem List Containers Styling (Practice Mode) */
+/* Practice Mode Problem List Styling */
 #factorials, #powers, #cubes, #fractions, #square-roots {
     display: flex;
     flex-direction: column;
-    gap: 5px; /* Reduced vertical gap */
+    gap: 5px;
     align-items: center;
     width: 100%;
 }
-#squares { /* 4 columns for Squares */
+#squares {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 5px; /* Reduced gap */
+    gap: 5px;
     width: 100%;
     justify-items: center;
 }
-#multiplication { /* 4 columns for Multiplication */
+#multiplication {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 5px; /* Reduced gap */
+    gap: 5px;
     width: 100%;
     justify-items: center;
 }
 
-/* Individual Problem Styling (shared) */
+/* Shared Individual Problem Styling */
 .problem {
     display: flex;
     align-items: center;
@@ -174,7 +378,7 @@ main { /* Applies to both practice and sudden death main containers */
     border: 2px solid #ccc;
     border-radius: 5px;
     outline: none;
-    transition: border-color 0.1s, background-color 0.1s;
+    transition: border-color 0.1s, background-color 0.1s, color 0.1s;
     text-align: center;
 }
 .problem button {
@@ -185,15 +389,16 @@ main { /* Applies to both practice and sudden death main containers */
     border-radius: 5px;
     cursor: pointer;
     flex-shrink: 0;
+    transition: background-color 0.2s ease;
 }
 .problem button:hover {
     background-color: #45a049;
 }
 
-/* Sudden Death Mode Specific Styles */
+/* Sudden Death Mode Styles */
 #suddenDeathModeContainer {
     min-height: calc(100vh - 120px);
-    display: flex; /* JS will toggle this from 'none' */
+    display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
@@ -201,10 +406,85 @@ main { /* Applies to both practice and sudden death main containers */
 }
 .sudden-death-content {
     width: 100%;
+    max-width: 600px;
     display: flex;
     flex-direction: column;
     align-items: center;
 }
+.sudden-death-content.game-active {
+    justify-content: center;
+    flex-grow: 1;
+}
+
+
+/* Category Selector Styles */
+.category-selector {
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+    width: 100%;
+    border: 1px solid #e0e0e0;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+.category-selector h4 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    text-align: center;
+    color: #333;
+    font-size: 1.2rem;
+    transition: color 0.3s ease;
+}
+#sdCategoryTogglesContainer {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+}
+.category-toggle {
+    display: flex;
+    align-items: center;
+}
+.category-toggle label {
+    margin-left: 8px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: color 0.3s ease;
+}
+.category-toggle input[type="checkbox"] {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    position: relative;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+.category-toggle input[type="checkbox"]:checked {
+    background-color: #4caf50;
+    border-color: #4caf50;
+}
+.category-toggle input[type="checkbox"]:checked::before {
+    content: '\2713';
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.error-message {
+    color: red;
+    text-align: center;
+    margin-top: 10px;
+    font-size: 0.9rem;
+    transition: color 0.3s ease;
+}
+
+
+/* Sudden Death Problem Area Styles */
 #suddenDeathProblemArea {
     margin-bottom: 30px;
     width: 100%;
@@ -223,8 +503,9 @@ main { /* Applies to both practice and sudden death main containers */
     border: 1px solid #c8e6c9;
     border-radius: 4px;
     width: 100%;
-    max-width: 340px; /* Align with .problem max-width */
+    max-width: 340px;
     box-sizing: border-box;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 #suddenDeathProblemArea .problem {
     transform: scale(1.3);
@@ -235,7 +516,12 @@ main { /* Applies to both practice and sudden death main containers */
     background-color: #fff;
     border-radius: 8px;
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
+#suddenDeathProblemArea .problem.hidden {
+    display: none;
+}
+
 #suddenDeathProblemArea .problem span {
     font-size: 1.6rem;
     min-width: 100px;
@@ -257,8 +543,10 @@ main { /* Applies to both practice and sudden death main containers */
     border: 1px solid darkred;
     border-radius: 5px;
     margin-top: 10px;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
+/* Score Popup Styles */
 .score-popup {
     position: fixed;
     bottom: 30px;
@@ -271,7 +559,7 @@ main { /* Applies to both practice and sudden death main containers */
     font-size: 1.3rem;
     z-index: 1000;
     opacity: 0;
-    transition: opacity 0.3s ease-in-out, bottom 0.3s ease-in-out;
+    transition: opacity 0.3s ease-in-out, bottom 0.3s ease-in-out, background-color 0.3s ease, color 0.3s ease;
     pointer-events: none;
 }
 .score-popup.show {
@@ -280,11 +568,13 @@ main { /* Applies to both practice and sudden death main containers */
     pointer-events: auto;
 }
 
+/* Feedback Styling For Inputs */
 .correct { border-color: #4caf50 !important; background-color: #e8f5e9; }
 .incorrect { border-color: #f44336 !important; background-color: #ffebee; }
 
-/* === Media Queries for Responsiveness === */
-@media (max-width: 991px) { /* Tablet */
+/* Media Queries For Responsiveness */
+/* Tablet Styles */
+@media (max-width: 991px) {
     header h1 { font-size: 2.2rem; }
     .header-button { font-size: 0.85rem; padding: 7px 10px; }
     #practiceModeContainer section h2 { font-size: 1.5rem; }
@@ -293,7 +583,7 @@ main { /* Applies to both practice and sudden death main containers */
     #practiceModeContainer .problem-columns-container > section:nth-child(6),
     #practiceModeContainer .problem-columns-container > section:nth-child(7) { grid-column: span 6; }
 
-    #squares { grid-template-columns: repeat(3, 1fr); gap: 5px; } /* Squares 3 cols */
+    #squares { grid-template-columns: repeat(3, 1fr); gap: 5px; }
     #multiplication { grid-template-columns: repeat(3, 1fr); gap: 5px; }
     .problem { max-width: 300px; }
 
@@ -304,12 +594,23 @@ main { /* Applies to both practice and sudden death main containers */
     #suddenDeathProblemArea .problem button { font-size: 1.2rem; }
     #suddenDeathProblemArea .game-over-message { font-size: 1.6rem; }
     .score-popup { font-size: 1.1rem; padding: 10px 20px; }
+
+    #sdCategoryTogglesContainer { grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); }
 }
 
-@media (max-width: 599px) { /* Mobile */
+/* Mobile Styles */
+@media (max-width: 599px) {
+    .theme-switch-wrapper { top: 10px; left: 10px; }
+    .theme-switch { width: 50px; height: 28px; }
+    .slider:before { height: 20px; width: 20px; left: 4px; bottom: 4px; }
+    input:checked + .slider:before { transform: translateX(22px); }
+
+
     header { padding: 10px 15px; min-height: 50px; }
     header h1 { font-size: 1.6rem; }
-    .header-button { font-size: 0.8rem; padding: 6px 8px; right: 10px;}
+    .header-button { font-size: 0.8rem; padding: 6px 8px; }
+    .sudden-death-button, .practice-mode-button { right: 10px; }
+
 
     main { padding: 10px; }
     #practiceModeContainer section h2 { font-size: 1.3rem; margin-bottom: 10px;}
@@ -317,13 +618,19 @@ main { /* Applies to both practice and sudden death main containers */
     #practiceModeContainer section { padding: 10px; }
     #practiceModeContainer .problem-columns-container > section { grid-column: span 6 !important; }
 
-    #squares { grid-template-columns: repeat(2, 1fr); gap: 5px; } /* Squares 2 cols */
+    #squares { grid-template-columns: repeat(2, 1fr); gap: 5px; }
     #multiplication { grid-template-columns: repeat(2, 1fr); gap: 5px; }
 
     .problem { max-width: 100%; gap: 5px; }
     .problem span { font-size: 0.9rem; min-width: 40px; margin-right: 3px; }
     .problem input[type="text"] { font-size: 0.85rem; padding: 6px; max-width: 80px; }
     .problem button { font-size: 0.85rem; padding: 6px 8px; }
+
+    .category-selector { padding: 10px; }
+    .category-selector h4 { font-size: 1.1rem; }
+    #sdCategoryTogglesContainer { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
+    .category-toggle label { font-size: 0.9rem; }
+
 
     #suddenDeathProblemArea .correct-answer-display { font-size: 1rem; max-width: 100%; margin-bottom: 8px;}
     #suddenDeathProblemArea .problem { transform: scale(1); margin-top: 15px; margin-bottom: 20px; padding: 8px; }
@@ -335,9 +642,12 @@ main { /* Applies to both practice and sudden death main containers */
     .score-popup.show { bottom: 30px; }
 }
 
-@media (max-width: 420px) { /* Very Small Mobile */
-    #squares { grid-template-columns: 1fr; } /* Squares 1 col */
+/* Very Small Mobile Styles */
+@media (max-width: 420px) {
+    #squares { grid-template-columns: 1fr; }
     #multiplication { grid-template-columns: 1fr; }
+
+    #sdCategoryTogglesContainer { grid-template-columns: 1fr; }
 
     .problem, #suddenDeathProblemArea .problem  {
         flex-direction: column;

@@ -7,6 +7,13 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <div class="theme-switch-wrapper">
+        <label class="theme-switch" for="themeToggleCheckbox">
+            <input type="checkbox" id="themeToggleCheckbox" />
+            <span class="slider round"></span>
+        </label>
+    </div>
+
     <header>
         <h1 id="mainHeaderTitle">GMAT Practice</h1>
         <button id="suddenDeathBtn" class="header-button sudden-death-button">Sudden Death</button>
@@ -16,16 +23,16 @@
     <main id="practiceModeContainer">
         <div class="problem-columns-container">
             <section>
-                <h2>Factorials (1!-10!)</h2>
+                <h2>Factorials (1! - 10!)</h2>
                 <div id="factorials"></div>
             </section>
             <section>
-                <h2>Powers of 2 (2⁰-2¹⁰)</h2>
+                <h2>Powers of 2 (2<sup>0</sup> - 2<sup>10</sup>)</h2>
                 <div id="powers"></div>
             </section>
 
             <section>
-                <h2>Cubes (1³-10³)</h2>
+                <h2>Cubes (1<sup>3</sup> - 10<sup>3</sup>)</h2>
                 <div id="cubes"></div>
             </section>
             <section>
@@ -38,7 +45,7 @@
             </section>
 
             <section>
-                <h2>Squares (0²-50²)</h2>
+                <h2>Squares (0<sup>2</sup> - 25<sup>2</sup>)</h2>
                 <div id="squares"></div>
             </section>
 
@@ -51,8 +58,15 @@
 
     <main id="suddenDeathModeContainer" style="display: none;">
         <div class="sudden-death-content">
-            <div id="suddenDeathProblemArea">
+            <div id="sdCategorySelector" class="category-selector">
+                <h4>Customize Sudden Death Problems:</h4>
+                <div id="sdCategoryTogglesContainer">
                 </div>
+                <button id="startSuddenDeathCustomBtn" class="header-button">Start Game</button>
+                 <p id="sdErrorNoCategory" class="error-message" style="display: none;">Please select at least one problem type!</p>
+            </div>
+            <div id="suddenDeathProblemArea">
+            </div>
         </div>
     </main>
     <div id="suddenDeathScorePopup" class="score-popup" style="display: none;">Score: 0</div>
