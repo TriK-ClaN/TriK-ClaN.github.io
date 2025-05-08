@@ -30,7 +30,7 @@ function playSound(id, volume = 0.5) {
 
 // --- Utility: Shuffle Array (Fisher-Yates) ---
 function shuffleArray(array) {
-    let newArray = [...array]; // Create a copy to avoid mutating original if it's a reference
+    let newArray = [...array];
     for (let i = newArray.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
@@ -38,41 +38,32 @@ function shuffleArray(array) {
     return newArray;
 }
 
-// --- Problem Data Population (Categorized) ---
+// --- Problem Data Population (Categorized for Sudden Death) ---
 function populateAllProblemData() {
-    // Clear existing problems
     for (const category in problemsByCat) {
         problemsByCat[category] = [];
     }
-
-    // Factorials
     for (let i = 1; i <= 10; i++) {
         problemsByCat.Factorials.push({ questionText: `${i}! =`, correctAnswer: factorial(i), type: 'integer' });
     }
-    // Powers Of 2
     for (let i = 0; i <= 10; i++) {
         problemsByCat.PowersOf2.push({ questionText: `2^${i} =`, correctAnswer: Math.pow(2, i), type: 'integer' });
     }
-    // Squares
     for (let i = 0; i <= 50; i++) {
         problemsByCat.Squares.push({ questionText: `${i}² =`, correctAnswer: i * i, type: 'integer' });
     }
-    // Multiplication
     for (let i = 1; i <= 25; i++) {
         for (let j = 1; j <= 25; j++) {
             problemsByCat.Multiplication.push({ questionText: `${i} × ${j} =`, correctAnswer: i * j, type: 'integer' });
         }
     }
-    // Cubes
     for (let i = 1; i <= 10; i++) {
         problemsByCat.Cubes.push({ questionText: `${i}³ =`, correctAnswer: Math.pow(i, 3), type: 'integer' });
     }
-    // Reciprocals
     for (let i = 2; i <= 20; i++) {
         let answer = parseFloat((1 / i).toFixed(4));
         problemsByCat.Reciprocals.push({ questionText: `1/${i} =`, correctAnswer: answer, type: 'float', precision: 4 });
     }
-    // Square Roots
     const roots = [2, 3, 5, 7];
     roots.forEach(num => {
         let answer = parseFloat(Math.sqrt(num).toFixed(3));
@@ -88,6 +79,8 @@ function createProblem(container, text, correctAnswer) {
     label.textContent = text;
     const input = document.createElement("input");
     input.type = "text";
+    input.incorrectGuessCount = 0; // Initialize incorrect guess counter for this problem
+
     if (Number.isInteger(correctAnswer)) {
         input.placeholder = "e.g. 42";
     } else if (correctAnswer.toString().includes('.')) {
@@ -98,39 +91,72 @@ function createProblem(container, text, correctAnswer) {
     button.textContent = "Check";
 
     button.addEventListener("click", () => {
+        if (suddenDeathActive) return; // This logic is only for Practice Mode
+
         const userAnswerText = input.value.trim().replace(',', '.');
         const userAnswerNum = parseFloat(userAnswerText);
         let isActuallyCorrect = false;
         input.classList.remove("correct", "incorrect");
+
         if (isNaN(userAnswerNum)) {
             isActuallyCorrect = false;
         } else {
-            const isCorrectAnswerInt = Number.isInteger(correctAnswer) || (Math.abs(correctAnswer - Math.round(correctAnswer)) < 0.0000001);
-            const decimals = correctAnswer.toString().includes('.') ? correctAnswer.toString().split('.')[1].length : 0;
-            if (isCorrectAnswerInt && decimals === 0) {
+            const isCorrectAnswerEffectivelyInteger = Number.isInteger(correctAnswer) || (Math.abs(correctAnswer - Math.round(correctAnswer)) < 0.0000001);
+            const correctAnswerStr = correctAnswer.toString();
+            const decimalPlacesOfCorrectAnswer = correctAnswerStr.includes('.') ? correctAnswerStr.split('.')[1].length : 0;
+
+            if (isCorrectAnswerEffectivelyInteger && decimalPlacesOfCorrectAnswer === 0) {
                 isActuallyCorrect = Math.abs(userAnswerNum - correctAnswer) < 0.0000001;
             } else {
                 let tolerance;
-                if (decimals === 4) tolerance = 0.00005;
-                else if (decimals === 3) tolerance = 0.0005;
-                else if (decimals === 1 && Math.abs(correctAnswer - 0.5) < 0.0001) tolerance = 0.005;
+                if (decimalPlacesOfCorrectAnswer === 4) tolerance = 0.00005;
+                else if (decimalPlacesOfCorrectAnswer === 3) tolerance = 0.0005;
+                else if (decimalPlacesOfCorrectAnswer === 1 && Math.abs(correctAnswer - 0.5) < 0.0001) tolerance = 0.005;
                 else tolerance = 0.001;
                 isActuallyCorrect = Math.abs(userAnswerNum - correctAnswer) < tolerance;
             }
         }
+
         if (isActuallyCorrect) {
             input.classList.add("correct");
             playSound("correct-sound", 0.1);
+            input.incorrectGuessCount = 0;
             if (!Number.isInteger(correctAnswer) && correctAnswer.toString().includes('.')) {
                  const dp = correctAnswer.toString().split('.')[1].length;
                  if (dp > 0) input.value = userAnswerNum.toFixed(dp); else input.value = userAnswerNum.toString();
             } else if (Number.isInteger(correctAnswer)){
                  input.value = correctAnswer.toString();
             }
+            input.disabled = true;
+            button.disabled = true;
             checkAllAnswers();
-        } else {
+        } else { // Incorrect Answer
             input.classList.add("incorrect");
             playSound("wrong-sound", 0.1);
+            input.incorrectGuessCount++;
+
+            // CHANGE IS HERE: Check if incorrect guess count is 3 or more
+            if (input.incorrectGuessCount >= 3) {
+                let formattedCorrectAnswer;
+                const isAnsInt = Number.isInteger(correctAnswer) || (Math.abs(correctAnswer - Math.round(correctAnswer)) < 0.0000001);
+                const ansStr = correctAnswer.toString();
+                const ansDecimals = ansStr.includes('.') ? ansStr.split('.')[1].length : 0;
+
+                if (isAnsInt && ansDecimals === 0) {
+                    formattedCorrectAnswer = correctAnswer.toString();
+                } else {
+                    // Use the number of decimal places inherent in the correctAnswer
+                    // (which was typically created using toFixed during its generation)
+                    formattedCorrectAnswer = correctAnswer.toFixed(ansDecimals);
+                }
+                input.value = formattedCorrectAnswer;
+                input.classList.remove("incorrect");
+                input.classList.add("correct");
+                input.disabled = true;
+                button.disabled = true;
+                playSound("correct-sound", 0.1);
+                checkAllAnswers();
+            }
         }
     });
     input.addEventListener("keypress", (event) => { if (event.key === "Enter") button.click(); });
@@ -181,8 +207,8 @@ function switchToSuddenDeath() {
         if(suddenDeathProblemArea) suddenDeathProblemArea.innerHTML = '<p>Error: No problems available for Sudden Death mode!</p>';
         return;
     }
-    sdCategoryOrder = shuffleArray(categoryKeys); // Shuffle initial order
-    sdCurrentCategoryIndex = 0; // Start from the beginning of the shuffled list
+    sdCategoryOrder = shuffleArray(categoryKeys);
+    sdCurrentCategoryIndex = 0;
 
     currentSuddenDeathStreak = 0;
     showScorePopup(false);
@@ -212,10 +238,9 @@ function loadNextSuddenDeathProblem() {
     }
 
     if (sdCategoryOrder.length === 0 || sdCurrentCategoryIndex >= sdCategoryOrder.length) {
-        // Reshuffle categories if we've gone through all of them or if order is empty
         sdCategoryOrder = shuffleArray(availableCategories);
         sdCurrentCategoryIndex = 0;
-        if (sdCategoryOrder.length === 0) { // Should be caught by availableCategories check
+        if (sdCategoryOrder.length === 0) {
             suddenDeathProblemArea.innerHTML = '<p>Error: Categories exhausted unexpectedly!</p>';
             return;
         }
@@ -226,8 +251,8 @@ function loadNextSuddenDeathProblem() {
 
     if (!problemsInCurrentCategory || problemsInCurrentCategory.length === 0) {
         console.warn(`Category ${currentCategoryKey} is empty. Attempting to skip.`);
-        sdCurrentCategoryIndex++; // Move to next category
-        loadNextSuddenDeathProblem(); // Recursive call, will check index bounds again
+        sdCurrentCategoryIndex++;
+        loadNextSuddenDeathProblem();
         return;
     }
 
@@ -236,7 +261,7 @@ function loadNextSuddenDeathProblem() {
     
     createSuddenDeathProblemDOM(currentSuddenDeathProblemData);
     
-    sdCurrentCategoryIndex++; // Move to the next category in the shuffled list for the next turn
+    sdCurrentCategoryIndex++;
 }
 
 function createSuddenDeathProblemDOM(problemData) {
@@ -357,9 +382,9 @@ function showScorePopup(show, isGameOver = false, text = "") {
 
 // --- Initial Page Setup ---
 document.addEventListener('DOMContentLoaded', () => {
-    populateAllProblemData(); // Populate the categorized problems
+    populateAllProblemData();
 
-    const uiElements = { // Store references to DOM elements used for practice mode
+    const uiElements = {
         factorials: document.getElementById("factorials"),
         powers: document.getElementById("powers"),
         squares: document.getElementById("squares"),
