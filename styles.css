@@ -19,36 +19,80 @@ body {
     min-width: 320px;
 }
 
+/* Ensure form elements and buttons inherit the body font */
+input,
+button,
+select,
+textarea {
+    font-family: inherit;
+}
+
 header {
     background-color: #4caf50;
     color: white;
     padding: 15px 20px;
     margin-bottom: 20px;
     text-align: center;
+    position: relative;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 header h1 {
     font-size: 2.5rem;
     margin: 0;
+    flex-grow: 1;
 }
 
-main {
+.header-button {
+    border: none;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    color: white;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.sudden-death-button {
+    background-color: red;
+    right: 20px;
+}
+.sudden-death-button:hover {
+    background-color: darkred;
+}
+
+.practice-mode-button {
+    background-color: #007bff;
+    right: 20px;
+}
+.practice-mode-button:hover {
+    background-color: #0056b3;
+}
+
+
+main { /* Applies to both practice and sudden death main containers */
     width: 100%;
     padding: 20px;
     margin: 0;
 }
 
-/* Main Layout Grid for Sections */
-.problem-columns-container {
+/* Main Layout Grid for Sections (Practice Mode) */
+#practiceModeContainer .problem-columns-container {
     display: grid;
-    grid-template-columns: repeat(6, 1fr); /* Desktop: 6-column base */
-    gap: 10px; /* Further reduced gap between sections */
+    grid-template-columns: repeat(6, 1fr);
+    gap: 10px; /* Reduced gap */
     max-width: 1400px;
     margin: 0 auto;
 }
 
-/* Section Styling */
-section {
+/* Section Styling (Practice Mode) */
+#practiceModeContainer section {
     background-color: #ffffff;
     padding: 15px;
     border-radius: 8px;
@@ -58,7 +102,7 @@ section {
     align-items: center;
 }
 
-section h2 {
+#practiceModeContainer section h2 {
     text-align: center;
     margin-top: 0;
     margin-bottom: 15px;
@@ -67,25 +111,22 @@ section h2 {
     width: 100%;
 }
 
-/* --- Desktop First: Section Spanning in the 6-column Grid --- */
-.problem-columns-container > section:nth-child(1), /* Factorials */
-.problem-columns-container > section:nth-child(2)  /* Powers of 2 */ {
+/* Section Spanning (Practice Mode) */
+#practiceModeContainer .problem-columns-container > section:nth-child(1),
+#practiceModeContainer .problem-columns-container > section:nth-child(2) {
     grid-column: span 3;
 }
-
-.problem-columns-container > section:nth-child(3), /* Cubes */
-.problem-columns-container > section:nth-child(4), /* Reciprocals */
-.problem-columns-container > section:nth-child(5)  /* Square Roots */ {
+#practiceModeContainer .problem-columns-container > section:nth-child(3),
+#practiceModeContainer .problem-columns-container > section:nth-child(4),
+#practiceModeContainer .problem-columns-container > section:nth-child(5) {
     grid-column: span 2;
 }
-
-.problem-columns-container > section:nth-child(6), /* Squares */
-.problem-columns-container > section:nth-child(7)  /* Multiplication */ {
+#practiceModeContainer .problem-columns-container > section:nth-child(6),
+#practiceModeContainer .problem-columns-container > section:nth-child(7) {
     grid-column: span 6;
 }
 
-/* Problem List Containers Styling */
-/* Default for single-column centered problem lists */
+/* Problem List Containers Styling (Practice Mode) */
 #factorials, #powers, #cubes, #fractions, #square-roots {
     display: flex;
     flex-direction: column;
@@ -93,26 +134,22 @@ section h2 {
     align-items: center;
     width: 100%;
 }
-
-/* Squares section's problem list: Default 4 columns (for desktop) */
-#squares {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr); /* Changed to 4 columns */
-    gap: 5px; /* Reduced gap between problems */
-    width: 100%;
-    justify-items: center;
-}
-
-/* Multiplication section's problem list: Default 4 columns (for desktop) */
-#multiplication {
+#squares { /* 4 columns for Squares */
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 5px; /* Reduced gap between problems */
+    gap: 5px; /* Reduced gap */
+    width: 100%;
+    justify-items: center;
+}
+#multiplication { /* 4 columns for Multiplication */
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 5px; /* Reduced gap */
     width: 100%;
     justify-items: center;
 }
 
-/* Individual Problem Styling */
+/* Individual Problem Styling (shared) */
 .problem {
     display: flex;
     align-items: center;
@@ -122,16 +159,14 @@ section h2 {
     max-width: 340px;
     padding: 5px 0;
 }
-
-.problem span { /* Problem label */
+.problem span {
     font-size: 1.1rem;
     text-align: right;
     min-width: 70px;
     flex-shrink: 0;
     margin-right: 5px;
 }
-
-input[type="text"] {
+.problem input[type="text"] {
     flex-grow: 1;
     max-width: 140px;
     padding: 8px;
@@ -142,134 +177,187 @@ input[type="text"] {
     transition: border-color 0.1s, background-color 0.1s;
     text-align: center;
 }
-
-button {
+.problem button {
     background-color: #4caf50;
     color: white;
-    border: none;
     padding: 8px 12px;
     font-size: 1rem;
     border-radius: 5px;
     cursor: pointer;
     flex-shrink: 0;
-    transition: background-color 0.2s;
 }
-
-button:hover {
+.problem button:hover {
     background-color: #45a049;
 }
 
-.correct {
-    border-color: #4caf50 !important;
+/* Sudden Death Mode Specific Styles */
+#suddenDeathModeContainer {
+    min-height: calc(100vh - 120px);
+    display: flex; /* JS will toggle this from 'none' */
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+.sudden-death-content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+#suddenDeathProblemArea {
+    margin-bottom: 30px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+#suddenDeathProblemArea .correct-answer-display {
+    font-size: 1.3rem;
+    color: #4caf50;
+    margin-bottom: 10px;
+    font-weight: 500;
+    text-align: center;
+    padding: 8px;
     background-color: #e8f5e9;
+    border: 1px solid #c8e6c9;
+    border-radius: 4px;
+    width: 100%;
+    max-width: 340px; /* Align with .problem max-width */
+    box-sizing: border-box;
 }
-
-.incorrect {
-    border-color: #f44336 !important;
+#suddenDeathProblemArea .problem {
+    transform: scale(1.3);
+    margin-top: 20px;
+    margin-bottom: 40px;
+    max-width: 450px;
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+#suddenDeathProblemArea .problem span {
+    font-size: 1.6rem;
+    min-width: 100px;
+}
+#suddenDeathProblemArea .problem input[type="text"] {
+    font-size: 1.4rem;
+    padding: 10px;
+    max-width: 180px;
+}
+#suddenDeathProblemArea .problem button {
+    font-size: 1.4rem;
+    padding: 10px 15px;
+}
+#suddenDeathProblemArea .game-over-message {
+    font-size: 1.8rem;
+    color: darkred;
+    padding: 20px;
     background-color: #ffebee;
+    border: 1px solid darkred;
+    border-radius: 5px;
+    margin-top: 10px;
 }
 
+.score-popup {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(40, 40, 40, 0.9);
+    color: white;
+    padding: 12px 25px;
+    border-radius: 20px;
+    font-size: 1.3rem;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out, bottom 0.3s ease-in-out;
+    pointer-events: none;
+}
+.score-popup.show {
+    opacity: 1;
+    bottom: 50px;
+    pointer-events: auto;
+}
+
+.correct { border-color: #4caf50 !important; background-color: #e8f5e9; }
+.incorrect { border-color: #f44336 !important; background-color: #ffebee; }
 
 /* === Media Queries for Responsiveness === */
-
-/* Medium Screens / Tablets (e.g., up to 991px) */
-@media (max-width: 991px) {
+@media (max-width: 991px) { /* Tablet */
     header h1 { font-size: 2.2rem; }
-    section h2 { font-size: 1.5rem; }
-    .problem-columns-container {
-        gap: 10px; /* Keep reduced gap */
-    }
+    .header-button { font-size: 0.85rem; padding: 7px 10px; }
+    #practiceModeContainer section h2 { font-size: 1.5rem; }
+    #practiceModeContainer .problem-columns-container { gap: 10px; }
+    #practiceModeContainer .problem-columns-container > section:not(:nth-child(6)):not(:nth-child(7)) { grid-column: span 3; }
+    #practiceModeContainer .problem-columns-container > section:nth-child(6),
+    #practiceModeContainer .problem-columns-container > section:nth-child(7) { grid-column: span 6; }
 
-    .problem-columns-container > section:not(:nth-child(6)):not(:nth-child(7)) {
-        grid-column: span 3;
-    }
-    .problem-columns-container > section:nth-child(6),
-    .problem-columns-container > section:nth-child(7) {
-        grid-column: span 6;
-    }
-
-    #squares {
-        grid-template-columns: repeat(3, 1fr); /* Squares: 3 cols on tablet */
-        gap: 5px;
-    }
-    #multiplication {
-        grid-template-columns: repeat(3, 1fr); /* Multiplication: 3 cols on tablet */
-        gap: 5px;
-    }
+    #squares { grid-template-columns: repeat(3, 1fr); gap: 5px; } /* Squares 3 cols */
+    #multiplication { grid-template-columns: repeat(3, 1fr); gap: 5px; }
     .problem { max-width: 300px; }
+
+    #suddenDeathProblemArea .correct-answer-display { font-size: 1.2rem; max-width: 300px; }
+    #suddenDeathProblemArea .problem { transform: scale(1.1); }
+    #suddenDeathProblemArea .problem span { font-size: 1.4rem; min-width: 80px; }
+    #suddenDeathProblemArea .problem input[type="text"] { font-size: 1.2rem; }
+    #suddenDeathProblemArea .problem button { font-size: 1.2rem; }
+    #suddenDeathProblemArea .game-over-message { font-size: 1.6rem; }
+    .score-popup { font-size: 1.1rem; padding: 10px 20px; }
 }
 
-/* Small Screens / Mobile (e.g., up to 599px) */
-@media (max-width: 599px) {
-    header h1 { font-size: 1.8rem; }
-    section h2 { font-size: 1.3rem; margin-bottom: 10px;}
+@media (max-width: 599px) { /* Mobile */
+    header { padding: 10px 15px; min-height: 50px; }
+    header h1 { font-size: 1.6rem; }
+    .header-button { font-size: 0.8rem; padding: 6px 8px; right: 10px;}
+
     main { padding: 10px; }
-    .problem-columns-container {
-        gap: 5px; /* Further reduced gap for tighter mobile layout */
-        max-width: 100%;
-    }
-    section { padding: 10px; }
+    #practiceModeContainer section h2 { font-size: 1.3rem; margin-bottom: 10px;}
+    #practiceModeContainer .problem-columns-container { gap: 5px; max-width: 100%; }
+    #practiceModeContainer section { padding: 10px; }
+    #practiceModeContainer .problem-columns-container > section { grid-column: span 6 !important; }
 
-    .problem-columns-container > section {
-        grid-column: span 6 !important; /* All sections stack */
-    }
+    #squares { grid-template-columns: repeat(2, 1fr); gap: 5px; } /* Squares 2 cols */
+    #multiplication { grid-template-columns: repeat(2, 1fr); gap: 5px; }
 
-    #squares {
-        grid-template-columns: repeat(2, 1fr); /* Squares: 2 cols on mobile */
-        gap: 5px;
-    }
-    #multiplication {
-        grid-template-columns: repeat(2, 1fr); /* Multiplication: 2 cols on mobile */
-        gap: 5px;
-    }
+    .problem { max-width: 100%; gap: 5px; }
+    .problem span { font-size: 0.9rem; min-width: 40px; margin-right: 3px; }
+    .problem input[type="text"] { font-size: 0.85rem; padding: 6px; max-width: 80px; }
+    .problem button { font-size: 0.85rem; padding: 6px 8px; }
 
-    .problem {
-        max-width: 100%;
-        gap: 5px;
-    }
-    .problem span {
-        font-size: 0.9rem;
-        min-width: 50px;
-        margin-right: 3px;
-    }
-    input[type="text"] {
-        font-size: 0.85rem;
-        padding: 6px;
-        max-width: 100px;
-    }
-    button {
-        font-size: 0.85rem;
-        padding: 6px 8px;
-    }
+    #suddenDeathProblemArea .correct-answer-display { font-size: 1rem; max-width: 100%; margin-bottom: 8px;}
+    #suddenDeathProblemArea .problem { transform: scale(1); margin-top: 15px; margin-bottom: 20px; padding: 8px; }
+    #suddenDeathProblemArea .problem span { font-size: 1.1rem; min-width: 60px; }
+    #suddenDeathProblemArea .problem input[type="text"] { font-size: 1rem; }
+    #suddenDeathProblemArea .problem button { font-size: 1rem; }
+    #suddenDeathProblemArea .game-over-message { font-size: 1.4rem; }
+    .score-popup { font-size: 1rem; padding: 8px 15px; bottom: 20px; }
+    .score-popup.show { bottom: 30px; }
 }
 
-/* Very Small Screens (e.g., up to 420px) - Stack items within .problem */
-@media (max-width: 420px) {
-    #squares {
-        grid-template-columns: 1fr; /* Squares: 1 column */
-    }
-    #multiplication {
-        grid-template-columns: 1fr; /* Multiplication: 1 column */
-    }
+@media (max-width: 420px) { /* Very Small Mobile */
+    #squares { grid-template-columns: 1fr; } /* Squares 1 col */
+    #multiplication { grid-template-columns: 1fr; }
 
-    .problem {
+    .problem, #suddenDeathProblemArea .problem  {
         flex-direction: column;
         align-items: stretch;
         gap: 5px;
-        padding: 8px 0;
+        padding: 8px;
     }
-    .problem span {
+    .problem span, #suddenDeathProblemArea .problem span {
         text-align: center;
         min-width: auto;
         margin-right: 0;
         margin-bottom: 5px;
     }
-    input[type="text"] {
+    .problem input[type="text"], #suddenDeathProblemArea .problem input[type="text"] {
         max-width: 100%;
         margin-bottom: 5px;
         text-align: center;
     }
-    button {
+    .problem button, #suddenDeathProblemArea .problem button {
         width: 100%;
     }
+    #suddenDeathProblemArea .correct-answer-display { margin-top: 10px; }
 }

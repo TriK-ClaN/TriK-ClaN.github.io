@@ -8,9 +8,12 @@
 </head>
 <body>
     <header>
-        <h1>GMAT Practice</h1>
+        <h1 id="mainHeaderTitle">GMAT Practice</h1>
+        <button id="suddenDeathBtn" class="header-button sudden-death-button">Sudden Death</button>
+        <button id="practiceModeBtn" class="header-button practice-mode-button" style="display: none;">Practice Mode</button>
     </header>
-    <main>
+
+    <main id="practiceModeContainer">
         <div class="problem-columns-container">
             <section>
                 <h2>Factorials (1!-10!)</h2>
@@ -45,6 +48,16 @@
             </section>
         </div>
     </main>
+
+    <main id="suddenDeathModeContainer" style="display: none;">
+        <div class="sudden-death-content">
+            <div id="suddenDeathProblemArea">
+                </div>
+        </div>
+    </main>
+    <div id="suddenDeathScorePopup" class="score-popup" style="display: none;">Score: 0</div>
+
+
     <audio id="correct-sound" src="correct-answer.mp3" preload="auto"></audio>
     <audio id="wrong-sound" src="wrong-answer.mp3" preload="auto"></audio>
     <audio id="cheer-sound" src="cheering.mp3" preload="auto"></audio>
