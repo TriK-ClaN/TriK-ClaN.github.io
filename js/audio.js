@@ -4,7 +4,7 @@
 
 (function () {
 
-    const AUDIO_SRC  = "./img/still-standing.mp3";
+    const AUDIO_SRC  = "./img/warm-hands.mp3";
     const VOLUME     = 0.05;
     const STORAGE_KEY = "audioCurrentTime";
 
