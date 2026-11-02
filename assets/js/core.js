@@ -1,4 +1,4 @@
-/* Core Helpers, Icons, Storage and Progress */
+/* Core Helpers and Shared Utilities */
 window.Guide = window.Guide || {};
 
 (function (Guide) {
@@ -76,6 +76,123 @@ window.Guide = window.Guide || {};
         /* Storage Unavailable: Continue Without Persistence */
       }
     }
+  };
+
+  /* Stored Data Groups for Resetting */
+  const DATA_GROUPS = {
+    progress: ["modulesDone", "flashState", "drillsDone", "checklist", "quizBest", "plan", "mockRatings", "caseLab"],
+    notes: ["story"],
+    settings: ["interviewParisDate", "interviewParisTime", "theme"]
+  };
+
+  Guide.resetData = function resetData(groups) {
+    Object.keys(DATA_GROUPS).forEach((group) => {
+      if (!groups[group]) return;
+      DATA_GROUPS[group].forEach((key) => {
+        try {
+          window.localStorage.removeItem(PREFIX + key);
+        } catch (error) {
+          /* Storage Unavailable: Nothing to Remove */
+        }
+      });
+    });
+  };
+
+  /* Paris Time Zone Helpers */
+  const ZONE = "Europe/Paris";
+
+  Guide.time = {
+    zone: ZONE,
+    partsInZone(date) {
+      const parts = new Intl.DateTimeFormat("en-GB", {
+        timeZone: ZONE,
+        hourCycle: "h23",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit"
+      }).formatToParts(date);
+      const read = (type) => Number(parts.find((part) => part.type === type).value);
+      return { year: read("year"), month: read("month"), day: read("day"), hour: read("hour"), minute: read("minute"), second: read("second") };
+    },
+    offsetMinutes(date) {
+      const p = this.partsInZone(date);
+      const asUtc = Date.UTC(p.year, p.month - 1, p.day, p.hour, p.minute, p.second);
+      return Math.round((asUtc - Math.floor(date.getTime() / 1000) * 1000) / 60000);
+    },
+    parisToDate(dateText, timeText) {
+      const [year, month, day] = dateText.split("-").map(Number);
+      const [hour, minute] = timeText.split(":").map(Number);
+      const guess = Date.UTC(year, month - 1, day, hour, minute);
+      let result = guess - this.offsetMinutes(new Date(guess)) * 60000;
+      result = guess - this.offsetMinutes(new Date(result)) * 60000;
+      return new Date(result);
+    },
+    todayInParis() {
+      const p = this.partsInZone(new Date());
+      return `${p.year}-${String(p.month).padStart(2, "0")}-${String(p.day).padStart(2, "0")}`;
+    },
+    zoneLabel(date) {
+      const name = new Intl.DateTimeFormat("en-GB", { timeZone: ZONE, timeZoneName: "short" })
+        .formatToParts(date)
+        .find((part) => part.type === "timeZoneName");
+      return name ? name.value : "Paris";
+    },
+    formatLongDate(dateText) {
+      const [year, month, day] = dateText.split("-").map(Number);
+      return new Intl.DateTimeFormat("en-GB", { timeZone: "UTC", weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(
+        new Date(Date.UTC(year, month - 1, day, 12))
+      );
+    },
+    formatLocalTime(date) {
+      return new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", weekday: "short" }).format(date);
+    }
+  };
+
+  /* Formula Rendering With Plain-Text Fallback */
+  function renderTex(tex, target, displayMode) {
+    if (window.katex) {
+      try {
+        window.katex.render(tex, target, { displayMode, throwOnError: false, strict: "ignore" });
+        return true;
+      } catch (error) {
+        return false;
+      }
+    }
+    return false;
+  }
+
+  Guide.renderFormulas = function renderFormulas(root) {
+    root.querySelectorAll("[data-f]").forEach((node) => {
+      if (node.dataset.rendered) return;
+      const formula = Guide.formulas[node.dataset.f];
+      if (!formula) return;
+
+      const math = document.createElement("div");
+      math.className = "eq-math";
+      if (!renderTex(formula.tex, math, true)) {
+        math.textContent = formula.plain;
+        math.classList.add("is-plain");
+      }
+      node.appendChild(math);
+
+      if (formula.where) {
+        const legend = document.createElement("dl");
+        legend.className = "eq-where";
+        formula.where.forEach(([symbol, meaning]) => {
+          const term = document.createElement("dt");
+          if (!renderTex(symbol, term, false)) term.textContent = symbol;
+          const detail = document.createElement("dd");
+          detail.textContent = meaning;
+          legend.append(term, detail);
+        });
+        node.appendChild(legend);
+      }
+
+      node.dataset.rendered = "true";
+    });
   };
 
   /* Text and Number Utilities */

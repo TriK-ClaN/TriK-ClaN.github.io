@@ -1,4 +1,4 @@
-/* Application Shell: Navigation, Routing, Theme and Search */
+/* Application Shell and Navigation */
 (function (Guide) {
   "use strict";
 
@@ -16,7 +16,7 @@
     },
     {
       title: "Study",
-      items: [{ href: "#/study", label: "Syllabus Overview", icon: "book" }].concat(
+      items: [{ href: "#/study", label: "Study Path", icon: "book" }].concat(
         Guide.modules.map((module) => ({ href: `#/study/${module.id}`, label: module.short, icon: module.icon, tier: module.tier, moduleId: module.id }))
       )
     },
@@ -46,7 +46,7 @@
     "": { view: "home", title: "Briefing" },
     neot: { view: "neot", title: "Neot Profile" },
     role: { view: "role", title: "Role Decoder" },
-    study: { view: "study", title: "Technical Syllabus" },
+    study: { view: "study", title: "Study Path" },
     "practice/flashcards": { view: "flashcards", title: "Flashcards" },
     "practice/quiz": { view: "quiz", title: "Quiz" },
     "practice/drills": { view: "drills", title: "Statement Drills" },
@@ -179,10 +179,11 @@
 
     view.insertAdjacentHTML(
       "beforeend",
-      `<footer class="site-footer">Interview preparation guide for the Neot Capital Investment Analyst internship · November 2026. Company facts come from Neot's public materials; confirm any figure before quoting it.</footer>`
+      `<footer class="site-footer">Interview preparation guide for the Neot Capital Investment Analyst internship, November 2026. Company facts come from Neot's public materials, so confirm any figure before quoting it.</footer>`
     );
 
     decorateCallouts(view);
+    Guide.renderFormulas(view);
     observeReveals(view);
     document.title = route.title ? `${route.title} · ${SITE_TITLE}` : SITE_TITLE;
 
@@ -194,7 +195,10 @@
   }
 
   /* Theme Handling */
+  let themeMode = "system";
+
   function applyTheme(mode) {
+    themeMode = mode;
     const root = document.documentElement;
     if (mode === "light" || mode === "dark") root.setAttribute("data-theme", mode);
     else root.removeAttribute("data-theme");
@@ -205,24 +209,22 @@
     document.querySelector('meta[name="theme-color"]').setAttribute("content", dark ? "#0a1014" : "#f5f7f6");
   }
 
-  function initTheme() {
-    let mode = store.get("theme", "system");
+  function setTheme(mode) {
+    store.set("theme", mode);
     applyTheme(mode);
+  }
+
+  function initTheme() {
+    applyTheme(store.get("theme", "system"));
     document.querySelectorAll("[data-theme-choice]").forEach((button) => {
-      button.addEventListener("click", () => {
-        mode = button.dataset.themeChoice;
-        store.set("theme", mode);
-        applyTheme(mode);
-      });
+      button.addEventListener("click", () => setTheme(button.dataset.themeChoice));
     });
     document.getElementById("theme-quick").addEventListener("click", () => {
-      const dark = document.documentElement.getAttribute("data-theme") === "dark" || (mode === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
-      mode = dark ? "light" : "dark";
-      store.set("theme", mode);
-      applyTheme(mode);
+      const dark = themeMode === "dark" || (themeMode === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+      setTheme(dark ? "light" : "dark");
     });
     window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
-      if (mode === "system") applyTheme(mode);
+      if (themeMode === "system") applyTheme(themeMode);
     });
   }
 
@@ -247,6 +249,7 @@
         entries.push({ kind: module.short, title: section.title, text: Guide.stripHtml(section.html), href: `#/study/${module.id}/${section.id}` });
       });
       module.ladder.forEach((item) => entries.push({ kind: "Answer", title: item.q, text: item.great, href: `#/study/${module.id}/answers` }));
+      entries.push({ kind: module.short, title: `${module.title}: Key Takeaways`, text: module.takeaways.join(" "), href: `#/study/${module.id}` });
     });
     Guide.lexicon.forEach((item) => entries.push({ kind: "Lexicon", title: `${item.fr} · ${item.en}`, text: item.def, href: "#/lexicon" }));
     Guide.flashcards.forEach((card) => entries.push({ kind: "Flashcard", title: card.q, text: Guide.stripHtml(card.a), href: "#/practice/flashcards" }));
@@ -343,6 +346,44 @@
     });
   }
 
+  /* Reset Progress Dialog */
+  function initReset() {
+    const dialog = document.getElementById("reset-dialog");
+    const form = dialog.querySelector("form");
+
+    document.addEventListener("click", (event) => {
+      if (!event.target.closest("[data-open-reset]")) return;
+      closeNav();
+      form.reset();
+      dialog.showModal();
+    });
+
+    dialog.querySelector("[data-close-reset]").addEventListener("click", () => dialog.close());
+    dialog.addEventListener("click", (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const groups = {
+        progress: form.elements.progress.checked,
+        notes: form.elements.notes.checked,
+        settings: form.elements.settings.checked
+      };
+      if (!groups.progress && !groups.notes && !groups.settings) {
+        dialog.close();
+        return;
+      }
+      Guide.resetData(groups);
+      dialog.close();
+      if (groups.settings) applyTheme("system");
+      Guide.emit("progress");
+      lastPath = null;
+      render();
+      Guide.toast("Selected Data Reset");
+    });
+  }
+
   /* Initialisation */
   function init() {
     if ("scrollRestoration" in window.history) window.history.scrollRestoration = "manual";
@@ -350,6 +391,7 @@
     renderReadiness();
     initTheme();
     initSearch();
+    initReset();
 
     document.getElementById("menu-toggle").addEventListener("click", () => {
       if (document.body.classList.contains("nav-open")) closeNav();

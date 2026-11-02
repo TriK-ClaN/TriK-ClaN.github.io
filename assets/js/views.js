@@ -4,10 +4,11 @@ window.Guide = window.Guide || {};
 (function (Guide) {
   "use strict";
 
-  const { icon, ui, fmt, escapeHtml, store, progress } = Guide;
+  const { icon, ui, escapeHtml, store, progress } = Guide;
   Guide.views = Guide.views || {};
 
   const moduleById = (id) => Guide.modules.find((module) => module.id === id);
+  const totalMinutes = () => Guide.modules.reduce((sum, module) => sum + module.minutes, 0);
 
   /* Progress Ring Markup */
   function ring(score, label) {
@@ -32,22 +33,38 @@ window.Guide = window.Guide || {};
     });
   }
 
-  /* Countdown Logic */
+  /* Paris-Time Countdown */
   function startCountdown(root) {
-    const input = root.querySelector("#interview-time");
+    const dateInput = root.querySelector("#interview-date");
+    const timeInput = root.querySelector("#interview-time");
     const units = root.querySelector("#countdown-units");
     const label = root.querySelector("#countdown-label");
-    if (!input) return null;
+    const summary = root.querySelector("#countdown-summary");
+    const note = root.querySelector("#countdown-note");
 
-    input.value = store.get("interviewTime", Guide.interview.defaultDate);
+    dateInput.value = store.get("interviewParisDate", Guide.interview.defaultDate);
+    timeInput.value = store.get("interviewParisTime", "");
 
     function tick() {
-      const target = new Date(input.value);
+      const dateText = dateInput.value || Guide.interview.defaultDate;
+      const timeSet = Boolean(timeInput.value);
+      const timeText = timeSet ? timeInput.value : Guide.interview.assumedTime;
+      const target = Guide.time.parisToDate(dateText, timeText);
+      const zone = Guide.time.zoneLabel(target);
+
+      summary.textContent = `${Guide.time.formatLongDate(dateText)} · ${timeSet ? `${timeText} Paris Time (${zone})` : "Start Time to Be Confirmed"}`;
+
+      const deviceDiffers = Guide.time.offsetMinutes(target) !== -target.getTimezoneOffset();
+      note.textContent = timeSet
+        ? deviceDiffers
+          ? `This device shows that moment as ${Guide.time.formatLocalTime(target)}.`
+          : "Countdown follows Paris time automatically."
+        : `Counting to ${Guide.interview.assumedTime} Paris time until the confirmed start time is entered.`;
+
       const diff = target.getTime() - Date.now();
-      if (!Number.isFinite(diff)) return;
       if (diff <= 0) {
         label.textContent = "Interview Time";
-        units.innerHTML = `<div class="countdown-unit" style="grid-column:1/-1"><strong>Bonne chance</strong><span>Trust the preparation</span></div>`;
+        units.innerHTML = `<div class="countdown-unit countdown-done"><strong>Bonne Chance</strong><span>Trust the Preparation</span></div>`;
         return;
       }
       const days = Math.floor(diff / 86400000);
@@ -55,16 +72,20 @@ window.Guide = window.Guide || {};
       const minutes = Math.floor((diff % 3600000) / 60000);
       label.textContent = "Interview Countdown";
       units.innerHTML = [
-        [days, days === 1 ? "day" : "days"],
-        [hours, hours === 1 ? "hour" : "hours"],
-        [minutes, minutes === 1 ? "minute" : "minutes"]
+        [days, days === 1 ? "Day" : "Days"],
+        [hours, hours === 1 ? "Hour" : "Hours"],
+        [minutes, minutes === 1 ? "Minute" : "Minutes"]
       ]
         .map(([value, unit]) => `<div class="countdown-unit"><strong>${String(value).padStart(2, "0")}</strong><span>${unit}</span></div>`)
         .join("");
     }
 
-    input.addEventListener("change", () => {
-      store.set("interviewTime", input.value);
+    dateInput.addEventListener("change", () => {
+      store.set("interviewParisDate", dateInput.value);
+      tick();
+    });
+    timeInput.addEventListener("change", () => {
+      store.set("interviewParisTime", timeInput.value);
       tick();
     });
 
@@ -77,6 +98,7 @@ window.Guide = window.Guide || {};
     const summary = progress.summary();
     const planState = store.get("plan", {});
     const done = progress.modules();
+    const today = Guide.time.todayInParis();
 
     const tierColumn = (tier, title, note) => `
       <div class="card reveal">
@@ -86,9 +108,9 @@ window.Guide = window.Guide || {};
           ${Guide.modules
             .filter((module) => module.tier === tier)
             .map(
-              (module) => `<li><a class="check" href="#/study/${module.id}" style="text-decoration:none;color:inherit">
-                <span class="nav-check" style="${done[module.id] ? "" : "background:var(--surface-3);color:var(--muted)"}">${icon(done[module.id] ? "check" : "arrowRight")}</span>
-                <span>${module.title}<small>${module.minutes} minutes</small></span></a></li>`
+              (module) => `<li><a class="check check-link" href="#/study/${module.id}">
+                <span class="nav-check${done[module.id] ? "" : " is-pending"}">${icon(done[module.id] ? "check" : "arrowRight")}</span>
+                <span>${module.title}<small>${module.minutes} Minutes</small></span></a></li>`
             )
             .join("")}
         </ul>
@@ -104,7 +126,7 @@ window.Guide = window.Guide || {};
           <div>
             <span class="eyebrow">${icon("spark")} Neot Capital · Investment Analyst Internship</span>
             <h1>Ready for Neot, Ha Linh.</h1>
-            <p class="lede">Everything needed for Wednesday in one place: project finance depth and the investor mindset Neot looks for, plus a story linking Resonance to sustainable mobility.</p>
+            <p class="lede">Everything needed for Wednesday in about ${Math.round(totalMinutes() / 60)} hours of focused study, built around the strengths Resonance has already given you.</p>
             <div class="btn-row" style="margin-top:1.25rem">
               <a class="btn" href="#/study/project-finance">Start With Tier 1 ${icon("arrowRight")}</a>
               <a class="btn btn-ghost" href="#/practice/mock">${icon("mic")} Mock Interview</a>
@@ -113,23 +135,30 @@ window.Guide = window.Guide || {};
           <div class="countdown">
             <span class="countdown-label" id="countdown-label">Interview Countdown</span>
             <div class="countdown-units" id="countdown-units"></div>
-            <label class="countdown-edit" for="interview-time">${icon("clock")}<input type="datetime-local" id="interview-time" aria-label="Interview date and time"></label>
-            <span class="small muted">Set the confirmed time; it stays saved in this browser.</span>
+            <p class="countdown-summary" id="countdown-summary"></p>
+            <div class="countdown-edit">
+              <label class="field-inline"><span>Date</span><input type="date" id="interview-date" aria-label="Interview date in Paris"></label>
+              <label class="field-inline"><span>Paris Time</span><input type="time" id="interview-time" aria-label="Interview start time in Paris"></label>
+            </div>
+            <span class="small muted" id="countdown-note"></span>
           </div>
         </div>
       </section>
 
       <section class="section reveal">
-        <div class="card" style="display:flex;flex-wrap:wrap;gap:1.75rem;align-items:center">
-          ${ring(summary.score, "ready")}
-          <div style="flex:1;min-width:240px">
-            <h2 style="margin-bottom:0.35rem">Readiness</h2>
-            <p class="muted small">Progress saves automatically in this browser whenever study or practice items are completed.</p>
+        <div class="card readiness-card">
+          ${ring(summary.score, "Ready")}
+          <div class="readiness-body">
+            <div class="readiness-head">
+              <h2>Readiness</h2>
+              <button type="button" class="btn btn-ghost btn-sm" data-open-reset>${icon("refresh")} Reset Progress</button>
+            </div>
+            <p class="muted small">Progress saves automatically in this browser as you study and practise.</p>
             <div class="grid grid-4">
               <div class="stat"><span class="stat-value">${summary.modulesDone}/${summary.totals.modules}</span><span class="stat-label">Modules</span></div>
               <div class="stat"><span class="stat-value">${summary.flashKnown}/${summary.totals.flash}</span><span class="stat-label">Flashcards</span></div>
               <div class="stat"><span class="stat-value">${summary.drillsDone}/${summary.totals.drills}</span><span class="stat-label">Drills</span></div>
-              <div class="stat"><span class="stat-value">${summary.quizBest}%</span><span class="stat-label">Best quiz</span></div>
+              <div class="stat"><span class="stat-value">${summary.quizBest}%</span><span class="stat-label">Best Quiz</span></div>
             </div>
           </div>
         </div>
@@ -137,56 +166,43 @@ window.Guide = window.Guide || {};
 
       <section class="section">
         <h2 class="section-title reveal"><span class="num">01</span>Interview at a Glance</h2>
-        <div class="grid grid-4 reveal" style="margin-bottom:1.75rem">
-          <div class="stat"><span class="stat-label">Role</span><strong style="display:block">Investment Analyst Intern</strong></div>
-          <div class="stat"><span class="stat-label">Start</span><strong style="display:block">${Guide.interview.start}</strong></div>
-          <div class="stat"><span class="stat-label">Duration</span><strong style="display:block">${Guide.interview.duration}</strong></div>
-          <div class="stat"><span class="stat-label">Location</span><strong style="display:block">${Guide.interview.location}</strong></div>
-        </div>
         <div class="stages reveal">
           ${Guide.interview.stages
-            .map(
-              (stage) => `<div class="card stage"><h3>${stage.title}</h3><p class="small muted">${stage.length} · ${stage.who}</p><ul>${stage.focus.map((item) => `<li>${item}</li>`).join("")}</ul></div>`
-            )
+            .map((stage) => `<div class="card stage"><h3>${stage.title}</h3><p class="small muted">${stage.meta}</p><ul>${stage.focus.map((item) => `<li>${item}</li>`).join("")}</ul></div>`)
             .join("")}
         </div>
-        ${ui.callout("Which Round Is Wednesday?", "<p>Prepare for both. Screening calls reward a sharp pitch and genuine knowledge of Neot; the technical round with an Investment Director and an Investment Officer rewards depth in project finance plus judgement on EV fleets. Everything below covers both.</p>", "callout-indigo", "info")}
+        ${ui.callout("Which Round Is Wednesday?", "<p>Prepare for both. Screening calls reward a sharp pitch and genuine knowledge of Neot, while the technical round rewards depth in project finance and judgement on EV fleets.</p>", "callout-indigo", "info")}
       </section>
 
       <section class="section">
         <h2 class="section-title reveal"><span class="num">02</span>Winning Answer Formula</h2>
-        <p class="reveal">Strong answers climb a ladder rather than stopping at a definition. Apply this progression to virtually every technical question.</p>
+        <p class="reveal">Strong answers climb a ladder instead of stopping at a definition.</p>
         <div class="chain reveal">
           <span class="chain-step"><strong>Formula</strong></span><span class="chain-arrow">→</span>
-          <span class="chain-step"><strong>Financial intuition</strong></span><span class="chain-arrow">→</span>
-          <span class="chain-step"><strong>Risk implication</strong></span><span class="chain-arrow">→</span>
-          <span class="chain-step"><strong>Investment decision</strong></span>
+          <span class="chain-step"><strong>Financial Intuition</strong></span><span class="chain-arrow">→</span>
+          <span class="chain-step"><strong>Risk Implication</strong></span><span class="chain-arrow">→</span>
+          <span class="chain-step"><strong>Investment Decision</strong></span>
         </div>
-        <div class="ladder reveal">
-          <div class="ladder-step" data-level="weak"><span class="ladder-tag">Weak</span><p>DSCR = CFADS / debt service.</p></div>
-          <div class="ladder-step" data-level="good"><span class="ladder-tag">Good</span><p>DSCR measures the project's ability to service debt in a given period.</p></div>
-          <div class="ladder-step" data-level="great"><span class="ladder-tag">Excellent</span><p>${moduleById("project-finance").ladder[0].great}</p></div>
-        </div>
-        ${ui.callout("Biggest Mindset Shift", "<p>Resonance work proves that a financing works. Neot asks whether an asset deserves equity at all. Show that both perspectives come naturally: the lender's “Will I be repaid?” and the investor's “Is this return worth the risk?”</p>", "", "lightbulb")}
+        ${ui.callout("Biggest Mindset Shift", "<p>Resonance work proves that a financing works. Neot asks whether an asset deserves equity at all, so show both the lender's view and the investor's view.</p>", "", "lightbulb")}
       </section>
 
       <section class="section">
-        <h2 class="section-title reveal"><span class="num">03</span>Priority Tiers</h2>
-        <div class="grid grid-3">
-          ${tierColumn(1, "Must Master", "Current Resonance work makes any hesitation here costly.")}
+        <h2 class="section-title reveal"><span class="num">03</span>Study Path</h2>
+        <div class="grid grid-auto">
+          ${tierColumn(1, "Must Master", "Current Resonance work makes these essential.")}
           ${tierColumn(2, "Very Likely", "Core corporate finance and investment reasoning.")}
-          ${tierColumn(3, "Stand Out", "Sector depth that separates a strong candidate.")}
+          ${tierColumn(3, "Stand Out", "Sector depth that sets a candidate apart.")}
         </div>
       </section>
 
       <section class="section">
-        <h2 class="section-title reveal"><span class="num">04</span>48-Hour Plan</h2>
+        <h2 class="section-title reveal"><span class="num">04</span>Three-Day Plan</h2>
         <div class="timeline">
           ${Guide.plan
             .map(
               (day, dayIndex) => `
-            <div class="card reveal">
-              <div class="timeline-day"><strong>${day.day}</strong><span class="pill">${day.date}</span></div>
+            <div class="card reveal${day.date === today ? " is-today" : ""}">
+              <div class="timeline-day"><strong>${day.day}</strong><span class="pill${day.date === today ? " pill-good" : ""}">${day.date === today ? "Today" : day.label}</span></div>
               <p class="small muted" style="margin-bottom:0.5rem">${day.theme}</p>
               <ul class="checklist">
                 ${day.tasks
@@ -220,142 +236,99 @@ window.Guide = window.Guide || {};
       <header class="page-header">
         <span class="eyebrow">${icon("building")} Company Profile</span>
         <h1>Neot Capital</h1>
-        <p class="lede">Paris-based specialist that designs and manages investment platforms financing low-carbon mobility, with the tagline “We drive the energy transition.”</p>
+        <p class="lede">Paris-based specialist that designs and manages investment platforms financing low-carbon mobility.</p>
       </header>
 
       <section class="section">
         <div class="grid grid-4 reveal">
           <div class="stat"><span class="stat-value">2016</span><span class="stat-label">Founded</span></div>
-          <div class="stat"><span class="stat-value">€500m</span><span class="stat-label">Equity across platforms</span></div>
-          <div class="stat"><span class="stat-value">~€2bn</span><span class="stat-label">Financing capacity</span></div>
-          <div class="stat"><span class="stat-value">€350m</span><span class="stat-label">Neot e-motion commitment</span></div>
+          <div class="stat"><span class="stat-value">€500m</span><span class="stat-label">Equity Across Platforms</span></div>
+          <div class="stat"><span class="stat-value">~€2bn</span><span class="stat-label">Financing Capacity</span></div>
+          <div class="stat"><span class="stat-value">€350m</span><span class="stat-label">Neot e-motion Equity</span></div>
         </div>
       </section>
 
       <section class="section reveal">
         <h2 class="section-title"><span class="num">01</span>Business Model</h2>
-        <p>Neot brings institutional investors together to acquire electric vehicles along with batteries and charging infrastructure, then makes these assets available to public authorities and transport operators as integrated services. Customers avoid heavy upfront capex and technology risk, while Neot supports projects from structuring and financing through technical follow-up and operational management.</p>
-        <p>Asset classes named by Neot and its partners:</p>
-        <ul>
-          <li>Electric buses and coaches</li>
-          <li>Trucks and logistics fleets</li>
-          <li>Vessels</li>
-          <li>Charging infrastructure</li>
-          <li>Battery packs and retrofits</li>
-        </ul>
-        <p>Neot's homepage also cites expertise in stationary energy storage.</p>
-        <p><a class="btn btn-soft btn-sm" href="#/study/mobility">See the five as-a-service offers</a></p>
-      </section>
-
-      <section class="section reveal">
-        <h2 class="section-title"><span class="num">02</span>Shareholders</h2>
+        <p>Neot brings institutional investors together to acquire electric vehicles along with batteries and chargers, then makes these assets available to transport operators and public authorities as integrated services. Customers avoid heavy upfront capex and technology risk, while Neot supports each project from structuring through operational follow-up.</p>
         <div class="grid grid-3">
-          <div class="card"><h3>EDF</h3><p class="small">Energy group, invested through its corporate venture arm EDF Pulse Ventures. Co-founder in 2016.</p></div>
-          <div class="card"><h3>Forsee Power</h3><p class="small">Battery manufacturer and co-founder in 2016, which explains Neot's depth in battery technology.</p></div>
-          <div class="card"><h3>Mitsui &amp; Co.</h3><p class="small">Global trading and investment group that became a shareholder in 2023.</p></div>
+          <div class="card"><h4>EDF</h4><p class="small">Energy group and co-founder, invested through EDF Pulse Ventures.</p></div>
+          <div class="card"><h4>Forsee Power</h4><p class="small">Battery manufacturer and co-founder, the source of Neot's battery expertise.</p></div>
+          <div class="card"><h4>Mitsui &amp; Co.</h4><p class="small">Global trading and investment group, a shareholder since 2023.</p></div>
         </div>
       </section>
 
       <section class="section reveal">
-        <h2 class="section-title"><span class="num">03</span>Platforms</h2>
-        <div class="grid grid-3">
-          <div class="card">
-            <span class="pill">Since 2017</span>
-            <h3 style="margin-top:0.6rem">Neot Green Mobility</h3>
-            <p class="small">First low-carbon mobility vehicle, backed by Alba Infra Partners and Mirova alongside Banque des Territoires. Through May 2025, NGM financed over €350m of mobility assets and raised €170m of debt, mainly across France and the United Kingdom plus Scandinavia.</p>
-          </div>
+        <h2 class="section-title"><span class="num">02</span>Platforms</h2>
+        <div class="grid grid-2">
           <div class="card">
             <span class="pill pill-good">Launched May 2025</span>
             <h3 style="margin-top:0.6rem">Neot e-motion</h3>
-            <p class="small">Pan-European leasing platform with a €350m equity commitment from Mirova (through its Mirova Energy Transition 6 fund) and Alba Infra Partners alongside Banque des Territoires. Neot e-motion France focuses on the French market. Set to take over from NGM once that platform is fully invested. European Investment Fund capital participates indirectly through Alba.</p>
+            <p class="small">Pan-European leasing platform backed by a €350m equity commitment from Mirova and Alba Infra Partners alongside Banque des Territoires. Neot e-motion will take over from NGM once that platform is fully invested.</p>
           </div>
           <div class="card">
-            <span class="pill">2018 to 2023</span>
-            <h3 style="margin-top:0.6rem">Neot Offgrid Africa</h3>
-            <p class="small">Platform launched with EDF and Meridiam to finance decentralised energy across Africa, now closed to new activity.</p>
+            <span class="pill">Since 2017</span>
+            <h3 style="margin-top:0.6rem">Neot Green Mobility (NGM)</h3>
+            <p class="small">First mobility platform, which had financed over €350m of assets by May 2025, mainly in France and the United Kingdom plus Scandinavia.</p>
           </div>
         </div>
       </section>
 
       <section class="section reveal">
-        <h2 class="section-title"><span class="num">04</span>Platform Debt Financing</h2>
-        <p>Debt raised at platform level is the clearest bridge between Resonance experience and Neot's model, so know these two transactions precisely.</p>
+        <h2 class="section-title"><span class="num">03</span>Platform Debt Financing</h2>
+        <p>Platform-level debt is the clearest bridge between Resonance experience and Neot's model, so know these two transactions precisely.</p>
         <div class="grid grid-2">
           <div class="card">
             <span class="pill pill-good">December 2025</span>
             <h3 style="margin-top:0.6rem">Neot e-motion: €125m From MUFG</h3>
-            <p class="small">Senior financing in which MUFG acts as sole lender as well as arranger and agent. Tenor reaches 16 years, structured as a hybrid portfolio facility that combines a revolving credit facility with long-term project financing. Neot e-motion now pairs its €350m of equity with a full debt structure.</p>
+            <p class="small">Senior financing in which MUFG acts as sole lender as well as arranger and agent. Structured over 16 years, the hybrid portfolio facility combines a revolving credit facility with long-term project financing.</p>
           </div>
           <div class="card">
             <span class="pill">November 2025</span>
             <h3 style="margin-top:0.6rem">NGM: €170m Refinancing</h3>
-            <p class="small">Long-term, non-recourse debt facility provided by MUFG and La Banque Postale together with its asset management arm LBP AM. Structured as a multi-currency portfolio combining project and asset financings, it replaced the revolving credit facility set up at NGM's launch.</p>
+            <p class="small">Long-term non-recourse portfolio debt from MUFG and La Banque Postale with its asset manager LBP AM. Refinancing followed the revolving facility set up at NGM's launch.</p>
           </div>
         </div>
-        ${ui.callout("Why This Matters", "<p>Both facilities follow a classic platform pattern: a revolving facility funds new assets quickly, then long-term non-recourse debt refinances the operating portfolio. Expect questions on how assets are sized under a portfolio facility and why lenders accept long tenors on contracted fleets.</p>", "callout-indigo", "lightbulb")}
+        ${ui.callout("Why This Matters", "<p>Both facilities follow a classic platform pattern. Revolving facilities fund new assets quickly, then long-term non-recourse debt refinances the operating portfolio.</p>", "callout-indigo", "lightbulb")}
       </section>
 
       <section class="section reveal">
-        <h2 class="section-title"><span class="num">05</span>Recent Transactions and News</h2>
+        <h2 class="section-title"><span class="num">04</span>Recent Transactions</h2>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Date</th><th>Platform</th><th>Transaction</th></tr></thead>
+            <thead><tr><th>Date</th><th>Transaction</th></tr></thead>
             <tbody>
-              <tr><td>Sep 2026</td><td>Neot</td><td><strong>DepotOne:</strong> integrated pay-per-use solution launched with E.ON Drive for commercial fleet operators in Germany and the DACH region, backed by Mitsui and E.ON Innovation. One contract covers trucks and charging together with energy and financing as well as operations, with no upfront investment.</td></tr>
-              <tr><td>Apr 2026</td><td>Neot</td><td><strong>E.ON, Neot and Mitsui:</strong> Charging-as-a-Service for van and truck fleets, optionally paired with Truck-as-a-Service, billed at a fixed rate per charged kilowatt hour.</td></tr>
-              <tr><td>Apr 2026</td><td>NGM</td><td>Support for DSV's electrification of last-mile logistics in Germany.</td></tr>
-              <tr><td>Apr 2026</td><td>Neot</td><td>Recognition in the Impact 120 index of Mouvement Impact France.</td></tr>
-              <tr><td>Feb 2026</td><td>NGM</td><td><strong>Scotland:</strong> second financing round with Ember adding 60 e-coaches to the 40 delivered in March 2025, giving more than 100 by mid-2026 under the ScotZEB2 programme. Total investment is estimated at £50m, creating Europe's largest e-coach fleet run by a single operator.</td></tr>
-              <tr><td>Jan 2026</td><td>Neot e-motion</td><td><strong>Denmark:</strong> 186 BYD electric buses and 93 Efacec chargers for GoCollective, an operator owned by Mutares. Phased commissioning through mid-2026 across Central Jutland and Funen as well as Greater Copenhagen. First Neot e-motion project.</td></tr>
-              <tr><td>Nov 2025</td><td>NGM</td><td>Delivery of first electric trucks in Germany.</td></tr>
-              <tr><td>Nov 2025</td><td>Neot</td><td>Partnership with LinkByCar to build a data-driven offer for electric vehicles.</td></tr>
-              <tr><td>Mar 2025</td><td>NGM</td><td>Valbus electric buses in Val d'Isère.</td></tr>
-              <tr><td>Oct 2024</td><td>NGM</td><td>Charging infrastructure programme with Zeplug, plus hybrid crew transfer vessels.</td></tr>
+              <tr><td>Sep 2026</td><td><strong>DepotOne:</strong> Pay-per-use solution launched with E.ON Drive for truck fleets in Germany and the DACH region, with one contract and no upfront investment.</td></tr>
+              <tr><td>Apr 2026</td><td><strong>E.ON and Mitsui:</strong> Charging-as-a-Service for van and truck fleets, billed at a fixed rate per charged kilowatt hour.</td></tr>
+              <tr><td>Feb 2026</td><td><strong>Scotland:</strong> NGM financing for Ember reaching more than 100 electric coaches by mid-2026, set to become Europe's largest e-coach fleet under one operator.</td></tr>
+              <tr><td>Jan 2026</td><td><strong>Denmark:</strong> First Neot e-motion deal, covering 186 BYD electric buses and 93 Efacec chargers for GoCollective.</td></tr>
             </tbody>
           </table>
         </div>
-        ${ui.callout("Use Figures Carefully", "<p>Neot's own pages cite different asset totals depending on metric and date, such as €400m of low-carbon assets financed since 2018 on the homepage and more than €250m of deployed assets elsewhere. Quote the €500m equity and nearly €2bn capacity figures with confidence, and frame other totals as approximate.</p>", "callout-amber", "alert")}
+        ${ui.callout("Use Figures Carefully", "<p>Neot's pages quote different totals for assets financed depending on metric and date. Quote the €500m equity and nearly €2bn capacity figures with confidence, and frame other totals as approximate.</p>", "callout-amber", "alert")}
       </section>
 
       <section class="section reveal">
-        <h2 class="section-title"><span class="num">06</span>People</h2>
-        <p>Philippe Ringenbach leads Neot as CEO. Round two pairs an Investment Director with an Investment Officer, and Neot's website lists the following members of the investment team.</p>
+        <h2 class="section-title"><span class="num">05</span>Investment Team</h2>
+        <p>Philippe Ringenbach leads Neot as CEO. Round two pairs an Investment Director with an Investment Officer, so review the team members below once interviewer names are confirmed.</p>
         <div class="grid grid-2">
-          <div class="card">
-            <h4>Investment Directors</h4>
-            <ul>
-              <li>Francisco Elens Da Silva Passos</li>
-              <li>Maël Guégan</li>
-              <li>Victor Cabanes</li>
-            </ul>
-          </div>
-          <div class="card">
-            <h4>Investment Officers</h4>
-            <ul>
-              <li>Agathe Laîné</li>
-              <li>Bachar Salamé</li>
-              <li>Paul Albespy</li>
-              <li>Xavier Rule</li>
-            </ul>
-          </div>
+          <div class="card"><h4>Investment Directors</h4><ul><li>Francisco Elens Da Silva Passos</li><li>Maël Guégan</li><li>Victor Cabanes</li></ul></div>
+          <div class="card"><h4>Investment Officers</h4><ul><li>Agathe Laîné</li><li>Bachar Salamé</li><li>Paul Albespy</li><li>Xavier Rule</li></ul></div>
         </div>
-        <p style="margin-top:1rem">Once interviewer names are confirmed, review their LinkedIn profiles for recent transactions and backgrounds.</p>
       </section>
 
       <section class="section reveal">
-        <h2 class="section-title"><span class="num">07</span>Talking Points That Land</h2>
+        <h2 class="section-title"><span class="num">06</span>Talking Points</h2>
         <ul>
-          <li><strong>Specialist model:</strong> Neot combines financial structuring with industrial and technical expertise, which matches a profile built on modelling plus genuine curiosity about technology.</li>
-          <li><strong>Timing:</strong> Neot e-motion is newly deployed capital, so the team is originating and structuring actively, the ideal moment to join.</li>
-          <li><strong>Battery DNA:</strong> having a battery manufacturer as shareholder makes battery risk a core competence rather than a blind spot.</li>
-          <li><strong>Leverage model:</strong> €500m of equity supporting nearly €2bn of assets implies substantial debt financing, where debt-sizing experience from Resonance adds immediate value.</li>
-          <li><strong>Debt platform:</strong> the 16-year €125m MUFG facility for Neot e-motion shows lenders backing the model for the long term, and sizing assets into such a facility is exactly the skill Resonance has built.</li>
-          <li><strong>Full cycle:</strong> origination through asset management offers exposure that advisory work rarely provides.</li>
+          <li><strong>Specialist Model:</strong> Neot pairs financial structuring with technical expertise, matching a profile built on modelling and curiosity about technology.</li>
+          <li><strong>Timing:</strong> Neot e-motion has fresh equity and debt, so the team is originating actively.</li>
+          <li><strong>Debt Platform:</strong> Sizing assets into a facility like the MUFG one is exactly the skill Resonance has built.</li>
+          <li><strong>Battery DNA:</strong> Having a battery manufacturer among the shareholders makes battery risk a core competence.</li>
         </ul>
       </section>
 
       <section class="section reveal">
-        <h2 class="section-title"><span class="num">08</span>Sources</h2>
+        <h2 class="section-title"><span class="num">07</span>Sources</h2>
         <ul>${Guide.sources.map((source) => `<li><a href="${source.url}" target="_blank" rel="noopener noreferrer">${source.label}</a></li>`).join("")}</ul>
       </section>`;
   };
@@ -363,42 +336,25 @@ window.Guide = window.Guide || {};
   /* Role Decoder View */
   Guide.views.role = function role(view) {
     const missions = [
-      ["Développement commercial", "Identify opportunities and monitor the market to design innovative offers.", "Show awareness of fleet electrification trends and the as-a-service model."],
-      ["Analyse financière et structuration des projets", "Financial analysis and modelling plus profitability tracking and contractual negotiation.", "Resonance modelling and debt sizing; explain sculpting and sensitivities fluently."],
-      ["Pilotage du processus d'investissement & due diligences", "Coordinate investors and banks together with external financial and legal advisers.", "Describe interactions with lenders or advisers and knowledge of DD workstreams."],
-      ["Support aux décisions stratégiques et relations investisseurs", "Prepare key documents for investment committees.", "Answer “Would you invest?” with a structured framework and a recommendation."],
-      ["Suivi de la performance des projets", "Analyse KPIs and recommend actions to maximise asset returns.", "Discuss budget versus actual analysis and fleet KPIs."]
-    ];
-
-    const profile = [
-      ["Business school student in a finance track, Bac+4 or Bac+5", "Master's at EDHEC Business School"],
-      ["First 4–6 month corporate finance internship, with Project Finance and Infrastructure among the listed fields", "Current project finance internship at Resonance Advisory"],
-      ["Essential interest in energy transition topics such as sustainable mobility or infrastructure", "Infrastructure focus at Resonance plus a personal motivation to articulate"],
-      ["Corporate finance concepts covering financial statements and debt structuring plus valuation", "Accounting and Valuation modules plus Debt Sizing"],
-      ["Comfort with financial modelling; Project Finance exposure is a real plus", "Daily modelling and debt sizing plus model QC at Resonance"],
-      ["Strong command of Microsoft Office with Excel above all", "Excel toolkit, including French function names"],
-      ["Fluent French and English; a third European language is a plus", "Prepare the pitch in both languages"]
-    ];
-
-    const soft = [
-      ["Analytical rigour and synthesis with a taste for numbers", "Model audit and QC procedure story"],
-      ["Intellectual curiosity and ability to learn technical topics", "Battery and charging knowledge from the EV module"],
-      ["Autonomy and initiative with a business orientation", "Formalising the QC procedure on personal initiative"],
-      ["Team spirit and relationship skills with sponsors and LPs as well as advisers", "Coordination with clients and lenders at Resonance"]
+      ["Développement commercial", "Identify opportunities and monitor the market to design innovative offers.", "Awareness of the As-a-Service Model"],
+      ["Analyse financière et structuration", "Model projects and track profitability while supporting contract negotiation.", "Resonance Modelling and Debt Sizing"],
+      ["Pilotage des due diligences", "Coordinate investors and banks together with external advisers.", "Lender and Adviser Interactions"],
+      ["Support aux comités d'investissement", "Prepare key documents for investment committees.", "Structured “Would You Invest?” Answer"],
+      ["Suivi de la performance des actifs", "Analyse KPIs and recommend actions to maximise returns.", "Budget Versus Actual Reasoning"]
     ];
 
     view.innerHTML = `
       <header class="page-header">
         <span class="eyebrow">${icon("briefcase")} Role Decoder</span>
         <h1>Investment Analyst, Sustainable Mobility</h1>
-        <p class="lede">Every line of the offer is translated here into what interviewers will test and the evidence to bring. Reporting to an Investment Director within the Investment team, the intern works across the entire investment cycle of the Neot e-motion platform.</p>
+        <p class="lede">Reporting to an Investment Director, the intern works across the entire investment cycle of the Neot e-motion platform.</p>
       </header>
 
       <section class="section reveal">
         <h2 class="section-title"><span class="num">01</span>Missions</h2>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Mission in the Offer</th><th>What It Means</th><th>How to Prove It</th></tr></thead>
+            <thead><tr><th>Mission in the Offer</th><th>What It Means</th><th>Evidence to Bring</th></tr></thead>
             <tbody>${missions.map(([fr, meaning, proof]) => `<tr><td><strong lang="fr">${fr}</strong></td><td>${meaning}</td><td>${proof}</td></tr>`).join("")}</tbody>
           </table>
         </div>
@@ -406,42 +362,51 @@ window.Guide = window.Guide || {};
 
       <section class="section reveal">
         <h2 class="section-title"><span class="num">02</span>Profile Match</h2>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Requirement</th><th>Evidence to Bring</th></tr></thead>
-            <tbody>${profile.map(([need, proof]) => `<tr><td>${need}</td><td>${proof}</td></tr>`).join("")}</tbody>
-          </table>
-        </div>
-      </section>
-
-      <section class="section reveal">
-        <h2 class="section-title"><span class="num">03</span>Soft Skills to Evidence</h2>
         <div class="grid grid-2">
-          ${soft.map(([skill, story]) => `<div class="card"><h4>${skill}</h4><p class="small" style="margin:0">Prepare: ${story}.</p></div>`).join("")}
+          <div class="card">
+            <h4>What Neot Asks For</h4>
+            <ul>
+              <li>Finance Track at Bac+4 or Bac+5</li>
+              <li>First Corporate Finance Internship</li>
+              <li>Comfort With Financial Modelling</li>
+              <li>Project Finance Exposure as a Real Plus</li>
+              <li>Fluent French and English</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h4>What Ha Linh Brings</h4>
+            <ul>
+              <li>EDHEC Master's Programme</li>
+              <li>Project Finance Internship at Resonance</li>
+              <li>Daily Modelling and Debt Sizing</li>
+              <li>Model QC Procedure Formalised</li>
+              <li>Credit Experience at VIB</li>
+            </ul>
+          </div>
         </div>
       </section>
 
       <section class="section reveal">
-        <h2 class="section-title"><span class="num">04</span>Practical Details</h2>
+        <h2 class="section-title"><span class="num">03</span>Practical Details</h2>
         <div class="grid grid-2">
           <div class="card">
             <h4>Logistics</h4>
             <ul>
-              <li>Start in March 2027 for six months</li>
-              <li>Office on Rue Saint-Lazare, Paris 9e</li>
-              <li>Remote work two days a week after onboarding</li>
+              <li>Start in March 2027</li>
+              <li>Six Months</li>
+              <li>Rue Saint-Lazare, Paris 9e</li>
+              <li>Two Remote Days Weekly After Onboarding</li>
             </ul>
           </div>
           <div class="card">
             <h4>Benefits</h4>
             <ul>
-              <li>Swile meal card worth €11 a day, 60% covered by Neot</li>
-              <li>Sustainable mobility allowance of €50 to €58, depending on conditions</li>
-              <li>One day of paid leave per month</li>
+              <li>Swile Meal Card at €11 Daily, 60% Covered</li>
+              <li>Sustainable Mobility Allowance of €50 to €58</li>
+              <li>One Day of Paid Leave per Month</li>
             </ul>
           </div>
         </div>
-        ${ui.callout("Why the Timing Fits", "<p>Neot recruits for March 2027, which suits the second internship required by the EDHEC Master's programme. Mention availability for the full six months without hesitation.</p>", "", "calendar")}
       </section>`;
   };
 
@@ -451,8 +416,8 @@ window.Guide = window.Guide || {};
     view.innerHTML = `
       <header class="page-header">
         <span class="eyebrow">${icon("book")} Study</span>
-        <h1>Technical Syllabus</h1>
-        <p class="lede">Nine modules ordered by priority. Tier 1 is non-negotiable given current Resonance work, Tier 2 is very likely to come up and Tier 3 is where a candidate stands out.</p>
+        <h1>Study Path</h1>
+        <p class="lede">Seven focused modules totalling about ${Math.round(totalMinutes() / 60)} hours. Each opens with three key takeaways, so a quick review is always possible.</p>
       </header>
       ${[1, 2, 3]
         .map(
@@ -465,9 +430,9 @@ window.Guide = window.Guide || {};
               .map(
                 (module) => `
               <a class="card card-link reveal" href="#/study/${module.id}">
-                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem">
+                <div class="card-top">
                   <span class="card-icon">${icon(module.icon)}</span>
-                  ${done[module.id] ? `<span class="pill pill-good">${icon("check", "inline-icon")} Reviewed</span>` : `<span class="pill">${module.minutes} min</span>`}
+                  ${done[module.id] ? `<span class="pill pill-good">${icon("check", "inline-icon")} Reviewed</span>` : `<span class="pill">${module.minutes} Minutes</span>`}
                 </div>
                 <h3>${module.title}</h3>
                 <p class="small" style="margin:0">${module.summary}</p>
@@ -495,12 +460,16 @@ window.Guide = window.Guide || {};
       <header class="page-header" style="max-width:var(--content-w)">
         <span class="eyebrow">${icon(module.icon)} Module ${index + 1} of ${Guide.modules.length}</span>
         <h1>${module.title}</h1>
-        <p class="lede">${module.summary}</p>
-        <div class="meta-row">${ui.tierPill(module.tier)}<span class="pill">${icon("clock", "inline-icon")} ${module.minutes} minutes</span><span class="pill">${module.sections.length} sections</span></div>
+        <div class="meta-row">${ui.tierPill(module.tier)}<span class="pill">${icon("clock", "inline-icon")} ${module.minutes} Minutes</span></div>
       </header>
 
       <div class="module-layout">
         <article>
+          <section class="takeaways reveal">
+            <h2>${icon("spark")} Key Takeaways</h2>
+            <ol>${module.takeaways.map((item) => `<li>${item}</li>`).join("")}</ol>
+          </section>
+
           ${module.sections
             .map(
               (section, i) => `
@@ -513,7 +482,6 @@ window.Guide = window.Guide || {};
 
           <section class="section reveal" id="sec-answers">
             <h2 class="section-title"><span class="num">${String(module.sections.length + 1).padStart(2, "0")}</span>Interview-Ready Answers</h2>
-            <p>Every question shows three levels. Aim for the excellent version, then make it your own.</p>
             ${module.ladder
               .map(
                 (item, i) => `
@@ -534,13 +502,13 @@ window.Guide = window.Guide || {};
           </section>
 
           <div class="complete-bar">
-            <div><strong>Finished this module?</strong><div class="small muted">Marking it reviewed updates the readiness score.</div></div>
+            <div><strong>Finished This Module?</strong><div class="small muted">Marking it reviewed updates the readiness score.</div></div>
             <button type="button" class="btn ${isDone ? "btn-soft" : ""}" id="mark-done" aria-pressed="${isDone}">${icon("check")} <span>${isDone ? "Reviewed" : "Mark as Reviewed"}</span></button>
           </div>
 
           <nav class="module-nav" aria-label="Module navigation">
-            ${prev ? `<a class="card card-link prev" href="#/study/${prev.id}"><span class="small muted">${icon("arrowLeft", "inline-icon")} Previous</span><strong style="display:block">${prev.title}</strong></a>` : "<span></span>"}
-            ${next ? `<a class="card card-link next" href="#/study/${next.id}"><span class="small muted">Next ${icon("arrowRight", "inline-icon")}</span><strong style="display:block">${next.title}</strong></a>` : `<a class="card card-link next" href="#/practice/quiz"><span class="small muted">Next ${icon("arrowRight", "inline-icon")}</span><strong style="display:block">Test Yourself With the Quiz</strong></a>`}
+            ${prev ? `<a class="card card-link prev" href="#/study/${prev.id}"><span class="small muted">${icon("arrowLeft", "inline-icon")} Previous</span><strong>${prev.title}</strong></a>` : "<span></span>"}
+            ${next ? `<a class="card card-link next" href="#/study/${next.id}"><span class="small muted">Next ${icon("arrowRight", "inline-icon")}</span><strong>${next.title}</strong></a>` : `<a class="card card-link next" href="#/practice/quiz"><span class="small muted">Next ${icon("arrowRight", "inline-icon")}</span><strong>Test Yourself With the Quiz</strong></a>`}
           </nav>
         </article>
 
@@ -561,7 +529,7 @@ window.Guide = window.Guide || {};
       button.setAttribute("aria-pressed", String(nowDone));
       button.classList.toggle("btn-soft", nowDone);
       button.querySelector("span").textContent = nowDone ? "Reviewed" : "Mark as Reviewed";
-      if (nowDone) Guide.toast(`${module.short} marked as reviewed`);
+      if (nowDone) Guide.toast(`${module.short} Marked as Reviewed`);
     });
 
     /* Table of Contents Scroll Spy */
@@ -604,7 +572,7 @@ window.Guide = window.Guide || {};
       <header class="page-header">
         <span class="eyebrow">${icon("cards")} Practice</span>
         <h1>Flashcards</h1>
-        <p class="lede">Recall before revealing. Mark each card as known or keep it in the review pile; progress feeds the readiness score.</p>
+        <p class="lede">Recall the answer before flipping. Cards marked as known leave the review pile and raise the readiness score.</p>
       </header>
       <div class="toolbar"><div class="segmented" role="group" aria-label="Deck filter" id="flash-filter">${groups.map((group) => `<button type="button" data-filter="${group.id}">${group.label}</button>`).join("")}</div></div>
       <div class="card" style="padding:1rem 1.2rem">
@@ -619,7 +587,7 @@ window.Guide = window.Guide || {};
         <button type="button" class="btn btn-ghost" id="flash-next" aria-label="Next card">${icon("arrowRight")}</button>
         <button type="button" class="btn btn-ghost" id="flash-shuffle">${icon("shuffle")} Shuffle</button>
       </div>
-      <p class="small muted" style="text-align:center;margin-top:1rem">Keyboard: <kbd>Space</kbd> flips, <kbd>←</kbd> and <kbd>→</kbd> move, <kbd>1</kbd> still learning, <kbd>2</kbd> got it.</p>`;
+      <p class="small muted" style="text-align:center;margin-top:1rem">Use <kbd>Space</kbd> to flip and the <kbd>←</kbd> <kbd>→</kbd> keys to move. Press <kbd>1</kbd> for Still Learning or <kbd>2</kbd> for Got It.</p>`;
 
     const stage = view.querySelector("#flash-stage");
 
@@ -636,8 +604,8 @@ window.Guide = window.Guide || {};
     function renderStats() {
       const state = progress.flash();
       const known = Guide.flashcards.filter((card) => state[card.id] === "known").length;
-      view.querySelector("#flash-count").textContent = deck.length ? `Card ${position + 1} of ${deck.length}` : "No cards in this deck";
-      view.querySelector("#flash-known").textContent = `${known} of ${Guide.flashcards.length} known`;
+      view.querySelector("#flash-count").textContent = deck.length ? `Card ${position + 1} of ${deck.length}` : "No Cards in This Deck";
+      view.querySelector("#flash-known").textContent = `${known} of ${Guide.flashcards.length} Known`;
       view.querySelector("#flash-meter").style.width = `${(known / Guide.flashcards.length) * 100}%`;
       view.querySelectorAll("#flash-filter button").forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.filter === filter)));
     }
@@ -645,7 +613,7 @@ window.Guide = window.Guide || {};
     function renderCard() {
       renderStats();
       if (!deck.length) {
-        stage.innerHTML = `<div class="card" style="text-align:center;padding:3rem 1.5rem"><h3>Every card here is marked as known.</h3><p class="muted">Pick another deck or switch to All to keep revising.</p></div>`;
+        stage.innerHTML = `<div class="card empty-state"><h3>Every Card Here Is Known</h3><p class="muted">Pick another deck or switch to All to keep revising.</p></div>`;
         return;
       }
       const card = deck[position];
@@ -657,13 +625,14 @@ window.Guide = window.Guide || {};
           <div class="flash-face front">
             <div class="flash-top"><span>${topic}</span><span>${state === "known" ? "Known" : "Question"}</span></div>
             <div class="flash-q">${card.q}</div>
-            <div class="flash-hint">Click or press Space to reveal</div>
+            <div class="flash-hint">Click or Press Space to Reveal</div>
           </div>
           <div class="flash-face back">
             <div class="flash-top"><span>${topic}</span><span>Answer</span></div>
             <div class="flash-a">${card.a}</div>
           </div>
         </button>`;
+      Guide.renderFormulas(stage);
       stage.querySelector("#flashcard").addEventListener("click", flip);
     }
 
@@ -708,7 +677,7 @@ window.Guide = window.Guide || {};
     });
 
     function onKey(event) {
-      if (event.target.closest("input, textarea, select")) return;
+      if (event.target.closest("input, textarea, select, dialog")) return;
       if (event.key === " ") {
         event.preventDefault();
         flip();
@@ -734,7 +703,7 @@ window.Guide = window.Guide || {};
       <header class="page-header">
         <span class="eyebrow">${icon("quiz")} Practice</span>
         <h1>Quiz</h1>
-        <p class="lede">Calculation and concept questions with explanations. A full run across all topics records a best score toward readiness.</p>
+        <p class="lede">${Guide.quiz.length} calculation and concept questions with explanations. Completing a full run across all topics records a best score.</p>
       </header>
       <div id="quiz-host"></div>`;
 
@@ -750,7 +719,7 @@ window.Guide = window.Guide || {};
           </div>
           <div class="btn-row" style="align-items:center">
             <button type="button" class="btn" id="quiz-start">${icon("play")} Start Quiz</button>
-            <span class="small muted">Best full-run score: <strong>${best}%</strong></span>
+            <span class="small muted">Best Full-Run Score: <strong>${best}%</strong></span>
           </div>
         </div>`;
 
@@ -766,10 +735,7 @@ window.Guide = window.Guide || {};
 
     function run(topic) {
       const pool = Guide.quiz.filter((item) => topic === "all" || item.module === topic);
-      const questions = Guide.shuffle(pool).map((item) => {
-        const order = Guide.shuffle(item.options.map((option, i) => i));
-        return { item, order };
-      });
+      const questions = Guide.shuffle(pool).map((item) => ({ item, order: Guide.shuffle(item.options.map((option, i) => i)) }));
       let index = 0;
       let score = 0;
       const misses = [];
@@ -778,13 +744,13 @@ window.Guide = window.Guide || {};
         const { item, order } = questions[index];
         const module = moduleById(item.module);
         host.innerHTML = `
-          <div class="card" style="padding:clamp(1.25rem,4vw,2rem)">
+          <div class="card quiz-card">
             <div class="range-head small"><span>Question ${index + 1} of ${questions.length}</span><span>Score ${score}</span></div>
             <div class="meter" style="margin:0.5rem 0 1.4rem"><span style="width:${(index / questions.length) * 100}%"></span></div>
             <span class="pill" style="margin-bottom:0.75rem">${module ? module.short : "Neot"}</span>
             <p class="quiz-q">${item.q}</p>
             <ul class="options">
-              ${order.map((optionIndex, i) => `<li><button type="button" class="option" data-option="${optionIndex}"><span class="option-key">${"ABCD"[i]}</span><span>${item.options[optionIndex]}</span></button></li>`).join("")}
+              ${order.map((optionIndex, i) => `<li><button type="button" class="option" data-option="${optionIndex}"><span class="option-key">${"ABCD"[i]}</span><span>${escapeHtml(item.options[optionIndex])}</span></button></li>`).join("")}
             </ul>
             <div id="quiz-feedback"></div>
           </div>`;
@@ -806,9 +772,9 @@ window.Guide = window.Guide || {};
                 ${ui.callout(correct ? "Correct" : "Not Quite", `<p>${item.explain}</p>`, correct ? "" : "callout-rose", correct ? "check" : "info")}
                 <button type="button" class="btn" id="quiz-next">${index + 1 < questions.length ? "Next Question" : "See Results"} ${icon("arrowRight")}</button>
               </div>`;
-            const next = host.querySelector("#quiz-next");
-            next.focus();
-            next.addEventListener("click", () => {
+            const nextButton = host.querySelector("#quiz-next");
+            nextButton.focus();
+            nextButton.addEventListener("click", () => {
               index += 1;
               if (index < questions.length) renderQuestion();
               else finish();
@@ -823,9 +789,9 @@ window.Guide = window.Guide || {};
           store.set("quizBest", percent);
           Guide.emit("progress");
         }
-        const verdict = percent >= 80 ? "Interview-ready on these topics." : percent >= 60 ? "Solid base; revisit the explanations below." : "Worth another pass through the related modules.";
+        const verdict = percent >= 80 ? "Interview-ready on these topics." : percent >= 60 ? "Solid base, so revisit the explanations below." : "Worth another pass through the related modules.";
         host.innerHTML = `
-          <div class="card" style="text-align:center;padding:2rem 1.5rem">
+          <div class="card empty-state">
             <div class="score-big">${percent}%</div>
             <p class="muted" style="margin:0.5rem 0 1.25rem">${score} of ${questions.length} correct. ${verdict}</p>
             <div class="btn-row" style="justify-content:center">
@@ -836,7 +802,7 @@ window.Guide = window.Guide || {};
           ${
             misses.length
               ? `<h3 style="margin-top:2rem">Review These</h3>${misses
-                  .map((item) => `<div class="card" style="margin-bottom:0.75rem"><p><strong>${item.q}</strong></p><p class="small" style="margin:0">Answer: ${item.options[item.answer]}. ${item.explain}</p></div>`)
+                  .map((item) => `<div class="card" style="margin-bottom:0.75rem"><p><strong>${item.q}</strong></p><p class="small" style="margin:0">Correct answer: ${escapeHtml(item.options[item.answer])}. ${item.explain}</p></div>`)
                   .join("")}`
               : ""
           }`;
@@ -859,7 +825,7 @@ window.Guide = window.Guide || {};
       <header class="page-header">
         <span class="eyebrow">${icon("table")} Practice</span>
         <h1>Statement Drills</h1>
-        <p class="lede">Classic “what happens if” questions at a 25% tax rate. Say the answer aloud for each statement, then reveal it to check.</p>
+        <p class="lede">Classic “what happens if” questions at a 25% tax rate. Say each answer aloud, then reveal it to check.</p>
       </header>
       <div class="drill-picker" id="drill-picker" role="group" aria-label="Choose a drill"></div>
       <div id="drill-host" style="margin-top:1.25rem"></div>`;
@@ -878,7 +844,7 @@ window.Guide = window.Guide || {};
       return items
         .map(([label, value]) => {
           const tone = value.startsWith("+") ? "up" : value.startsWith("−") ? "down" : "flat";
-          return `<div class="drill-line"><span>${label}</span><span class="val ${tone}">${value}</span></div>`;
+          return `<div class="drill-line"><span>${escapeHtml(label)}</span><span class="val ${tone}">${value}</span></div>`;
         })
         .join("");
     }
@@ -900,7 +866,7 @@ window.Guide = window.Guide || {};
               ([key, abbr, title]) => `
             <div class="drill-col" data-col="${key}">
               <h4><span>${abbr}</span>${title}</h4>
-              <div class="drill-body"><div class="drill-locked"><div><p>Think it through first.</p><button type="button" class="btn btn-soft btn-sm" data-reveal="${key}">Reveal</button></div></div></div>
+              <div class="drill-body"><div class="drill-locked"><div><p>Think It Through First</p><button type="button" class="btn btn-soft btn-sm" data-reveal="${key}">Reveal</button></div></div></div>
             </div>`
             )
             .join("")}
@@ -962,7 +928,7 @@ window.Guide = window.Guide || {};
       <header class="page-header">
         <span class="eyebrow">${icon("mic")} Practice</span>
         <h1>Mock Interview</h1>
-        <p class="lede">Draw a question, answer it aloud against the clock, then compare with the key points an Investment Director will listen for.</p>
+        <p class="lede">Draw a question, answer aloud against the clock, then compare with the key points an Investment Director will listen for.</p>
       </header>
       <div class="toolbar">
         <div class="segmented" role="group" aria-label="Question category" id="mock-cat">
@@ -971,7 +937,7 @@ window.Guide = window.Guide || {};
         </div>
       </div>
       <div class="card mock-card" id="mock-host"></div>
-      ${ui.callout("How to Answer", "<p>Pause for two seconds, state the structure of the answer, then climb from formula to intuition to risk to decision. For calculations, think aloud so the interviewer can follow the logic.</p>", "callout-indigo", "lightbulb")}`;
+      ${ui.callout("How to Answer", "<p>Pause for two seconds and state the structure first. Then climb from formula to intuition to risk to decision, thinking aloud on any calculation.</p>", "callout-indigo", "lightbulb")}`;
 
     const host = view.querySelector("#mock-host");
 
@@ -1003,13 +969,14 @@ window.Guide = window.Guide || {};
       const cat = Guide.mockCategories.find((item) => item.id === current.cat);
       const ratings = store.get("mockRatings", {});
       const key = current.q;
+      const lang = current.cat === "fr" ? ' lang="fr"' : "";
 
       host.innerHTML = `
-        <div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:0.75rem;align-items:center">
+        <div class="mock-top">
           <span class="pill">${cat.label}</span>
           <div class="timer"><span class="timer-time">1:30</span><span class="timer-bar"><span></span></span></div>
         </div>
-        <p class="mock-q" ${current.cat === "fr" ? 'lang="fr"' : ""}>${current.q}</p>
+        <p class="mock-q"${lang}>${current.q}</p>
         <div class="btn-row">
           <button type="button" class="btn" id="mock-timer">${icon("play")} Start Timer</button>
           <div class="segmented" role="group" aria-label="Answer length" id="mock-duration">
@@ -1051,9 +1018,9 @@ window.Guide = window.Guide || {};
         host.querySelector("#mock-points").innerHTML = `
           <div class="keypoints">
             <h3>Key Points to Hit</h3>
-            <ul ${current.cat === "fr" ? 'lang="fr"' : ""}>${current.points.map((point) => `<li>${point}</li>`).join("")}</ul>
+            <ul${lang}>${current.points.map((point) => `<li>${point}</li>`).join("")}</ul>
             <div class="btn-row" style="align-items:center">
-              <span class="small muted">Rate this answer:</span>
+              <span class="small muted">Rate This Answer</span>
               <div class="segmented" role="group" aria-label="Self-rating" id="mock-rate">
                 ${["Needs Work", "Solid", "Nailed It"].map((label) => `<button type="button" data-rate="${label}" aria-pressed="${ratings[key] === label}">${label}</button>`).join("")}
               </div>
@@ -1094,21 +1061,21 @@ window.Guide = window.Guide || {};
       <header class="page-header">
         <span class="eyebrow">${icon("pen")} Prepare</span>
         <h1>Story Builder</h1>
-        <p class="lede">Draft the answers only Ha Linh can give. Every prompt includes a structure and a starter line; notes save automatically in this browser and can be downloaded at any time.</p>
+        <p class="lede">Draft the answers only you can give. Every prompt includes a structure and a starter line, and drafts save automatically in this browser.</p>
       </header>
       <div class="toolbar">
         <button type="button" class="btn" id="story-download">${icon("download")} Download My Notes</button>
-        <span class="save-state" id="story-state" aria-live="polite">Saved locally</span>
+        <span class="save-state" id="story-state" aria-live="polite">Saved Locally</span>
       </div>
       ${Guide.story
         .map(
           (prompt, i) => `
         <details class="accordion reveal" ${i === 0 ? "open" : ""}>
-          <summary><span class="pill" style="margin-right:0.25rem">${prompt.target}</span>${prompt.title} ${icon("chevronDown", "chev")}</summary>
-          <div class="accordion-body" ${prompt.lang === "fr" ? 'lang="fr"' : ""}>
+          <summary><span class="pill">${prompt.target}</span>${prompt.title} ${icon("chevronDown", "chev")}</summary>
+          <div class="accordion-body"${prompt.lang === "fr" ? ' lang="fr"' : ""}>
             <ul>${prompt.guidance.map((line) => `<li>${line}</li>`).join("")}</ul>
             <div class="field">
-              <label for="story-${prompt.id}">Draft</label>
+              <label for="story-${prompt.id}">${prompt.lang === "fr" ? "Brouillon" : "Draft"}</label>
               <textarea class="input" id="story-${prompt.id}" data-story="${prompt.id}" placeholder="${escapeHtml(prompt.starter)}">${escapeHtml(saved[prompt.id] || "")}</textarea>
             </div>
             <div class="btn-row" style="margin-top:0.6rem;align-items:center">
@@ -1127,7 +1094,7 @@ window.Guide = window.Guide || {};
       const text = view.querySelector(`#story-${id}`).value.trim();
       const words = text ? text.split(/\s+/).length : 0;
       const seconds = Math.round((words / 140) * 60);
-      view.querySelector(`[data-count="${id}"]`).textContent = words ? `${words} words · about ${seconds} seconds spoken` : "No draft yet";
+      view.querySelector(`[data-count="${id}"]`).textContent = words ? `${words} Words · About ${seconds} Seconds Spoken` : "No Draft Yet";
     }
 
     const persist = Guide.debounce(() => {
@@ -1136,7 +1103,7 @@ window.Guide = window.Guide || {};
         data[area.dataset.story] = area.value;
       });
       store.set("story", data);
-      state.textContent = "Saved locally";
+      state.textContent = "Saved Locally";
       Guide.emit("progress");
     }, 500);
 
@@ -1153,7 +1120,7 @@ window.Guide = window.Guide || {};
       button.addEventListener("click", () => {
         const prompt = Guide.story.find((item) => item.id === button.dataset.starter);
         const area = view.querySelector(`#story-${prompt.id}`);
-        if (!area.value.trim()) area.value = prompt.starter + " ";
+        if (!area.value.trim()) area.value = `${prompt.starter} `;
         area.focus();
         area.setSelectionRange(area.value.length, area.value.length);
         area.dispatchEvent(new Event("input"));
@@ -1193,7 +1160,7 @@ window.Guide = window.Guide || {};
     function highlight(text, query) {
       const safe = escapeHtml(text);
       if (!query) return safe;
-      const pattern = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "gi");
+      const pattern = new RegExp(`(${escapeHtml(query).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "gi");
       return safe.replace(pattern, "<mark>$1</mark>");
     }
 
@@ -1201,7 +1168,7 @@ window.Guide = window.Guide || {};
       const query = input.value.trim();
       const lower = query.toLowerCase();
       const items = Guide.lexicon.filter((item) => !lower || `${item.fr} ${item.en} ${item.def}`.toLowerCase().includes(lower));
-      view.querySelector("#lex-count").textContent = `${items.length} of ${Guide.lexicon.length} terms`;
+      view.querySelector("#lex-count").textContent = `${items.length} of ${Guide.lexicon.length} Terms`;
       list.innerHTML = items.length
         ? items
             .map((item) => `<div class="lex-item"><span class="lex-fr" lang="fr">${highlight(item.fr, query)}</span><span class="lex-en">${highlight(item.en, query)}</span><span class="lex-def">${highlight(item.def, query)}</span></div>`)
@@ -1218,7 +1185,7 @@ window.Guide = window.Guide || {};
     const checks = progress.checklist();
     const groups = [...new Set(Guide.checklist.map((item) => item.group))];
 
-    const emailEn = `Subject: Thank you – Investment Analyst Internship
+    const emailEn = `Subject: Thank You – Investment Analyst Internship
 
 Dear [Name],
 
@@ -1244,7 +1211,7 @@ Ha Linh`;
       <header class="page-header">
         <span class="eyebrow">${icon("calendar")} Prepare</span>
         <h1>Interview Day</h1>
-        <p class="lede">Final checklist and conduct during the interview, followed by questions to ask and the follow-up email.</p>
+        <p class="lede">Final checklist and conduct during the interview, followed by questions to ask and the thank-you email.</p>
       </header>
 
       <section class="section reveal">
@@ -1270,32 +1237,25 @@ Ha Linh`;
       <section class="section reveal">
         <h2 class="section-title"><span class="num">02</span>During the Interview</h2>
         <ol class="steps">
-          <li><strong>Open strong:</strong> greet both interviewers by name and keep the pitch under two minutes.</li>
-          <li><strong>Structure first:</strong> announce how the answer will unfold before diving in.</li>
-          <li><strong>Think aloud on numbers:</strong> state assumptions and round sensibly before sanity-checking the result.</li>
-          <li><strong>Climb the ladder:</strong> formula → intuition → risk → decision.</li>
-          <li><strong>Handle gaps honestly:</strong> say what is known, reason toward the rest and offer to follow up.</li>
-          <li><strong>Connect to Neot:</strong> tie answers back to fleets and batteries or the as-a-service model.</li>
-          <li><strong>Close with intent:</strong> summarise motivation and availability from March 2027 for six months.</li>
+          <li><strong>Open Strong:</strong> Greet both interviewers by name and keep the pitch under two minutes.</li>
+          <li><strong>Structure First:</strong> Announce how the answer will unfold before diving in.</li>
+          <li><strong>Think Aloud on Numbers:</strong> State assumptions and round sensibly before sanity-checking the result.</li>
+          <li><strong>Handle Gaps Honestly:</strong> Say what is known, then reason toward the rest.</li>
+          <li><strong>Close With Intent:</strong> Confirm motivation and availability for six months from March 2027.</li>
         </ol>
       </section>
 
       <section class="section reveal">
         <h2 class="section-title"><span class="num">03</span>Questions to Ask</h2>
         <p>Choose two or three, ideally adapted to what the interviewers mention.</p>
-        ${Guide.askThem.map((item) => `<div class="card" style="margin-bottom:0.6rem"><p style="margin-bottom:0.3rem"><strong>“${item.q}”</strong></p><p class="small muted" style="margin:0">${item.why}</p></div>`).join("")}
+        ${Guide.askThem.map((item) => `<div class="card ask-card"><p><strong>“${item.q}”</strong></p><p class="small muted">${item.why}</p></div>`).join("")}
       </section>
 
       <section class="section reveal">
-        <h2 class="section-title"><span class="num">04</span>Closing Statement</h2>
-        <div class="card"><p style="margin:0">“Thank you for this conversation. Today's conversation confirmed that Neot is where my project finance foundation can grow into investment judgement. Availability for the full six months from March 2027 is guaranteed, and contributing to Neot e-motion's next transactions would be genuinely exciting.”</p></div>
-      </section>
-
-      <section class="section reveal">
-        <h2 class="section-title"><span class="num">05</span>Thank-You Email</h2>
+        <h2 class="section-title"><span class="num">04</span>Thank-You Email</h2>
         <p>Send within 24 hours, adapted to the conversation.</p>
         <div class="toolbar"><div class="segmented" role="group" aria-label="Email language" id="email-lang"><button type="button" data-lang="en" aria-pressed="true">English</button><button type="button" data-lang="fr" aria-pressed="false">Français</button></div><button type="button" class="btn btn-ghost btn-sm" id="email-copy">${icon("copy")} Copy</button></div>
-        <textarea class="input" id="email-text" rows="14" aria-label="Thank-you email template" style="min-height:320px;font-size:0.92rem"></textarea>
+        <textarea class="input email-text" id="email-text" rows="14" aria-label="Thank-you email template"></textarea>
       </section>`;
 
     view.querySelectorAll("[data-check]").forEach((box) => {
@@ -1316,10 +1276,10 @@ Ha Linh`;
     view.querySelector("#email-copy").addEventListener("click", async () => {
       try {
         await navigator.clipboard.writeText(textArea.value);
-        Guide.toast("Email copied to clipboard");
+        Guide.toast("Email Copied to Clipboard");
       } catch (error) {
         textArea.select();
-        Guide.toast("Press Ctrl+C to copy the selected text");
+        Guide.toast("Press Ctrl+C to Copy the Selected Text");
       }
     });
   };
@@ -1327,7 +1287,7 @@ Ha Linh`;
   /* Not Found View */
   Guide.views.notFound = function notFound(view) {
     view.innerHTML = `
-      <div class="card" style="text-align:center;padding:3rem 1.5rem">
+      <div class="card empty-state">
         <h1>Page Not Found</h1>
         <p class="muted">That section does not exist.</p>
         <a class="btn" href="#/">Return to the Briefing</a>

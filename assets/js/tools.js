@@ -169,7 +169,7 @@ window.Guide = window.Guide || {};
     const plotH = height - margin.top - margin.bottom;
     const maxValue = Math.max(1, ...rows.map((row) => Math.max(row.a, row.b)));
 
-    /* Round Axis Steps Such as 1, 2, 5 or 10 */
+    /* Round Axis Steps to Clean Increments */
     const rawStep = maxValue / 4;
     const magnitude = Math.pow(10, Math.floor(Math.log10(rawStep)));
     const step = [1, 2, 5, 10].map((factor) => factor * magnitude).find((candidate) => candidate >= rawStep);
@@ -239,13 +239,13 @@ window.Guide = window.Guide || {};
   function mountSpv(node) {
     node.innerHTML = `
       <figure class="spv" aria-label="Project finance structure around an SPV">
-        <div class="spv-node spv-top"><strong>Equity Investors</strong><span>Equity ↓ · Distributions ↑</span></div>
-        <div class="spv-node spv-left"><strong>Lenders</strong><span>Debt → · Debt service ←</span></div>
-        <div class="spv-node spv-core"><strong>SPV</strong><span>Owns the fleet and its chargers</span></div>
-        <div class="spv-node spv-right"><strong>Operator or Authority</strong><span>Lease or service payments →</span></div>
-        <div class="spv-node spv-b1"><strong>Manufacturers</strong><span>Supply and warranties</span></div>
-        <div class="spv-node spv-b2"><strong>O&amp;M Providers</strong><span>Maintenance and availability</span></div>
-        <div class="spv-node spv-b3"><strong>Insurers</strong><span>Damage and loss cover</span></div>
+        <div class="spv-node spv-top"><strong>Equity Investors</strong><span>Equity In · Distributions Out</span></div>
+        <div class="spv-node spv-left"><strong>Lenders</strong><span>Debt In · Debt Service Out</span></div>
+        <div class="spv-node spv-core"><strong>SPV</strong><span>Owns the Fleet and Chargers</span></div>
+        <div class="spv-node spv-right"><strong>Operator or Authority</strong><span>Lease or Service Payments</span></div>
+        <div class="spv-node spv-b1"><strong>Manufacturers</strong><span>Supply and Warranties</span></div>
+        <div class="spv-node spv-b2"><strong>O&amp;M Providers</strong><span>Maintenance and Availability</span></div>
+        <div class="spv-node spv-b3"><strong>Insurers</strong><span>Damage and Loss Cover</span></div>
         <figcaption>Contracts surround the SPV; cash flows from the customer service the debt first, and equity receives the residual.</figcaption>
       </figure>`;
   }
@@ -260,7 +260,7 @@ window.Guide = window.Guide || {};
 
     node.innerHTML = `
       <div class="card">
-        ${ui.range("wf-cfads", "CFADS for the period", 6, 16, 0.1, 13, "€13.0m")}
+        ${ui.range("wf-cfads", "CFADS for the Period", 6, 16, 0.1, 13, "€13.0m")}
         <div class="wf" id="wf-rows"></div>
         <p class="small muted" id="wf-status" style="margin-top:0.9rem" aria-live="polite"></p>
       </div>`;
@@ -296,14 +296,14 @@ window.Guide = window.Guide || {};
       const equity = lockedUp ? 0 : cash - sub;
 
       let html = "";
-      html += row("Senior interest", interest, SENIOR_INTEREST, SENIOR_INTEREST, interest < SENIOR_INTEREST ? "short" : "paid");
-      html += row("Senior principal", principal, SENIOR_PRINCIPAL, SENIOR_PRINCIPAL, principal < SENIOR_PRINCIPAL ? "short" : "paid");
-      html += row("DSRA top-up", dsra, DSRA_TOP_UP, DSRA_TOP_UP, dsra < DSRA_TOP_UP ? "short" : "paid");
+      html += row("Senior Interest", interest, SENIOR_INTEREST, SENIOR_INTEREST, interest < SENIOR_INTEREST ? "short" : "paid");
+      html += row("Senior Principal", principal, SENIOR_PRINCIPAL, SENIOR_PRINCIPAL, principal < SENIOR_PRINCIPAL ? "short" : "paid");
+      html += row("DSRA Top-Up", dsra, DSRA_TOP_UP, DSRA_TOP_UP, dsra < DSRA_TOP_UP ? "short" : "paid");
       if (lockedUp) {
-        html += row("Cash trapped by lock-up", trapped, null, 4.5, "trapped");
+        html += row("Cash Trapped by Lock-Up", trapped, null, 4.5, "trapped");
       } else {
-        html += row("Subordinated debt", sub, SUB_DEBT, SUB_DEBT, sub < SUB_DEBT ? "short" : "paid");
-        html += row("Equity distributions", equity, null, 4.5, "paid", "equity");
+        html += row("Subordinated Debt", sub, SUB_DEBT, SUB_DEBT, sub < SUB_DEBT ? "short" : "paid");
+        html += row("Equity Distributions", equity, null, 4.5, "paid", "equity");
       }
       rowsHost.innerHTML = html;
 
@@ -323,26 +323,26 @@ window.Guide = window.Guide || {};
   /* Total Cost of Ownership Calculator */
   function mountTco(node) {
     const fields = [
-      ["evPrice", "EV purchase (€k)", 450],
-      ["dPrice", "Diesel purchase (€k)", 250],
-      ["charger", "Charger share per EV (€k)", 50],
-      ["battery", "EV battery replacement (€k)", 80],
-      ["evUse", "EV energy use (kWh/km)", 1.2],
-      ["dUse", "Diesel use (L/km)", 0.38],
+      ["evPrice", "EV Purchase (€k)", 450],
+      ["dPrice", "Diesel Purchase (€k)", 250],
+      ["charger", "Charger Share per EV (€k)", 50],
+      ["battery", "EV Battery Replacement (€k)", 80],
+      ["evUse", "EV Energy Use (kWh/km)", 1.2],
+      ["dUse", "Diesel Use (L/km)", 0.38],
       ["evPriceEnergy", "Electricity (€/kWh)", 0.2],
       ["dPriceEnergy", "Diesel (€/L)", 1.6],
-      ["evMaint", "EV maintenance (€/km)", 0.2],
-      ["dMaint", "Diesel maintenance (€/km)", 0.32],
-      ["residual", "Residual value (% of purchase)", 10],
-      ["rate", "Discount rate (%)", 6]
+      ["evMaint", "EV Maintenance (€/km)", 0.2],
+      ["dMaint", "Diesel Maintenance (€/km)", 0.32],
+      ["residual", "Residual Value (% of Purchase)", 10],
+      ["rate", "Discount Rate (%)", 6]
     ];
 
     node.innerHTML = `
       <div class="card">
-        <div class="chart-head"><h3>Illustrative TCO: Electric Versus Diesel City Bus</h3><span class="pill">Editable inputs</span></div>
+        <div class="chart-head"><h3>Illustrative TCO: Electric Versus Diesel City Bus</h3><span class="pill">Editable Inputs</span></div>
         <div class="grid grid-2" style="margin-top:0.75rem">
-          ${ui.range("tco-km", "Annual distance", 20000, 120000, 1000, 60000, "60,000 km")}
-          ${ui.range("tco-years", "Holding period", 8, 15, 1, 12, "12 years")}
+          ${ui.range("tco-km", "Annual Distance", 20000, 120000, 1000, 60000, "60,000 km")}
+          ${ui.range("tco-years", "Holding Period", 8, 15, 1, 12, "12 Years")}
         </div>
         <details class="accordion" style="margin-top:1rem">
           <summary>Adjust Unit Assumptions ${icon("chevronDown", "chev")}</summary>
@@ -364,7 +364,7 @@ window.Guide = window.Guide || {};
       const km = Number(kmInput.value);
       const years = Number(yearsInput.value);
       node.querySelector("#tco-km-out").textContent = `${km.toLocaleString("en-GB")} km`;
-      node.querySelector("#tco-years-out").textContent = `${years} years`;
+      node.querySelector("#tco-years-out").textContent = `${years} Years`;
       ui.syncRangeFill(kmInput);
       ui.syncRangeFill(yearsInput);
 
@@ -390,10 +390,10 @@ window.Guide = window.Guide || {};
 
       const k = (value) => `${value < 0 ? "−" : ""}€${Math.abs(Math.round(value / 1000)).toLocaleString("en-GB")}k`;
       node.querySelector("#tco-kpis").innerHTML = `
-        <div class="kpi"><span class="kpi-label">EV TCO (present value)</span><span class="kpi-value">${k(evTco)}</span><span class="kpi-delta flat">€${(evTco / totalKm).toFixed(2)} per km</span></div>
-        <div class="kpi"><span class="kpi-label">Diesel TCO (present value)</span><span class="kpi-value">${k(dTco)}</span><span class="kpi-delta flat">€${(dTco / totalKm).toFixed(2)} per km</span></div>
-        <div class="kpi"><span class="kpi-label">EV advantage</span><span class="kpi-value">${k(dTco - evTco)}</span><span class="kpi-delta ${dTco >= evTco ? "up" : "down"}">${dTco >= evTco ? "EV cheaper" : "Diesel cheaper"}</span></div>
-        <div class="kpi"><span class="kpi-label">Breakeven distance</span><span class="kpi-value">${Number.isFinite(breakeven) && breakeven > 0 ? `${Math.round(breakeven / 1000)}k km` : "n/a"}</span><span class="kpi-delta flat">per year</span></div>`;
+        <div class="kpi"><span class="kpi-label">EV TCO (Present Value)</span><span class="kpi-value">${k(evTco)}</span><span class="kpi-delta flat">€${(evTco / totalKm).toFixed(2)} per km</span></div>
+        <div class="kpi"><span class="kpi-label">Diesel TCO (Present Value)</span><span class="kpi-value">${k(dTco)}</span><span class="kpi-delta flat">€${(dTco / totalKm).toFixed(2)} per km</span></div>
+        <div class="kpi"><span class="kpi-label">EV Advantage</span><span class="kpi-value">${k(dTco - evTco)}</span><span class="kpi-delta ${dTco >= evTco ? "up" : "down"}">${dTco >= evTco ? "EV Cheaper" : "Diesel Cheaper"}</span></div>
+        <div class="kpi"><span class="kpi-label">Breakeven Distance</span><span class="kpi-value">${Number.isFinite(breakeven) && breakeven > 0 ? `${Math.round(breakeven / 1000)}k km` : "n/a"}</span><span class="kpi-delta flat">Per Year</span></div>`;
 
       node.querySelector("#tco-note").textContent =
         `Running cost: €${evRunPerKm.toFixed(2)} per km electric versus €${dRunPerKm.toFixed(2)} per km diesel. Battery replacement assumed in year ${batteryYear}. Figures are illustrative and exclude subsidies and carbon costs as well as low-emission-zone access, any of which can shift the result.`;
@@ -429,7 +429,7 @@ window.Guide = window.Guide || {};
       <header class="page-header">
         <span class="eyebrow">${icon("flask")} Practice</span>
         <h1>Fleet Case Lab</h1>
-        <p class="lede">Neot-style case: an SPV buys an electric bus fleet for €75m under a twelve-year service contract. Size the debt, then stress the assumptions and watch coverage and returns respond exactly as an Investment Director would expect you to explain.</p>
+        <p class="lede">Neot-style case in which an SPV buys an electric bus fleet for €75m under a twelve-year service contract. Size the debt and stress the assumptions, then watch coverage and returns respond exactly as an Investment Director would expect you to explain.</p>
       </header>
 
       <div class="toolbar">
@@ -443,17 +443,17 @@ window.Guide = window.Guide || {};
           <fieldset>
             <legend>Financing Structure</legend>
             ${ui.range("cf-dscr", "Target DSCR", 1.1, 1.6, 0.05, state.financing.dscr, "")}
-            ${ui.range("cf-gearing", "Gearing cap", 0.4, 0.8, 0.05, state.financing.gearing, "")}
-            ${ui.range("cf-tenor", "Debt tenor (years)", 6, 12, 1, state.financing.tenor, "")}
-            ${ui.range("cf-rate", "All-in interest rate", 0.02, 0.09, 0.0025, state.financing.rate, "")}
+            ${ui.range("cf-gearing", "Gearing Cap", 0.4, 0.8, 0.05, state.financing.gearing, "")}
+            ${ui.range("cf-tenor", "Debt Tenor (Years)", 6, 12, 1, state.financing.tenor, "")}
+            ${ui.range("cf-rate", "All-In Interest Rate", 0.02, 0.09, 0.0025, state.financing.rate, "")}
           </fieldset>
           <fieldset>
             <legend>Stress Tests</legend>
-            ${ui.range("cs-revenue", "Revenue change", -0.2, 0.1, 0.01, state.stress.revenue, "")}
-            ${ui.range("cs-opex", "Opex change", -0.1, 0.2, 0.01, state.stress.opex, "")}
-            ${ui.range("cs-battery", "Battery replacement shift (years)", -4, 2, 1, state.stress.batteryShift, "")}
-            ${ui.range("cs-residual", "Residual value change", -0.5, 0.2, 0.05, state.stress.residual, "")}
-            ${ui.range("cs-rate", "Floating rate shock (unhedged)", 0, 300, 25, state.stress.rateBp, "")}
+            ${ui.range("cs-revenue", "Revenue Change", -0.2, 0.1, 0.01, state.stress.revenue, "")}
+            ${ui.range("cs-opex", "Opex Change", -0.1, 0.2, 0.01, state.stress.opex, "")}
+            ${ui.range("cs-battery", "Battery Replacement Shift (Years)", -4, 2, 1, state.stress.batteryShift, "")}
+            ${ui.range("cs-residual", "Residual Value Change", -0.5, 0.2, 0.05, state.stress.residual, "")}
+            ${ui.range("cs-rate", "Floating Rate Shock (Unhedged)", 0, 300, 25, state.stress.rateBp, "")}
           </fieldset>
           <button type="button" class="btn btn-ghost" id="case-reset">${icon("refresh")} Reset All Inputs</button>
         </div>
@@ -466,7 +466,7 @@ window.Guide = window.Guide || {};
               <h3>CFADS Versus Debt Service (€m)</h3>
               <ul class="legend">
                 <li><span class="swatch" style="background:var(--series-1)"></span>CFADS</li>
-                <li><span class="swatch" style="background:var(--series-2)"></span>Debt service</li>
+                <li><span class="swatch" style="background:var(--series-2)"></span>Debt Service</li>
               </ul>
             </div>
             <div id="case-chart" class="chart-scroll"></div>
@@ -494,11 +494,11 @@ window.Guide = window.Guide || {};
     const bindings = [
       ["cf-dscr", "financing", "dscr", (v) => `${v.toFixed(2)}x`],
       ["cf-gearing", "financing", "gearing", (v) => `${Math.round(v * 100)}%`],
-      ["cf-tenor", "financing", "tenor", (v) => `${v} years`],
+      ["cf-tenor", "financing", "tenor", (v) => `${v} Years`],
       ["cf-rate", "financing", "rate", (v) => `${(v * 100).toFixed(2)}%`],
       ["cs-revenue", "stress", "revenue", (v) => fmt.signed(v * 100, 0, "%")],
       ["cs-opex", "stress", "opex", (v) => fmt.signed(v * 100, 0, "%")],
-      ["cs-battery", "stress", "batteryShift", (v) => (v === 0 ? "On plan" : `${v > 0 ? "+" : "−"}${Math.abs(v)} yr`)],
+      ["cs-battery", "stress", "batteryShift", (v) => (v === 0 ? "On Plan" : `${v > 0 ? "+" : "−"}${Math.abs(v)} yr`)],
       ["cs-residual", "stress", "residual", (v) => fmt.signed(v * 100, 0, "%")],
       ["cs-rate", "stress", "rateBp", (v) => `+${v} bp`]
     ];
@@ -521,9 +521,9 @@ window.Guide = window.Guide || {};
 
     function delta(value, base, digits, unit, higherIsBetter = true) {
       const diff = value - base;
-      if (Math.abs(diff) < Math.pow(10, -digits) / 2) return `<span class="kpi-delta flat">No change</span>`;
+      if (Math.abs(diff) < Math.pow(10, -digits) / 2) return `<span class="kpi-delta flat">No Change</span>`;
       const good = higherIsBetter ? diff > 0 : diff < 0;
-      return `<span class="kpi-delta ${good ? "up" : "down"}">${fmt.signed(diff, digits, unit)} vs base</span>`;
+      return `<span class="kpi-delta ${good ? "up" : "down"}">${fmt.signed(diff, digits, unit)} vs Base</span>`;
     }
 
     function render() {
@@ -536,13 +536,13 @@ window.Guide = window.Guide || {};
       });
 
       const minStatus = result.minDscr < 1 ? "critical" : result.minDscr < 1.15 ? "warning" : "good";
-      const statusText = { critical: "Below 1.00x", warning: "Near lock-up", good: "Comfortable" }[minStatus];
+      const statusText = { critical: "Below 1.00x", warning: "Near Lock-Up", good: "Comfortable" }[minStatus];
 
       view.querySelector("#case-kpis").innerHTML = `
-        <div class="kpi"><span class="kpi-label">Senior debt</span><span class="kpi-value">${fmt.eur(result.debt)}</span><span class="kpi-delta flat">${result.binding} constraint binds</span></div>
+        <div class="kpi"><span class="kpi-label">Senior Debt</span><span class="kpi-value">${fmt.eur(result.debt)}</span><span class="kpi-delta flat">${result.binding} Constraint Binds</span></div>
         <div class="kpi"><span class="kpi-label">Equity</span><span class="kpi-value">${fmt.eur(result.equity)}</span><span class="kpi-delta flat">Gearing ${fmt.pct(result.debt / result.capex, 0)}</span></div>
         <div class="kpi"><span class="kpi-label">Minimum DSCR</span><span class="kpi-value">${fmt.mult(result.minDscr)}</span>${delta(result.minDscr, base.minDscr, 2, "x")}</div>
-        <div class="kpi"><span class="kpi-label">LLCR at close</span><span class="kpi-value">${fmt.mult(result.llcr)}</span>${delta(result.llcr, base.llcr, 2, "x")}</div>
+        <div class="kpi"><span class="kpi-label">LLCR at Close</span><span class="kpi-value">${fmt.mult(result.llcr)}</span>${delta(result.llcr, base.llcr, 2, "x")}</div>
         <div class="kpi"><span class="kpi-label">Project IRR</span><span class="kpi-value">${fmt.pct(result.projectIrr)}</span>${delta(result.projectIrr * 100, base.projectIrr * 100, 1, " pts")}</div>
         <div class="kpi"><span class="kpi-label">Equity IRR</span><span class="kpi-value">${fmt.pct(result.equityIrr)}</span>${delta(result.equityIrr * 100, base.equityIrr * 100, 1, " pts")}</div>
         <div class="kpi"><span class="kpi-label">MOIC</span><span class="kpi-value">${fmt.mult(result.moic)}</span>${delta(result.moic, base.moic, 2, "x")}</div>
@@ -565,9 +565,9 @@ window.Guide = window.Guide || {};
           tooltip: (item) => `
             <div class="tt-title">Year ${item.row.year}</div>
             <div class="tt-row"><span><span class="swatch" style="width:9px;height:9px;border-radius:2px;background:var(--series-1)"></span>CFADS</span><span>${fmt.eur(item.row.cfads, 2)}</span></div>
-            <div class="tt-row"><span><span class="swatch" style="width:9px;height:9px;border-radius:2px;background:var(--series-2)"></span>Debt service</span><span>${fmt.eur(item.row.debtService, 2)}</span></div>
+            <div class="tt-row"><span><span class="swatch" style="width:9px;height:9px;border-radius:2px;background:var(--series-2)"></span>Debt Service</span><span>${fmt.eur(item.row.debtService, 2)}</span></div>
             <div class="tt-row"><span>DSCR</span><span>${Number.isFinite(item.row.dscr) ? fmt.mult(item.row.dscr) : "Repaid"}</span></div>
-            <div class="tt-row"><span>Equity cash flow</span><span>${fmt.eur(item.row.equity, 2)}</span></div>`
+            <div class="tt-row"><span>Equity Cash Flow</span><span>${fmt.eur(item.row.equity, 2)}</span></div>`
         }
       );
 
@@ -644,9 +644,9 @@ window.Guide = window.Guide || {};
           <div class="lab-controls">
             <fieldset>
               <legend>Single-Exit Investment</legend>
-              ${ui.range("rl-invest", "Equity invested", 10, 100, 5, 50, "")}
-              ${ui.range("rl-proceeds", "Exit proceeds", 10, 300, 5, 100, "")}
-              ${ui.range("rl-years", "Holding period", 1, 20, 1, 3, "")}
+              ${ui.range("rl-invest", "Equity Invested", 10, 100, 5, 50, "")}
+              ${ui.range("rl-proceeds", "Exit Proceeds", 10, 300, 5, 100, "")}
+              ${ui.range("rl-years", "Holding Period", 1, 20, 1, 3, "")}
             </fieldset>
           </div>
           <div class="lab-output">
@@ -662,9 +662,9 @@ window.Guide = window.Guide || {};
           <div class="lab-controls">
             <fieldset>
               <legend>Assumptions</legend>
-              ${ui.range("lv-exit", "Exit value", 60, 140, 1, 120, "")}
-              ${ui.range("lv-debt", "Debt share", 0, 0.8, 0.05, 0.6, "")}
-              ${ui.range("lv-rate", "Interest rate", 0, 0.1, 0.005, 0.05, "")}
+              ${ui.range("lv-exit", "Exit Value", 60, 140, 1, 120, "")}
+              ${ui.range("lv-debt", "Debt Share", 0, 0.8, 0.05, 0.6, "")}
+              ${ui.range("lv-rate", "Interest Rate", 0, 0.1, 0.005, 0.05, "")}
             </fieldset>
           </div>
           <div class="lab-output">
@@ -685,7 +685,7 @@ window.Guide = window.Guide || {};
       const years = value("rl-years");
       view.querySelector("#rl-invest-out").textContent = `€${invest}m`;
       view.querySelector("#rl-proceeds-out").textContent = `€${proceeds}m`;
-      view.querySelector("#rl-years-out").textContent = `${years} ${years === 1 ? "year" : "years"}`;
+      view.querySelector("#rl-years-out").textContent = `${years} ${years === 1 ? "Year" : "Years"}`;
       const moic = proceeds / invest;
       const irr = Math.pow(moic, 1 / years) - 1;
       view.querySelector("#rl-kpis").innerHTML = `
@@ -709,10 +709,10 @@ window.Guide = window.Guide || {};
       const levered = residual / equity - 1;
 
       view.querySelector("#lv-kpis").innerHTML = `
-        <div class="kpi"><span class="kpi-label">Equity invested</span><span class="kpi-value">€${equity.toFixed(0)}</span></div>
-        <div class="kpi"><span class="kpi-label">Debt repayment</span><span class="kpi-value">€${repayment.toFixed(1)}</span></div>
-        <div class="kpi"><span class="kpi-label">Unlevered return</span><span class="kpi-value">${fmt.pct(unlevered)}</span></div>
-        <div class="kpi"><span class="kpi-label">Levered equity return</span><span class="kpi-value">${fmt.pct(levered)}</span><span class="kpi-delta ${levered >= unlevered ? "up" : "down"}">${fmt.signed((levered - unlevered) * 100, 1, " pts")}</span></div>`;
+        <div class="kpi"><span class="kpi-label">Equity Invested</span><span class="kpi-value">€${equity.toFixed(0)}</span></div>
+        <div class="kpi"><span class="kpi-label">Debt Repayment</span><span class="kpi-value">€${repayment.toFixed(1)}</span></div>
+        <div class="kpi"><span class="kpi-label">Unlevered Return</span><span class="kpi-value">${fmt.pct(unlevered)}</span></div>
+        <div class="kpi"><span class="kpi-label">Levered Equity Return</span><span class="kpi-value">${fmt.pct(levered)}</span><span class="kpi-delta ${levered >= unlevered ? "up" : "down"}">${fmt.signed((levered - unlevered) * 100, 1, " pts")}</span></div>`;
 
       let note;
       if (exit < repayment) {
