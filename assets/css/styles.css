@@ -3106,6 +3106,144 @@ mark {
   margin-top: 1.25rem;
 }
 
+/* Prose Blocks */
+.prose {
+  max-width: 70ch;
+}
+
+.prose p:last-child {
+  margin-bottom: 0;
+}
+
+/* Model Answers */
+.model-answer {
+  position: relative;
+  margin: 0.75rem 0 1rem;
+  padding: 1.15rem 1.3rem 1.15rem 1.5rem;
+  border-left: 3px solid var(--accent);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  background: var(--accent-soft);
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+.model-answer p:last-child {
+  margin-bottom: 0;
+}
+
+.fill-in {
+  padding: 0.05em 0.35em;
+  border-radius: 5px;
+  background: var(--amber-soft);
+  color: var(--amber);
+  font-weight: 600;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+.answer-note {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--amber);
+  font-size: 0.86rem;
+}
+
+.answer-heading {
+  margin-top: 1.5rem;
+}
+
+.listen-for {
+  margin: 0.5rem 0 1rem;
+}
+
+.listen-for h4 {
+  margin-bottom: 0.5rem;
+  color: var(--text-2);
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin: 0 0 1rem;
+  padding: 0;
+  list-style: none;
+}
+
+.tag-list li {
+  margin: 0;
+  padding: 0.3rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  background: var(--surface);
+  color: var(--text-2);
+  font-size: 0.84rem;
+}
+
+.sample-answer {
+  margin: 0.25rem 0 1.1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+}
+
+.sample-answer > summary {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 0.9rem;
+  color: var(--accent-strong);
+  font-weight: 600;
+  list-style: none;
+  cursor: pointer;
+}
+
+.sample-answer > summary::-webkit-details-marker {
+  display: none;
+}
+
+.sample-answer > summary svg {
+  width: 17px;
+  height: 17px;
+}
+
+.sample-answer[open] > summary {
+  border-bottom: 1px solid var(--border);
+}
+
+.sample-answer .model-answer,
+.sample-answer .answer-note {
+  margin: 0.8rem 0.9rem;
+}
+
+.model-quote {
+  margin: 0;
+  color: var(--text);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.model-lines {
+  margin-top: 1.25rem;
+}
+
+.bank-title {
+  margin-bottom: 0.9rem;
+  font-size: 1.3rem;
+}
+
+.mock-remaining {
+  margin: 1rem 0 0;
+}
+
+.rate-row {
+  align-items: center;
+}
+
 /* Stacked Labs on Medium Screens */
 @media (max-width: 1279px) {
   .lab {

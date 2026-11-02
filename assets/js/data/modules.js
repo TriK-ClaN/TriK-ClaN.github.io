@@ -23,25 +23,16 @@ Guide.modules = [
         html: `
           <p>Project finance funds a single asset or portfolio through a ring-fenced special purpose vehicle (SPV). Lenders look primarily to the SPV's cash flows and contracts for repayment, with limited or no recourse to the sponsors. Contracts and due diligence therefore carry enormous weight.</p>
           <div data-widget="spv"></div>
-          <div class="grid grid-2">
-            <div class="card">
-              <h4>Corporate Lending</h4>
-              <ul>
-                <li>Diversified Operating Company</li>
-                <li>Repaid From Group Cash Flows</li>
-                <li>Based on Historical Financials</li>
-                <li>Leverage Capped by Group Ratios</li>
-              </ul>
-            </div>
-            <div class="card">
-              <h4>Project Finance</h4>
-              <ul>
-                <li>Dedicated SPV</li>
-                <li>Repaid From Ring-Fenced Cash Flows</li>
-                <li>Based on Forecasts and Contracts</li>
-                <li>Higher Leverage on Contracted Revenue</li>
-              </ul>
-            </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th></th><th>Corporate Lending</th><th>Project Finance</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Borrower</strong></td><td>Diversified Operating Company</td><td>Dedicated SPV</td></tr>
+                <tr><td><strong>Repayment Source</strong></td><td>Group Cash Flows</td><td>Ring-Fenced Project Cash Flows</td></tr>
+                <tr><td><strong>Credit Analysis</strong></td><td>Historical Financials</td><td>Forecasts and Contracts</td></tr>
+                <tr><td><strong>Leverage</strong></td><td>Capped by Group Ratios</td><td>Often Higher on Contracted Revenue</td></tr>
+              </tbody>
+            </table>
           </div>
           <div class="callout callout-indigo">
             <div><span class="callout-title">Neot Lens</span>
@@ -169,27 +160,8 @@ Guide.modules = [
         id: "phases",
         title: "Deployment Versus Operations",
         html: `
-          <div class="grid grid-2">
-            <div class="card">
-              <h4>Deployment Risks</h4>
-              <ul>
-                <li>Delivery Delays</li>
-                <li>Cost Overruns</li>
-                <li>Supplier Performance</li>
-                <li>Grid Connection and Permits</li>
-              </ul>
-            </div>
-            <div class="card">
-              <h4>Operating Risks</h4>
-              <ul>
-                <li>Utilisation and Availability</li>
-                <li>Operating Cost Inflation</li>
-                <li>Counterparty Performance</li>
-                <li>Technology Obsolescence</li>
-                <li>Residual Value</li>
-              </ul>
-            </div>
-          </div>
+          <p>Risk changes character over an asset's life. During deployment, the main threats are delivery delays and cost overruns, together with supplier performance and the time needed to secure grid connections and permits. Contracts with manufacturers usually address these through delay penalties and fixed prices.</p>
+          <p>Once assets operate, attention shifts to utilisation and availability, then to operating cost inflation and the counterparty's ability to keep paying. Over the longer term, technology obsolescence and residual value become the risks that equity investors watch most closely.</p>
           <div class="callout callout-indigo">
             <div><span class="callout-title">Neot Lens</span>
             <p>Fleet financings replace a long construction phase with a deployment phase covering vehicle delivery and charger installation. Neot's Danish financing, for example, commissions 186 electric buses in phases through mid-2026.</p></div>
@@ -331,13 +303,7 @@ Guide.modules = [
             <p>Bankable means lenders accept the repayment risk. Investable means the equity return justifies the equity risk. Resonance work proves that a financing works, whereas Neot asks whether the asset deserves equity at all.</p></div>
           </div>
           <h4>Why Not Maximise Debt?</h4>
-          <p>Maximum leverage can:</p>
-          <ul>
-            <li>Reduce financial flexibility.</li>
-            <li>Increase the financing cost demanded by lenders.</li>
-            <li>Push the minimum DSCR toward lock-up.</li>
-            <li>Make downside cases unacceptable for equity.</li>
-          </ul>`
+          <p>Pushing leverage to the maximum reduces financial flexibility and raises the margin lenders demand. Coverage also tightens, so the minimum DSCR drifts toward the lock-up level and a modest shortfall can stop distributions altogether. Sensible investors therefore choose the leverage at which downside cases remain acceptable for equity, rather than the most debt lenders will offer.</p>`
       }
     ],
     ladder: [
@@ -395,12 +361,7 @@ Guide.modules = [
             <li><span class="flow-index">3</span><strong>Financing</strong><span>CFADS and Debt Schedule</span></li>
             <li><span class="flow-index">4</span><strong>Outputs</strong><span>Returns and Checks</span></li>
           </ol>
-          <ul>
-            <li>Never hardcode assumptions inside formulas.</li>
-            <li>Keep one consistent formula across each row.</li>
-            <li>Drive timing with flags rather than manual date ranges.</li>
-            <li>Centralise checks on one sheet feeding a master check.</li>
-          </ul>`
+          <p>Good practice keeps every assumption on the inputs sheet and out of formulas, with one consistent formula running across each row. Timing flags drive the calendar rather than manually selected date ranges, and all integrity checks feed a single master check so problems surface immediately.</p>`
       },
       {
         id: "audit",
@@ -644,12 +605,7 @@ Guide.modules = [
         html: `
           <div class="eq" data-f="npv"></div>
           <div class="eq" data-f="irr"></div>
-          <p>Positive NPV means the investment beats the required return. IRR has three known weaknesses:</p>
-          <ul>
-            <li>Implicit reinvestment of interim cash at the IRR itself.</li>
-            <li>Multiple solutions when cash flows change sign more than once.</li>
-            <li>Blindness to scale, since a small project can show a higher IRR than a larger one creating more value.</li>
-          </ul>`
+          <p>Positive NPV means the investment beats the required return. IRR is intuitive but has known weaknesses: it implicitly assumes interim cash is reinvested at the IRR itself, and it can produce multiple solutions when cash flows change sign more than once. Scale is invisible to IRR as well, so a small project can show a higher IRR than a larger one that creates more value, which is why NPV should rank competing projects.</p>`
       },
       {
         id: "moic",
@@ -813,11 +769,8 @@ Guide.modules = [
             </table>
           </div>
           <div class="eq" data-f="el"></div>
-          <ul>
-            <li><strong>Investment Grade:</strong> Ratings of BBB− or above at S&amp;P and Fitch, or Baa3 or above at Moody's.</li>
-            <li><strong>Issuer Versus Issue:</strong> Issuer ratings assess the entity, while issue ratings reflect a specific instrument's seniority and security.</li>
-            <li><strong>Lease Accounting:</strong> Under IFRS 16, operators record most leases as liabilities, so their leverage must include lease debt.</li>
-          </ul>`
+          <p>Ratings add an external view. Investment grade starts at BBB− for S&amp;P and Fitch, or Baa3 for Moody's, and anything below is sub-investment grade. Issuer ratings assess the entity as a whole, whereas issue ratings reflect a specific instrument's seniority and security.</p>
+          <p>Lease accounting matters for transport operators in particular. Under IFRS 16, operators record most leases as liabilities, so their leverage must be measured with lease debt included.</p>`
       }
     ],
     ladder: [
@@ -861,11 +814,8 @@ Guide.modules = [
         id: "fleet",
         title: "Fleet Economics",
         html: `
-          <div class="grid grid-3">
-            <div class="card"><h4>Capex</h4><ul><li>Vehicles</li><li>Chargers</li><li>Installation and Grid</li></ul></div>
-            <div class="card"><h4>Revenue</h4><ul><li>Lease Payments</li><li>Service Fees</li><li>Availability Payments</li></ul></div>
-            <div class="card"><h4>Costs</h4><ul><li>Electricity</li><li>Maintenance and Insurance</li><li>Battery Replacement</li></ul></div>
-          </div>
+          <p>Fleet financings follow a simple economic shape. Upfront capex buys the vehicles and chargers and pays for installation and grid connection. Revenue then comes from lease or service payments, which are often fixed or availability-based so that the operator rather than the investor carries usage risk. Ongoing costs cover maintenance and insurance, while electricity is often borne by the operator, and battery replacement remains the largest single cost to plan for.</p>
+          <p>Neot packages this model into five as-a-service offers, each removing a different barrier for transport operators.</p>
           <div class="table-wrap">
             <table>
               <thead><tr><th>Neot Offer</th><th>What It Covers</th></tr></thead>
@@ -898,10 +848,8 @@ Guide.modules = [
             <span class="chain-step">Lower CFADS</span><span class="chain-arrow">→</span>
             <span class="chain-step">Lower IRR and Coverage</span>
           </div>
-          <div class="grid grid-2">
-            <div class="card"><h4>Residual Value Drivers</h4><ul><li>Age and Mileage</li><li>Battery State of Health</li><li>Secondary Market Depth</li><li>Technology Progress</li></ul></div>
-            <div class="card"><h4>Why Timing Matters</h4><p>Residual value usually arrives after debt maturity, so lenders are unaffected and the entire shortfall lands on equity.</p></div>
-          </div>
+          <p>Investors look for exactly this skill of translating technical variables into cash flow consequences.</p>
+          <p>Residual value depends on age and mileage and above all on the battery's state of health, since the battery is the most valuable component. Secondary markets for electric heavy vehicles remain young, and rapid technological progress can erode the value of older models. Because residual value usually arrives after debt maturity, lenders are unaffected and the entire shortfall lands on equity.</p>
           <div class="callout callout-indigo">
             <div><span class="callout-title">Neot Lens</span>
             <p>Forsee Power, one of Neot's shareholders, manufactures batteries. Neot also markets Battery-as-a-Service with performance guarantees. Expect questions on how battery risk is priced and allocated.</p></div>
@@ -944,10 +892,7 @@ Guide.modules = [
           <p>Neot's offer includes monitoring deployed assets and recommending actions to maximise their returns. Showing interest in this phase signals maturity.</p>
           <p><strong>Variance Example:</strong> Budget assumes 100 buses earning €100k each, while actual deployment reaches 95 buses earning €102k each.</p>
           <div class="eq eq-example" data-f="variance"></div>
-          <div class="grid grid-2">
-            <div class="card"><h4>Operational KPIs</h4><ul><li>Fleet Deployment</li><li>Availability and Downtime</li><li>Energy Consumption</li><li>Maintenance Cost</li></ul></div>
-            <div class="card"><h4>Financial KPIs</h4><ul><li>CFADS and DSCR</li><li>Debt Balance</li><li>Distributions</li><li>IRR Forecast</li></ul></div>
-          </div>`
+          <p>Monitoring combines two families of indicators. Operational KPIs track fleet deployment and availability together with energy consumption and maintenance cost, while financial KPIs follow CFADS and DSCR alongside the debt balance and distributions. Together they feed an updated IRR forecast, which shows whether the asset is still delivering the return approved by the investment committee.</p>`
       }
     ],
     ladder: [

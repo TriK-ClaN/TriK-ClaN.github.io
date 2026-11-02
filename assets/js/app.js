@@ -253,7 +253,7 @@
     });
     Guide.lexicon.forEach((item) => entries.push({ kind: "Lexicon", title: `${item.fr} · ${item.en}`, text: item.def, href: "#/lexicon" }));
     Guide.flashcards.forEach((card) => entries.push({ kind: "Flashcard", title: card.q, text: Guide.stripHtml(card.a), href: "#/practice/flashcards" }));
-    Guide.mock.forEach((item) => entries.push({ kind: "Mock Question", title: item.q, text: item.points.join(" · "), href: "#/practice/mock" }));
+    Guide.mock.forEach((item) => entries.push({ kind: "Model Answer", title: item.q, text: item.answer.join(" ").replace(/\[\[|\]\]/g, ""), href: "#/practice/mock" }));
     return entries;
   }
 

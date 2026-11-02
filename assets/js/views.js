@@ -126,10 +126,10 @@ window.Guide = window.Guide || {};
           <div>
             <span class="eyebrow">${icon("spark")} Neot Capital · Investment Analyst Internship</span>
             <h1>Ready for Neot, Ha Linh.</h1>
-            <p class="lede">Everything needed for Wednesday in about ${Math.round(totalMinutes() / 60)} hours of focused study, built around the strengths Resonance has already given you.</p>
+            <p class="lede">Everything needed to walk into Wednesday's interview with confidence, combining about ${Math.round(totalMinutes() / 60)} hours of focused study with spoken model answers to rehearse. All of it builds on the strengths Resonance has already given you.</p>
             <div class="btn-row" style="margin-top:1.25rem">
               <a class="btn" href="#/study/project-finance">Start With Tier 1 ${icon("arrowRight")}</a>
-              <a class="btn btn-ghost" href="#/practice/mock">${icon("mic")} Mock Interview</a>
+              <a class="btn btn-ghost" href="#/practice/mock">${icon("mic")} Practise Interview Answers</a>
             </div>
           </div>
           <div class="countdown">
@@ -168,15 +168,27 @@ window.Guide = window.Guide || {};
         <h2 class="section-title reveal"><span class="num">01</span>Interview at a Glance</h2>
         <div class="stages reveal">
           ${Guide.interview.stages
-            .map((stage) => `<div class="card stage"><h3>${stage.title}</h3><p class="small muted">${stage.meta}</p><ul>${stage.focus.map((item) => `<li>${item}</li>`).join("")}</ul></div>`)
+            .map((stage) => `<div class="card stage"><h3>${stage.title}</h3><p class="small muted">${stage.meta}</p><p>${stage.summary}</p></div>`)
             .join("")}
         </div>
         ${ui.callout("Which Round Is Wednesday?", "<p>Prepare for both. Screening calls reward a sharp pitch and genuine knowledge of Neot, while the technical round rewards depth in project finance and judgement on EV fleets.</p>", "callout-indigo", "info")}
       </section>
 
       <section class="section">
-        <h2 class="section-title reveal"><span class="num">02</span>Winning Answer Formula</h2>
-        <p class="reveal">Strong answers climb a ladder instead of stopping at a definition.</p>
+        <h2 class="section-title reveal"><span class="num">02</span>How to Prepare</h2>
+        <div class="prose reveal">
+          <p>Preparation works best in two passes. Begin with the study modules, which explain each concept once and finish with interview-ready answers. Then switch to the Mock Interview, answer each question aloud against the clock and compare your response with the spoken model answer.</p>
+          <p>Personal questions deserve the same care as technical ones. Story Builder pairs every fit question with a model answer to adapt, so the pitch and the Resonance stories sound natural rather than memorised.</p>
+        </div>
+        <div class="btn-row reveal">
+          <a class="btn btn-soft btn-sm" href="#/practice/mock">${icon("mic")} Mock Interview</a>
+          <a class="btn btn-soft btn-sm" href="#/story">${icon("pen")} Story Builder</a>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2 class="section-title reveal"><span class="num">03</span>Winning Answer Formula</h2>
+        <p class="reveal">Strong answers climb a ladder instead of stopping at a definition. Start with the formula, explain the financial intuition behind it, then show what it means for risk and finish with an investment judgement.</p>
         <div class="chain reveal">
           <span class="chain-step"><strong>Formula</strong></span><span class="chain-arrow">→</span>
           <span class="chain-step"><strong>Financial Intuition</strong></span><span class="chain-arrow">→</span>
@@ -187,7 +199,7 @@ window.Guide = window.Guide || {};
       </section>
 
       <section class="section">
-        <h2 class="section-title reveal"><span class="num">03</span>Study Path</h2>
+        <h2 class="section-title reveal"><span class="num">04</span>Study Path</h2>
         <div class="grid grid-auto">
           ${tierColumn(1, "Must Master", "Current Resonance work makes these essential.")}
           ${tierColumn(2, "Very Likely", "Core corporate finance and investment reasoning.")}
@@ -196,7 +208,7 @@ window.Guide = window.Guide || {};
       </section>
 
       <section class="section">
-        <h2 class="section-title reveal"><span class="num">04</span>Three-Day Plan</h2>
+        <h2 class="section-title reveal"><span class="num">05</span>Three-Day Plan</h2>
         <div class="timeline">
           ${Guide.plan
             .map(
@@ -318,13 +330,15 @@ window.Guide = window.Guide || {};
       </section>
 
       <section class="section reveal">
-        <h2 class="section-title"><span class="num">06</span>Talking Points</h2>
-        <ul>
-          <li><strong>Specialist Model:</strong> Neot pairs financial structuring with technical expertise, matching a profile built on modelling and curiosity about technology.</li>
-          <li><strong>Timing:</strong> Neot e-motion has fresh equity and debt, so the team is originating actively.</li>
-          <li><strong>Debt Platform:</strong> Sizing assets into a facility like the MUFG one is exactly the skill Resonance has built.</li>
-          <li><strong>Battery DNA:</strong> Having a battery manufacturer among the shareholders makes battery risk a core competence.</li>
-        </ul>
+        <h2 class="section-title"><span class="num">06</span>Talking About Neot in the Interview</h2>
+        <div class="prose">
+          <p>Company knowledge lands best when it connects to your own profile. Neot pairs financial structuring with technical expertise, which matches a background built on modelling and a genuine curiosity about technology. Timing helps too: Neot e-motion has fresh equity and a new debt facility, so the team is originating actively and needs analysts who can contribute quickly.</p>
+          <p>Debt is the strongest bridge. Sizing assets into a portfolio facility like the MUFG one is exactly the skill Resonance has built, so mention it whenever financing comes up. Having a battery manufacturer among the shareholders also makes battery risk a core competence at Neot, which is worth acknowledging when discussing EV economics.</p>
+        </div>
+        <h3 class="answer-heading">Model Thirty-Second Summary</h3>
+        <div class="model-answer">
+          <p>Neot designs and manages investment platforms that finance low-carbon mobility, acquiring electric buses and trucks along with their batteries and chargers, then providing them to operators as a service. Founded in 2016 by EDF and Forsee Power, with Mitsui joining in 2023, it now manages about €500 million of equity across its platforms. Neot e-motion, its newest platform, launched in 2025 with €350 million of equity and has since financed 186 electric buses in Denmark. MUFG then provided a €125 million facility to complete the platform's capital structure.</p>
+        </div>
       </section>
 
       <section class="section reveal">
@@ -362,50 +376,27 @@ window.Guide = window.Guide || {};
 
       <section class="section reveal">
         <h2 class="section-title"><span class="num">02</span>Profile Match</h2>
-        <div class="grid grid-2">
-          <div class="card">
-            <h4>What Neot Asks For</h4>
-            <ul>
-              <li>Finance Track at Bac+4 or Bac+5</li>
-              <li>First Corporate Finance Internship</li>
-              <li>Comfort With Financial Modelling</li>
-              <li>Project Finance Exposure as a Real Plus</li>
-              <li>Fluent French and English</li>
-            </ul>
-          </div>
-          <div class="card">
-            <h4>What Ha Linh Brings</h4>
-            <ul>
-              <li>EDHEC Master's Programme</li>
-              <li>Project Finance Internship at Resonance</li>
-              <li>Daily Modelling and Debt Sizing</li>
-              <li>Model QC Procedure Formalised</li>
-              <li>Credit Experience at VIB</li>
-            </ul>
-          </div>
+        <p>Every requirement in the offer has a direct answer in your background, so each one can be backed by a specific example during the interview.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>What Neot Asks For</th><th>What You Bring</th></tr></thead>
+            <tbody>
+              <tr><td>Finance Track at Bac+4 or Bac+5</td><td>EDHEC Master's Programme</td></tr>
+              <tr><td>First Corporate Finance Internship</td><td>Project Finance Internship at Resonance Advisory</td></tr>
+              <tr><td>Comfort With Financial Modelling</td><td>Daily Modelling and Debt Sizing</td></tr>
+              <tr><td>Project Finance Exposure as a Real Plus</td><td>Live Transactions and a Formalised QC Procedure</td></tr>
+              <tr><td>Analytical Rigour</td><td>Model Review Work and Credit Experience at VIB</td></tr>
+              <tr><td>Fluent French and English</td><td>Pitch Rehearsed in Both Languages</td></tr>
+            </tbody>
+          </table>
         </div>
       </section>
 
       <section class="section reveal">
         <h2 class="section-title"><span class="num">03</span>Practical Details</h2>
-        <div class="grid grid-2">
-          <div class="card">
-            <h4>Logistics</h4>
-            <ul>
-              <li>Start in March 2027</li>
-              <li>Six Months</li>
-              <li>Rue Saint-Lazare, Paris 9e</li>
-              <li>Two Remote Days Weekly After Onboarding</li>
-            </ul>
-          </div>
-          <div class="card">
-            <h4>Benefits</h4>
-            <ul>
-              <li>Swile Meal Card at €11 Daily, 60% Covered</li>
-              <li>Sustainable Mobility Allowance of €50 to €58</li>
-              <li>One Day of Paid Leave per Month</li>
-            </ul>
-          </div>
+        <div class="prose">
+          <p>Starting in March 2027, the internship lasts six months and is based on Rue Saint-Lazare in the 9th arrondissement of Paris. After onboarding, interns may work remotely two days a week. Benefits include a Swile meal card worth €11 a day, with 60% covered by Neot, together with a sustainable mobility allowance of €50 to €58 depending on conditions. Interns also earn one day of paid leave per month.</p>
+          <p>Since EDHEC requires a second internship, confirm availability for the full six months from March without hesitation.</p>
         </div>
       </section>`;
   };
@@ -915,8 +906,26 @@ window.Guide = window.Guide || {};
     renderDrill();
   };
 
+  /* Model Answer Markup With Highlighted Personal Details */
+  function answerHtml(item) {
+    const paragraphs = item.answer
+      .map((paragraph) => `<p>${paragraph.replace(/\[\[(.+?)\]\]/g, '<span class="fill-in" title="Personalise this detail">$1</span>')}</p>`)
+      .join("");
+    const note = item.note ? `<p class="answer-note">${icon("pen", "inline-icon")} ${item.note}</p>` : "";
+    const lang = item.cat === "fr" ? ' lang="fr"' : "";
+    return `<div class="model-answer"${lang}>${paragraphs}</div>${note}`;
+  }
+
+  function pointsHtml(item) {
+    const lang = item.cat === "fr" ? ' lang="fr"' : "";
+    return `<div class="listen-for"><h4>${item.cat === "fr" ? "Points attendus" : "What They Listen For"}</h4><ul class="tag-list"${lang}>${item.points.map((point) => `<li>${point}</li>`).join("")}</ul></div>`;
+  }
+
+  Guide.answerHtml = answerHtml;
+
   /* Mock Interview View */
   Guide.views.mock = function mock(view) {
+    let mode = "practice";
     let category = "all";
     let queue = [];
     let current = null;
@@ -928,22 +937,31 @@ window.Guide = window.Guide || {};
       <header class="page-header">
         <span class="eyebrow">${icon("mic")} Practice</span>
         <h1>Mock Interview</h1>
-        <p class="lede">Draw a question, answer aloud against the clock, then compare with the key points an Investment Director will listen for.</p>
+        <p class="lede">Answer each question aloud against the clock, then compare your response with a spoken model answer. Highlighted details in the model answers are placeholders for your own examples.</p>
       </header>
+      <div class="toolbar">
+        <div class="segmented" role="group" aria-label="Mode" id="mock-mode">
+          <button type="button" data-mode="practice" aria-pressed="true">${icon("clock", "inline-icon")} Timed Practice</button>
+          <button type="button" data-mode="bank" aria-pressed="false">${icon("book", "inline-icon")} Answer Bank</button>
+        </div>
+      </div>
       <div class="toolbar">
         <div class="segmented" role="group" aria-label="Question category" id="mock-cat">
           <button type="button" data-cat="all">All</button>
           ${Guide.mockCategories.map((cat) => `<button type="button" data-cat="${cat.id}">${cat.label}</button>`).join("")}
         </div>
       </div>
-      <div class="card mock-card" id="mock-host"></div>
-      ${ui.callout("How to Answer", "<p>Pause for two seconds and state the structure first. Then climb from formula to intuition to risk to decision, thinking aloud on any calculation.</p>", "callout-indigo", "lightbulb")}`;
+      <div id="mock-host"></div>`;
 
     const host = view.querySelector("#mock-host");
 
-    function buildQueue() {
-      queue = Guide.shuffle(Guide.mock.filter((item) => category === "all" || item.cat === category));
+    function syncButtons() {
       view.querySelectorAll("#mock-cat button").forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.cat === category)));
+      view.querySelectorAll("#mock-mode button").forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.mode === mode)));
+    }
+
+    function filtered() {
+      return Guide.mock.filter((item) => category === "all" || item.cat === category);
     }
 
     function stopTimer() {
@@ -961,32 +979,64 @@ window.Guide = window.Guide || {};
       node.querySelector(".timer-bar span").style.width = `${Math.min(100, (elapsed / duration) * 100)}%`;
     }
 
-    function next() {
+    /* Answer Bank Mode */
+    function renderBank() {
+      stopTimer();
+      const groups = Guide.mockCategories.filter((cat) => category === "all" || cat.id === category);
+      host.innerHTML = groups
+        .map((cat) => {
+          const items = Guide.mock.filter((item) => item.cat === cat.id);
+          return `
+            <section class="section">
+              <h2 class="bank-title">${cat.label}</h2>
+              ${items
+                .map(
+                  (item) => `
+                <details class="accordion">
+                  <summary${item.cat === "fr" ? ' lang="fr"' : ""}>${item.q} ${icon("chevronDown", "chev")}</summary>
+                  <div class="accordion-body">
+                    ${answerHtml(item)}
+                    ${pointsHtml(item)}
+                    <a class="btn btn-ghost btn-sm" href="${item.link}">Revise This Topic ${icon("arrowRight")}</a>
+                  </div>
+                </details>`
+                )
+                .join("")}
+            </section>`;
+        })
+        .join("");
+    }
+
+    /* Timed Practice Mode */
+    function nextQuestion() {
       stopTimer();
       elapsed = 0;
-      if (!queue.length) buildQueue();
+      if (!queue.length) queue = Guide.shuffle(filtered());
       current = queue.shift();
       const cat = Guide.mockCategories.find((item) => item.id === current.cat);
       const ratings = store.get("mockRatings", {});
-      const key = current.q;
+      const key = current.id;
       const lang = current.cat === "fr" ? ' lang="fr"' : "";
 
       host.innerHTML = `
-        <div class="mock-top">
-          <span class="pill">${cat.label}</span>
-          <div class="timer"><span class="timer-time">1:30</span><span class="timer-bar"><span></span></span></div>
-        </div>
-        <p class="mock-q"${lang}>${current.q}</p>
-        <div class="btn-row">
-          <button type="button" class="btn" id="mock-timer">${icon("play")} Start Timer</button>
-          <div class="segmented" role="group" aria-label="Answer length" id="mock-duration">
-            ${[60, 90, 120].map((seconds) => `<button type="button" data-seconds="${seconds}" aria-pressed="${seconds === duration}">${seconds}s</button>`).join("")}
+        <div class="card mock-card">
+          <div class="mock-top">
+            <span class="pill">${cat.label}</span>
+            <div class="timer"><span class="timer-time">1:30</span><span class="timer-bar"><span></span></span></div>
           </div>
-          <button type="button" class="btn btn-ghost" id="mock-reveal">${icon("lightbulb")} Reveal Key Points</button>
-          <button type="button" class="btn btn-ghost" id="mock-next">Next Question ${icon("arrowRight")}</button>
+          <p class="mock-q"${lang}>${current.q}</p>
+          <div class="btn-row">
+            <button type="button" class="btn" id="mock-timer">${icon("play")} Start Timer</button>
+            <div class="segmented" role="group" aria-label="Answer length" id="mock-duration">
+              ${[60, 90, 120].map((seconds) => `<button type="button" data-seconds="${seconds}" aria-pressed="${seconds === duration}">${seconds}s</button>`).join("")}
+            </div>
+            <button type="button" class="btn btn-ghost" id="mock-reveal">${icon("lightbulb")} Reveal Model Answer</button>
+            <button type="button" class="btn btn-ghost" id="mock-next">Next Question ${icon("arrowRight")}</button>
+          </div>
+          <div id="mock-answer"></div>
+          <p class="small muted mock-remaining">${queue.length} more questions in this round.${ratings[key] ? ` Last self-rating: ${ratings[key]}.` : ""}</p>
         </div>
-        <div id="mock-points"></div>
-        <p class="small muted" style="margin:1rem 0 0">${queue.length} more questions in this round.${ratings[key] ? ` Last self-rating: ${ratings[key]}.` : ""}</p>`;
+        ${ui.callout("How to Compare", "<p>Judge your answer on structure and substance rather than wording. Check whether you opened with a clear headline and covered the listening points, then whether you finished on a judgement or recommendation.</p>", "callout-indigo", "lightbulb")}`;
 
       renderTimer();
 
@@ -1015,12 +1065,13 @@ window.Guide = window.Guide || {};
       host.querySelector("#mock-reveal").addEventListener("click", () => {
         stopTimer();
         host.querySelector("#mock-timer").innerHTML = `${icon("play")} Resume`;
-        host.querySelector("#mock-points").innerHTML = `
+        host.querySelector("#mock-answer").innerHTML = `
           <div class="keypoints">
-            <h3>Key Points to Hit</h3>
-            <ul${lang}>${current.points.map((point) => `<li>${point}</li>`).join("")}</ul>
-            <div class="btn-row" style="align-items:center">
-              <span class="small muted">Rate This Answer</span>
+            <h3>Model Answer</h3>
+            ${answerHtml(current)}
+            ${pointsHtml(current)}
+            <div class="btn-row rate-row">
+              <span class="small muted">Rate Your Answer</span>
               <div class="segmented" role="group" aria-label="Self-rating" id="mock-rate">
                 ${["Needs Work", "Solid", "Nailed It"].map((label) => `<button type="button" data-rate="${label}" aria-pressed="${ratings[key] === label}">${label}</button>`).join("")}
               </div>
@@ -1037,19 +1088,34 @@ window.Guide = window.Guide || {};
         });
       });
 
-      host.querySelector("#mock-next").addEventListener("click", next);
+      host.querySelector("#mock-next").addEventListener("click", nextQuestion);
+    }
+
+    function render() {
+      syncButtons();
+      if (mode === "bank") {
+        renderBank();
+      } else {
+        queue = Guide.shuffle(filtered());
+        nextQuestion();
+      }
     }
 
     view.querySelector("#mock-cat").addEventListener("click", (event) => {
       const button = event.target.closest("button[data-cat]");
       if (!button) return;
       category = button.dataset.cat;
-      buildQueue();
-      next();
+      render();
     });
 
-    buildQueue();
-    next();
+    view.querySelector("#mock-mode").addEventListener("click", (event) => {
+      const button = event.target.closest("button[data-mode]");
+      if (!button) return;
+      mode = button.dataset.mode;
+      render();
+    });
+
+    render();
     return stopTimer;
   };
 
@@ -1061,19 +1127,26 @@ window.Guide = window.Guide || {};
       <header class="page-header">
         <span class="eyebrow">${icon("pen")} Prepare</span>
         <h1>Story Builder</h1>
-        <p class="lede">Draft the answers only you can give. Every prompt includes a structure and a starter line, and drafts save automatically in this browser.</p>
+        <p class="lede">Personal questions decide fit interviews, so draft the answers only you can give. Each prompt pairs a suggested structure with a model answer to adapt, and drafts save automatically in this browser.</p>
       </header>
       <div class="toolbar">
         <button type="button" class="btn" id="story-download">${icon("download")} Download My Notes</button>
         <span class="save-state" id="story-state" aria-live="polite">Saved Locally</span>
       </div>
       ${Guide.story
-        .map(
-          (prompt, i) => `
+        .map((prompt, i) => {
+          const sample = Guide.mock.find((item) => item.id === prompt.sampleId);
+          return `
         <details class="accordion reveal" ${i === 0 ? "open" : ""}>
           <summary><span class="pill">${prompt.target}</span>${prompt.title} ${icon("chevronDown", "chev")}</summary>
           <div class="accordion-body"${prompt.lang === "fr" ? ' lang="fr"' : ""}>
-            <ul>${prompt.guidance.map((line) => `<li>${line}</li>`).join("")}</ul>
+            <h4>${prompt.lang === "fr" ? "Structure suggérée" : "Suggested Structure"}</h4>
+            <ul class="tag-list">${prompt.guidance.map((line) => `<li>${line}</li>`).join("")}</ul>
+            ${
+              sample
+                ? `<details class="sample-answer"><summary>${icon("lightbulb")} ${prompt.lang === "fr" ? "Réponse modèle à adapter" : "Model Answer to Adapt"}</summary>${answerHtml(sample)}</details>`
+                : ""
+            }
             <div class="field">
               <label for="story-${prompt.id}">${prompt.lang === "fr" ? "Brouillon" : "Draft"}</label>
               <textarea class="input" id="story-${prompt.id}" data-story="${prompt.id}" placeholder="${escapeHtml(prompt.starter)}">${escapeHtml(saved[prompt.id] || "")}</textarea>
@@ -1083,8 +1156,8 @@ window.Guide = window.Guide || {};
               <span class="small muted" data-count="${prompt.id}"></span>
             </div>
           </div>
-        </details>`
-        )
+        </details>`;
+        })
         .join("")}
       ${ui.callout("Confidentiality", "<p>Describe Resonance work by sector and role rather than client names or deal figures that are not public.</p>", "callout-amber", "alert")}`;
 
@@ -1211,7 +1284,7 @@ Ha Linh`;
       <header class="page-header">
         <span class="eyebrow">${icon("calendar")} Prepare</span>
         <h1>Interview Day</h1>
-        <p class="lede">Final checklist and conduct during the interview, followed by questions to ask and the thank-you email.</p>
+        <p class="lede">Everything for the day itself, from the final checklist and conduct during the conversation to the questions worth asking and the follow-up email.</p>
       </header>
 
       <section class="section reveal">
@@ -1236,18 +1309,25 @@ Ha Linh`;
 
       <section class="section reveal">
         <h2 class="section-title"><span class="num">02</span>During the Interview</h2>
-        <ol class="steps">
-          <li><strong>Open Strong:</strong> Greet both interviewers by name and keep the pitch under two minutes.</li>
-          <li><strong>Structure First:</strong> Announce how the answer will unfold before diving in.</li>
-          <li><strong>Think Aloud on Numbers:</strong> State assumptions and round sensibly before sanity-checking the result.</li>
-          <li><strong>Handle Gaps Honestly:</strong> Say what is known, then reason toward the rest.</li>
-          <li><strong>Close With Intent:</strong> Confirm motivation and availability for six months from March 2027.</li>
-        </ol>
+        <div class="prose">
+          <p>First impressions form within the opening minute, so greet both interviewers by name and keep the introduction under two minutes. Before each technical answer, take a breath and announce the structure, for example by saying that you will define the ratio, explain how it is used and then give an example. Interviewers follow a structured answer far more easily, and it buys valuable thinking time.</p>
+          <p>Calculations deserve the same discipline. State the assumptions aloud and round sensibly, then sanity-check the result before moving on. When a question goes beyond what you know, say so calmly and share what you do know before reasoning toward the rest; investment teams value honest reasoning far more than confident guessing.</p>
+        </div>
+        <div class="grid grid-2 model-lines">
+          <div class="card">
+            <h4>Model Opening Line</h4>
+            <p class="model-quote">“Thank you both for taking the time today. Having followed Neot e-motion's first transactions closely, I am really looking forward to discussing how my project finance experience could contribute to the team.”</p>
+          </div>
+          <div class="card">
+            <h4>Model Closing Statement</h4>
+            <p class="model-quote">“Thank you for this conversation. Today's discussion confirmed that Neot is where my project finance foundation can grow into investment judgement, and I am fully available for the six months from March 2027.”</p>
+          </div>
+        </div>
       </section>
 
       <section class="section reveal">
         <h2 class="section-title"><span class="num">03</span>Questions to Ask</h2>
-        <p>Choose two or three, ideally adapted to what the interviewers mention.</p>
+        <p>Closing questions show how seriously you have prepared. Choose two or three from the list below, ideally adapting them to topics the interviewers raised earlier.</p>
         ${Guide.askThem.map((item) => `<div class="card ask-card"><p><strong>“${item.q}”</strong></p><p class="small muted">${item.why}</p></div>`).join("")}
       </section>
 

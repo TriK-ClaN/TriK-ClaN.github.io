@@ -13,12 +13,12 @@ Guide.interview = {
     {
       title: "Teams Screening",
       meta: "30 Minutes · Recruiter or Team Member",
-      focus: ["Motivation for Neot", "Resonance Experience in Brief", "French and English Fluency", "Possible Light Technicals"]
+      summary: "Expect a conversational call focused on motivation and fit. Interviewers will want a crisp walkthrough of the CV and clear reasons for choosing Neot, delivered with evident fluency in French and English. One or two light technical questions may check the basics."
     },
     {
       title: "Technical and Fit Interview",
       meta: "Investment Director and Investment Officer",
-      focus: ["Project Finance and Debt Sizing", "Accounting and Valuation", "Judgement on EV Fleets", "Fit With a Small Team"]
+      summary: "Expect technical depth, starting with project finance and debt sizing before moving to valuation and judgement on EV fleets. Fit matters just as much, because the team is small and works closely together."
     }
   ]
 };
@@ -101,6 +101,7 @@ Guide.lexicon = [
 Guide.story = [
   {
     id: "pitch",
+    sampleId: "fit-intro",
     title: "Tell Me About Yourself",
     lang: "en",
     target: "90 to 120 Seconds",
@@ -109,6 +110,7 @@ Guide.story = [
   },
   {
     id: "pitch-fr",
+    sampleId: "fr-intro",
     title: "Présentez-vous",
     lang: "fr",
     target: "90 à 120 secondes",
@@ -117,6 +119,7 @@ Guide.story = [
   },
   {
     id: "why-neot",
+    sampleId: "fit-why-neot",
     title: "Why Neot?",
     lang: "en",
     target: "60 Seconds",
@@ -125,6 +128,7 @@ Guide.story = [
   },
   {
     id: "why-role",
+    sampleId: "fit-why-investing",
     title: "Why Move From Advisory to Investing?",
     lang: "en",
     target: "60 Seconds",
@@ -133,6 +137,7 @@ Guide.story = [
   },
   {
     id: "model-story",
+    sampleId: "model-walk",
     title: "Walk Me Through a Model You Built",
     lang: "en",
     target: "Two Minutes",
@@ -141,6 +146,7 @@ Guide.story = [
   },
   {
     id: "error-story",
+    sampleId: "model-error",
     title: "Hardest Error You Have Found",
     lang: "en",
     target: "STAR in 90 Seconds",
@@ -149,6 +155,7 @@ Guide.story = [
   },
   {
     id: "qc-story",
+    sampleId: "model-qc",
     title: "QC Procedure You Formalised",
     lang: "en",
     target: "STAR in 90 Seconds",
@@ -157,6 +164,7 @@ Guide.story = [
   },
   {
     id: "weakness",
+    sampleId: "fit-weakness",
     title: "Strength and Weakness",
     lang: "en",
     target: "60 Seconds",
