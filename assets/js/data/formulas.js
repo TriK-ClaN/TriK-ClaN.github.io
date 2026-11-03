@@ -67,7 +67,7 @@ Guide.formulas = {
     plain: "FCFF = EBIT × (1 − T) + D&A − Capex − ΔNWC"
   },
   dcf: {
-    tex: String.raw`\text{EV} = \sum_{t=1}^{n} \dfrac{\text{FCFF}_t}{(1 + \text{WACC})^{t}} + \dfrac{\text{TV}_n}{(1 + \text{WACC})^{n}}`,
+    tex: String.raw`\begin{aligned} \text{EV} = {} & \sum_{t=1}^{n} \dfrac{\text{FCFF}_t}{(1 + \text{WACC})^{t}} \\ & + \dfrac{\text{TV}_n}{(1 + \text{WACC})^{n}} \end{aligned}`,
     plain: "EV = Σ FCFF(t) / (1 + WACC)^t + TV(n) / (1 + WACC)^n"
   },
   wacc: {
@@ -131,7 +131,7 @@ Guide.formulas = {
     ]
   },
   tco: {
-    tex: String.raw`\begin{aligned} \text{TCO} = {} & \text{Purchase} + \text{Financing} + \text{Energy} \\ & + \text{Maintenance} + \text{Insurance} + \text{Taxes} \\ & - \text{Residual value} \end{aligned}`,
+    tex: String.raw`\begin{aligned} \text{TCO} = {} & \text{Purchase} + \text{Financing} \\ & + \text{Energy} + \text{Maintenance} \\ & + \text{Insurance} + \text{Taxes} \\ & - \text{Residual value} \end{aligned}`,
     plain: "TCO = Purchase + Financing + Energy + Maintenance + Insurance + Taxes − Residual value"
   },
   indexation: {

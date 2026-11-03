@@ -180,6 +180,7 @@ Guide.checklist = [
   { id: "c3", group: "Technical", text: "Complete all eight Statement Drills without notes.", hint: "Statement Drills" },
   { id: "c4", group: "Technical", text: "Explain the battery-earlier case using the Fleet Case Lab.", hint: "Fleet Case Lab" },
   { id: "c5", group: "Technical", text: "Score 80% or better on the full quiz.", hint: "Quiz" },
+  { id: "c11", group: "Technical", text: "Score 80% or better on a full Formula Quiz run.", hint: "Formula Quiz" },
   { id: "c6", group: "Company", text: "Summarise Neot in thirty seconds, including the MUFG facility.", hint: "Neot Profile" },
   { id: "c7", group: "Story", text: "Rehearse the pitch aloud in English and in French.", hint: "Story Builder" },
   { id: "c8", group: "Story", text: "Prepare the error and QC stories in STAR format.", hint: "Story Builder" },
@@ -220,6 +221,7 @@ Guide.plan = [
     label: "4 November",
     theme: "Interview Day · Light Review",
     tasks: [
+      { text: "Formula Quiz as a Final Recall Check", href: "#/practice/formulas" },
       { text: "Flashcards Still Under Review", href: "#/practice/flashcards" },
       { text: "Pitch Rehearsal in Both Languages", href: "#/story" },
       { text: "Interview Day Checklist", href: "#/interview-day" }

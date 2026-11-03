@@ -25,6 +25,7 @@
       items: [
         { href: "#/practice/flashcards", label: "Flashcards", icon: "cards" },
         { href: "#/practice/quiz", label: "Quiz", icon: "quiz" },
+        { href: "#/practice/formulas", label: "Formula Quiz", icon: "sigma" },
         { href: "#/practice/drills", label: "Statement Drills", icon: "table" },
         { href: "#/practice/case", label: "Fleet Case Lab", icon: "flask" },
         { href: "#/practice/returns", label: "Returns Lab", icon: "calc" },
@@ -49,6 +50,7 @@
     study: { view: "study", title: "Study Path" },
     "practice/flashcards": { view: "flashcards", title: "Flashcards" },
     "practice/quiz": { view: "quiz", title: "Quiz" },
+    "practice/formulas": { view: "formulaQuiz", title: "Formula Quiz" },
     "practice/drills": { view: "drills", title: "Statement Drills" },
     "practice/case": { view: "caseLab", title: "Fleet Case Lab" },
     "practice/returns": { view: "returnsLab", title: "Returns Lab" },
@@ -142,6 +144,11 @@
     const parts = raw.split("/");
     if (parts[0] === "study" && parts[1]) {
       return { view: "module", title: (Guide.modules.find((m) => m.id === parts[1]) || {}).title, args: [parts[1], parts[2]], path: `study/${parts[1]}` };
+    }
+
+    /* Formula Quiz With a Preselected Topic */
+    if (parts[0] === "practice" && parts[1] === "formulas" && parts[2]) {
+      return { view: "formulaQuiz", title: "Formula Quiz", args: [parts[2]], path: raw };
     }
     const route = ROUTES[raw];
     return route ? { view: route.view, title: route.title, args: [], path: raw } : { view: "notFound", title: "Not Found", args: [], path: raw };
@@ -254,6 +261,7 @@
     Guide.lexicon.forEach((item) => entries.push({ kind: "Lexicon", title: `${item.fr} · ${item.en}`, text: item.def, href: "#/lexicon" }));
     Guide.flashcards.forEach((card) => entries.push({ kind: "Flashcard", title: card.q, text: Guide.stripHtml(card.a), href: "#/practice/flashcards" }));
     Guide.mock.forEach((item) => entries.push({ kind: "Model Answer", title: item.q, text: item.answer.join(" ").replace(/\[\[|\]\]/g, ""), href: "#/practice/mock" }));
+    Guide.formulaIndex.forEach((item) => entries.push({ kind: "Formula", title: item.name, text: Guide.formulas[item.key].plain, href: `#/study/${item.module}/${item.section}` }));
     return entries;
   }
 

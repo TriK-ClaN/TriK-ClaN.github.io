@@ -8,6 +8,7 @@ Interactive preparation guide for the Neot Capital Investment Analyst internship
 - **Neot Profile and Role Decoder:** Company facts, platform debt financing, recent transactions and the offer translated into evidence to bring
 - **Study:** Seven focused modules totalling about two hours, each opening with three key takeaways
 - **Practice:** Flashcards, quiz, statement drills, Fleet Case Lab, Returns Lab and a mock interview with spoken model answers and an Answer Bank
+- **Formula Quiz:** 52 questions across all 28 formulas, testing recall, recognition, completion and calculation, with per-formula mastery tracking
 - **Prepare:** Story Builder with model answers to adapt, French lexicon and interview-day guidance
 
 ## Structure

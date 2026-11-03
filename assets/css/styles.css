@@ -994,6 +994,10 @@ hr {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
+.grid-5 {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
 .grid-auto {
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
 }
@@ -2051,6 +2055,343 @@ input[type="range"]:active::-webkit-slider-thumb {
   font-size: 3rem;
   font-weight: 600;
   line-height: 1;
+}
+
+/* Formula Quiz Setup */
+#fq-host {
+  scroll-margin-top: 5rem;
+}
+
+.fq-setup h3 {
+  margin-bottom: 1.1rem;
+}
+
+.fq-field {
+  display: grid;
+  justify-items: start;
+  gap: 0.45rem;
+  margin-bottom: 1.1rem;
+}
+
+.fq-label {
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.fq-type-hint {
+  margin: -0.5rem 0 1.1rem;
+}
+
+.fq-start {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 1rem;
+  margin-top: 0.4rem;
+}
+
+.fq-best {
+  margin: 1rem 0 0;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--border);
+}
+
+/* Formula Mastery Grid */
+.fq-mastery-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+}
+
+.fq-mastery-head .section-title {
+  margin-bottom: 0.6rem;
+}
+
+.fq-mastery-head .num svg {
+  width: 15px;
+  height: 15px;
+}
+
+.fq-mastery-meter {
+  margin-bottom: 0.75rem;
+}
+
+.fq-mastery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(215px, 1fr));
+  gap: 0.6rem;
+  margin: 1rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fq-mastery li {
+  margin: 0;
+}
+
+.fq-chip {
+  display: grid;
+  grid-template-columns: 1.6rem minmax(0, 1fr);
+  gap: 0.1rem 0.65rem;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+}
+
+.fq-chip:hover {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-1px);
+}
+
+.fq-chip-dot {
+  display: grid;
+  grid-row: span 2;
+  place-items: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border: 1.5px dashed var(--border-strong);
+  border-radius: 50%;
+}
+
+.fq-chip-dot svg {
+  width: 13px;
+  height: 13px;
+}
+
+.fq-chip[data-state="mastered"] .fq-chip-dot {
+  border: 0;
+  background: var(--green);
+  color: #ffffff;
+}
+
+.fq-chip[data-state="review"] .fq-chip-dot {
+  border: 0;
+  background: var(--amber-soft);
+  color: var(--amber);
+}
+
+.fq-chip-name {
+  font-family: var(--font-display);
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.fq-chip-meta {
+  color: var(--muted);
+  font-size: 0.76rem;
+}
+
+/* Formula Quiz Questions */
+.fq-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-bottom: 0.85rem;
+}
+
+.fq-type[data-type="recall"] {
+  border-color: transparent;
+  background: var(--indigo-soft);
+  color: var(--indigo);
+}
+
+.fq-type[data-type="recognise"] {
+  border-color: transparent;
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+}
+
+.fq-type[data-type="complete"] {
+  border-color: transparent;
+  background: var(--amber-soft);
+  color: var(--amber);
+}
+
+.fq-type[data-type="apply"] {
+  border-color: transparent;
+  background: var(--green-soft);
+  color: var(--green);
+}
+
+.fq-prompt {
+  margin: 0 0 1.25rem;
+}
+
+.fq-prompt .fq-math {
+  display: block;
+  min-width: max-content;
+  text-align: center;
+}
+
+.fq-prompt .katex-display {
+  margin: 0;
+}
+
+.fq-math.is-plain {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  white-space: normal;
+}
+
+.options-math .option {
+  align-items: center;
+}
+
+.option > .fq-math {
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.2rem 0;
+  scrollbar-width: thin;
+}
+
+.option .fq-math .katex {
+  font-size: 1.08em;
+}
+
+.fq-keys {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+/* Reference Formula Card */
+.fq-reference {
+  margin: 1rem 0;
+}
+
+.fq-reference-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+}
+
+.fq-reference-name {
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+
+.fq-review-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.86rem;
+  font-weight: 550;
+}
+
+.fq-reference .eq {
+  margin-top: 0.5rem;
+}
+
+/* Formula Quiz Results */
+.fq-breakdown {
+  margin-top: 1rem;
+}
+
+.fq-type-row {
+  display: grid;
+  grid-template-columns: 6.5rem minmax(0, 1fr) 3rem;
+  gap: 0.85rem;
+  align-items: center;
+  margin-top: 0.7rem;
+  font-size: 0.9rem;
+}
+
+.fq-type-row strong {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.fq-review-title {
+  margin: 2rem 0 0.85rem;
+}
+
+.fq-miss {
+  margin-bottom: 0.9rem;
+}
+
+.fq-miss-q {
+  margin-bottom: 0.75rem;
+}
+
+.fq-answers {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.6rem;
+  margin-bottom: 0.85rem;
+}
+
+.fq-answer {
+  min-width: 0;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow-x: auto;
+  font-size: 0.92rem;
+}
+
+.fq-answer.is-wrong {
+  border-color: var(--rose);
+  background: var(--rose-soft);
+}
+
+.fq-answer.is-correct {
+  border-color: var(--green);
+  background: var(--green-soft);
+}
+
+.fq-answer-label {
+  display: block;
+  margin-bottom: 0.25rem;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Module Link to the Formula Quiz */
+.fq-module-link {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 0 0 1.5rem;
+}
+
+.fq-module-link .card-icon {
+  flex: none;
+  margin-bottom: 0;
+}
+
+.fq-module-link strong {
+  display: block;
+  font-family: var(--font-display);
+}
+
+.fq-module-link .small {
+  display: block;
+}
+
+.fq-module-arrow {
+  flex: none;
+  margin-left: auto;
+  color: var(--accent);
 }
 
 /* Statement Drills */
@@ -3394,6 +3735,10 @@ mark {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .grid-5 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
   .timeline {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -3403,6 +3748,19 @@ mark {
 @media (max-width: 680px) {
   body {
     font-size: 15.5px;
+  }
+
+  .fq-answers {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .fq-type-row {
+    grid-template-columns: 5.5rem minmax(0, 1fr) 2.5rem;
+    gap: 0.6rem;
+  }
+
+  .fq-module-link .card-icon {
+    display: none;
   }
 
   .grid-2,
@@ -3430,11 +3788,24 @@ mark {
   }
 
   .eq {
-    padding: 0.95rem 1rem;
+    padding: 0.85rem 0.8rem;
   }
 
   .eq .katex {
-    font-size: 1.05em;
+    font-size: 0.92em;
+  }
+
+  .eq-compact .katex {
+    font-size: 0.88em;
+  }
+
+  .option .fq-math .katex {
+    font-size: 0.95em;
+  }
+
+  .fq-round,
+  .fq-keys {
+    display: none;
   }
 
   .flash-a .eq-compact {
@@ -3442,7 +3813,7 @@ mark {
   }
 
   .flash-a .eq-compact .katex {
-    font-size: 0.9em;
+    font-size: 0.84em;
   }
 
   .eq-where {
@@ -3485,8 +3856,13 @@ mark {
 
 @media (max-width: 420px) {
   .grid-4,
+  .grid-5,
   .kpis {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .grid-5 > :last-child:nth-child(odd) {
+    grid-column: 1 / -1;
   }
 
   .countdown-unit strong {

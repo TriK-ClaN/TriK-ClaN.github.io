@@ -154,11 +154,12 @@ window.Guide = window.Guide || {};
               <button type="button" class="btn btn-ghost btn-sm" data-open-reset>${icon("refresh")} Reset Progress</button>
             </div>
             <p class="muted small">Progress saves automatically in this browser as you study and practise.</p>
-            <div class="grid grid-4">
+            <div class="grid grid-5">
               <div class="stat"><span class="stat-value">${summary.modulesDone}/${summary.totals.modules}</span><span class="stat-label">Modules</span></div>
               <div class="stat"><span class="stat-value">${summary.flashKnown}/${summary.totals.flash}</span><span class="stat-label">Flashcards</span></div>
               <div class="stat"><span class="stat-value">${summary.drillsDone}/${summary.totals.drills}</span><span class="stat-label">Drills</span></div>
               <div class="stat"><span class="stat-value">${summary.quizBest}%</span><span class="stat-label">Best Quiz</span></div>
+              <div class="stat"><span class="stat-value">${summary.formulaBest}%</span><span class="stat-label">Formula Quiz</span></div>
             </div>
           </div>
         </div>
@@ -445,6 +446,8 @@ window.Guide = window.Guide || {};
     const prev = Guide.modules[index - 1];
     const next = Guide.modules[index + 1];
     const isDone = Boolean(progress.modules()[id]);
+    const formulaCount = Guide.formulaIndex.filter((item) => item.module === id).length;
+    const formulaQuestions = Guide.formulaQuiz.filter((item) => Guide.formulaIndex.some((formula) => formula.key === item.formula && formula.module === id)).length;
 
     view.classList.add("is-wide");
     view.innerHTML = `
@@ -491,6 +494,12 @@ window.Guide = window.Guide || {};
           <section class="section reveal" id="sec-traps">
             ${ui.callout("Common Traps", `<ul>${module.traps.map((trap) => `<li>${trap}</li>`).join("")}</ul>`, "callout-rose", "flag")}
           </section>
+
+          ${formulaCount ? `<a class="card card-link fq-module-link reveal" href="#/practice/formulas/${module.id}">
+            <span class="card-icon">${icon("sigma")}</span>
+            <span><strong>Test This Module's Formulas</strong><span class="small muted">${formulaCount} formulas and ${formulaQuestions} questions in the Formula Quiz, filtered to ${module.short}.</span></span>
+            ${icon("arrowRight", "fq-module-arrow")}
+          </a>` : ""}
 
           <div class="complete-bar">
             <div><strong>Finished This Module?</strong><div class="small muted">Marking it reviewed updates the readiness score.</div></div>
@@ -805,6 +814,318 @@ window.Guide = window.Guide || {};
     }
 
     setup();
+  };
+
+  /* Formula Quiz View */
+  Guide.views.formulaQuiz = function formulaQuiz(view, presetTopic) {
+    const bank = Guide.formulaQuiz;
+    const formulaByKey = Object.fromEntries(Guide.formulaIndex.map((item) => [item.key, item]));
+    const topicOf = (item) => formulaByKey[item.formula].module;
+    const typeLabel = (id) => Guide.formulaTypes.find((type) => type.id === id).label;
+    const topics = [{ id: "all", label: "All Topics" }].concat(
+      Guide.modules.filter((module) => bank.some((item) => topicOf(item) === module.id)).map((module) => ({ id: module.id, label: module.short }))
+    );
+    const types = [{ id: "all", label: "All Types" }].concat(Guide.formulaTypes.map((type) => ({ id: type.id, label: type.label })));
+    const lengths = [{ id: "10", label: "10 Questions" }, { id: "20", label: "20 Questions" }, { id: "all", label: `All ${bank.length}` }];
+
+    const settings = {
+      topic: topics.some((topic) => topic.id === presetTopic) ? presetTopic : "all",
+      type: "all",
+      length: "20"
+    };
+    let keyHandler = null;
+
+    view.innerHTML = `
+      <header class="page-header">
+        <span class="eyebrow">${icon("sigma")} Practice</span>
+        <h1>Formula Quiz</h1>
+        <p class="lede">${bank.length} questions covering all ${Guide.formulaIndex.length} formulas in the guide. Each one asks you to recall an expression, recognise what it measures, complete a missing term or apply it to numbers.</p>
+      </header>
+      <div id="fq-host"></div>`;
+
+    const host = view.querySelector("#fq-host");
+
+    /* Shared Rendering Helpers */
+    const mathSpan = (tex, display) => `<span class="fq-math" data-tex="${escapeHtml(tex)}" data-display="${display}"></span>`;
+    const optionMarkup = (item, index) => (item.math ? mathSpan(item.options[index], false) : `<span>${escapeHtml(item.options[index])}</span>`);
+    const reviewLink = (key) => {
+      const formula = formulaByKey[key];
+      const module = moduleById(formula.module);
+      return `<a class="fq-review-link" href="#/study/${formula.module}/${formula.section}">${icon("book", "inline-icon")} Review in ${module.short}</a>`;
+    };
+    const referenceCard = (key) => `
+      <div class="fq-reference">
+        <div class="fq-reference-head"><span class="fq-reference-name">${escapeHtml(formulaByKey[key].name)}</span>${reviewLink(key)}</div>
+        <div class="eq eq-compact" data-f="${key}"></div>
+      </div>`;
+
+    function paint(root) {
+      Guide.renderMath(root);
+      Guide.renderFormulas(root);
+    }
+
+    function setKeys(handler) {
+      if (keyHandler) document.removeEventListener("keydown", keyHandler);
+      keyHandler = handler;
+      if (handler) document.addEventListener("keydown", handler);
+    }
+
+    function segmented(name, label, items, current) {
+      return `
+        <div class="fq-field">
+          <span class="fq-label" id="fq-${name}-label">${label}</span>
+          <div class="segmented" role="group" aria-labelledby="fq-${name}-label" data-setting="${name}">
+            ${items.map((item) => `<button type="button" data-value="${item.id}" aria-pressed="${item.id === current}">${item.label}</button>`).join("")}
+          </div>
+        </div>`;
+    }
+
+    function poolFor(scope) {
+      return bank.filter(
+        (item) =>
+          (scope.formula ? item.formula === scope.formula : true) &&
+          (scope.topic === "all" || topicOf(item) === scope.topic) &&
+          (scope.type === "all" || item.type === scope.type)
+      );
+    }
+
+    /* Setup Screen With Mastery Overview */
+    function setup() {
+      setKeys(null);
+      const best = progress.formulaQuizBest();
+      const mastery = progress.formulaMastery();
+      const mastered = Guide.formulaIndex.filter((item) => mastery[item.key] === "mastered").length;
+      const review = Guide.formulaIndex.filter((item) => mastery[item.key] === "review").length;
+
+      host.innerHTML = `
+        <div class="card fq-setup">
+          <h3>Build a Round</h3>
+          ${segmented("topic", "Topic", topics, settings.topic)}
+          ${segmented("type", "Question Type", types, settings.type)}
+          <p class="small muted fq-type-hint" id="fq-type-hint"></p>
+          ${segmented("length", "Length", lengths, settings.length)}
+          <div class="fq-start">
+            <button type="button" class="btn" id="fq-start">${icon("play")} Start Formula Quiz</button>
+            <span class="small muted" id="fq-count"></span>
+          </div>
+          <p class="small muted fq-best">Best Full-Run Score: <strong>${best}%</strong>. Full runs use every topic, every type and all ${bank.length} questions.</p>
+        </div>
+
+        <section class="section">
+          <div class="fq-mastery-head">
+            <h2 class="section-title"><span class="num">${icon("target")}</span>Formula Mastery</h2>
+            <span class="small muted">${mastered} of ${Guide.formulaIndex.length} Mastered${review ? ` · ${review} to Review` : ""}</span>
+          </div>
+          <div class="meter fq-mastery-meter"><span style="width:${(mastered / Guide.formulaIndex.length) * 100}%"></span></div>
+          <p class="small muted">Each formula reflects its most recent answer. Select any formula to drill every question that uses it.</p>
+          <ul class="fq-mastery" aria-label="Formula mastery">
+            ${Guide.formulaIndex
+              .map((item) => {
+                const state = mastery[item.key] || "untested";
+                const stateLabel = { mastered: "Mastered", review: "Review", untested: "Not Yet Tested" }[state];
+                const count = bank.filter((question) => question.formula === item.key).length;
+                return `<li><button type="button" class="fq-chip" data-state="${state}" data-formula="${item.key}" aria-label="${escapeHtml(item.name)}: ${stateLabel}. Drill ${count} questions.">
+                  <span class="fq-chip-dot" aria-hidden="true">${state === "mastered" ? icon("check") : state === "review" ? icon("refresh") : ""}</span>
+                  <span class="fq-chip-name">${escapeHtml(item.name)}</span>
+                  <span class="fq-chip-meta">${moduleById(item.module).short} · ${count} ${count === 1 ? "Question" : "Questions"}</span>
+                </button></li>`;
+              })
+              .join("")}
+          </ul>
+        </section>`;
+
+      function syncSetup() {
+        const available = poolFor(settings).length;
+        const size = settings.length === "all" ? available : Math.min(Number(settings.length), available);
+        const typeInfo = Guide.formulaTypes.find((type) => type.id === settings.type);
+        host.querySelector("#fq-type-hint").textContent = typeInfo ? typeInfo.hint : "Mixes all four question types for the broadest practice.";
+        host.querySelector("#fq-count").textContent = available ? `${size} of ${available} matching questions` : "No questions match this combination.";
+        host.querySelector("#fq-start").disabled = available === 0;
+      }
+
+      host.querySelectorAll("[data-setting]").forEach((group) => {
+        group.addEventListener("click", (event) => {
+          const button = event.target.closest("button[data-value]");
+          if (!button) return;
+          settings[group.dataset.setting] = button.dataset.value;
+          group.querySelectorAll("button").forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
+          syncSetup();
+        });
+      });
+
+      host.querySelector("#fq-start").addEventListener("click", () => {
+        const size = settings.length === "all" ? poolFor(settings).length : Number(settings.length);
+        const fullRun = settings.topic === "all" && settings.type === "all" && settings.length === "all";
+        const draw = () => Guide.shuffle(poolFor(settings)).slice(0, size);
+        run(draw(), { fullRun, label: fullRun ? "Full Run" : "Custom Round", draw });
+      });
+
+      host.querySelector(".fq-mastery").addEventListener("click", (event) => {
+        const chip = event.target.closest("[data-formula]");
+        if (!chip) return;
+        const formula = formulaByKey[chip.dataset.formula];
+        const draw = () => Guide.shuffle(poolFor({ formula: formula.key, topic: "all", type: "all" }));
+        run(draw(), { fullRun: false, label: formula.name, draw });
+      });
+
+      syncSetup();
+    }
+
+    /* Question Loop */
+    function run(selection, options) {
+      const questions = selection.map((item) => ({ item, order: Guide.shuffle(item.options.map((option, i) => i)) }));
+      const results = [];
+      let index = 0;
+      let answered = false;
+
+      function choose(chosen) {
+        if (answered) return;
+        answered = true;
+        const { item } = questions[index];
+        const correct = chosen === 0;
+        results.push({ item, correct, chosen });
+        progress.recordFormula(item.formula, correct);
+
+        host.querySelectorAll(".option").forEach((option) => {
+          option.disabled = true;
+          const value = Number(option.dataset.option);
+          if (value === 0) option.classList.add("is-correct");
+          else if (value === chosen) option.classList.add("is-wrong");
+        });
+
+        const feedback = host.querySelector("#fq-feedback");
+        feedback.innerHTML = `
+          <div class="explain">
+            ${ui.callout(correct ? "Correct" : "Not Quite", `<p>${item.explain}</p>`, correct ? "" : "callout-rose", correct ? "check" : "info")}
+            ${referenceCard(item.formula)}
+            <button type="button" class="btn" id="fq-next">${index + 1 < questions.length ? "Next Question" : "See Results"} ${icon("arrowRight")}</button>
+          </div>`;
+        paint(feedback);
+        feedback.scrollIntoView({ behavior: Guide.scrollBehavior(), block: "nearest" });
+        const nextButton = feedback.querySelector("#fq-next");
+        nextButton.focus({ preventScroll: true });
+        nextButton.addEventListener("click", advance);
+      }
+
+      function advance() {
+        index += 1;
+        if (index < questions.length) renderQuestion();
+        else finish();
+      }
+
+      function renderQuestion() {
+        answered = false;
+        const { item, order } = questions[index];
+        const module = moduleById(topicOf(item));
+        const score = results.filter((result) => result.correct).length;
+
+        host.innerHTML = `
+          <div class="card quiz-card">
+            <div class="range-head small"><span><span class="fq-round">${escapeHtml(options.label)} · </span>Question ${index + 1} of ${questions.length}</span><span>Score ${score}</span></div>
+            <div class="meter" style="margin:0.5rem 0 1.4rem"><span style="width:${(index / questions.length) * 100}%"></span></div>
+            <div class="meta-row fq-tags"><span class="pill">${module.short}</span><span class="pill fq-type" data-type="${item.type}">${typeLabel(item.type)}</span></div>
+            <p class="quiz-q">${escapeHtml(item.q)}</p>
+            ${item.tex ? `<div class="eq fq-prompt">${mathSpan(item.tex, true)}</div>` : ""}
+            <ul class="options${item.math ? " options-math" : ""}">
+              ${order.map((optionIndex, i) => `<li><button type="button" class="option" data-option="${optionIndex}"><span class="option-key">${"ABCD"[i]}</span>${optionMarkup(item, optionIndex)}</button></li>`).join("")}
+            </ul>
+            <div id="fq-feedback"></div>
+          </div>
+          <p class="small muted fq-keys">Press <kbd>1</kbd> to <kbd>4</kbd> or <kbd>A</kbd> to <kbd>D</kbd> to answer, then <kbd>Enter</kbd> to continue.</p>`;
+
+        paint(host);
+        if (host.getBoundingClientRect().top < 0) host.scrollIntoView({ behavior: "auto", block: "start" });
+        host.querySelectorAll(".option").forEach((button) => button.addEventListener("click", () => choose(Number(button.dataset.option))));
+      }
+
+      function finish() {
+        setKeys(null);
+        const score = results.filter((result) => result.correct).length;
+        const percent = Math.round((score / results.length) * 100);
+        if (options.fullRun && percent > progress.formulaQuizBest()) store.set("formulaQuizBest", percent);
+        Guide.emit("progress");
+
+        const misses = results.filter((result) => !result.correct);
+        const verdict = percent >= 80 ? "These formulas are interview-ready." : percent >= 60 ? "Solid recall, so revisit the formulas below." : "Worth another pass through the related study sections.";
+
+        /* Accuracy by Question Type */
+        const byType = Guide.formulaTypes
+          .map((type) => {
+            const subset = results.filter((result) => result.item.type === type.id);
+            if (!subset.length) return "";
+            const right = subset.filter((result) => result.correct).length;
+            return `<div class="fq-type-row"><span>${type.label}</span><div class="meter"><span style="width:${(right / subset.length) * 100}%"></span></div><strong>${right}/${subset.length}</strong></div>`;
+          })
+          .join("");
+
+        host.innerHTML = `
+          <div class="card empty-state">
+            <div class="score-big">${percent}%</div>
+            <p class="muted" style="margin:0.5rem 0 1.25rem">${score} of ${results.length} correct. ${verdict}</p>
+            <div class="btn-row" style="justify-content:center">
+              ${misses.length ? `<button type="button" class="btn" id="fq-retry">${icon("refresh")} Retry Missed Questions</button>` : ""}
+              <button type="button" class="btn ${misses.length ? "btn-ghost" : ""}" id="fq-again">${icon("shuffle")} New Round</button>
+              <button type="button" class="btn btn-ghost" id="fq-setup">Change Settings</button>
+            </div>
+          </div>
+          <div class="card fq-breakdown">
+            <h3>Accuracy by Question Type</h3>
+            ${byType}
+          </div>
+          ${
+            misses.length
+              ? `<h3 class="fq-review-title">Review These Formulas</h3>${misses
+                  .map(
+                    ({ item, chosen }) => `
+                <div class="card fq-miss">
+                  <p class="fq-miss-q"><strong>${escapeHtml(item.q)}</strong></p>
+                  ${item.tex ? `<div class="eq eq-compact fq-prompt">${mathSpan(item.tex, true)}</div>` : ""}
+                  <div class="fq-answers">
+                    <div class="fq-answer is-wrong"><span class="fq-answer-label">Your Answer</span>${optionMarkup(item, chosen)}</div>
+                    <div class="fq-answer is-correct"><span class="fq-answer-label">Correct Answer</span>${optionMarkup(item, 0)}</div>
+                  </div>
+                  <p class="small">${item.explain}</p>
+                  ${referenceCard(item.formula)}
+                </div>`
+                  )
+                  .join("")}`
+              : ui.callout("Clean Sheet", "<p>Every answer in this round was correct. Try a longer round or switch to the Apply type for more calculation practice.</p>", "", "check")
+          }`;
+
+        paint(host);
+        const retry = host.querySelector("#fq-retry");
+        if (retry) {
+          const missed = misses.map((result) => result.item);
+          const draw = () => Guide.shuffle(missed);
+          retry.addEventListener("click", () => run(draw(), { fullRun: false, label: "Missed Questions", draw }));
+        }
+        host.querySelector("#fq-again").addEventListener("click", () => run(options.draw(), options));
+        host.querySelector("#fq-setup").addEventListener("click", setup);
+        window.scrollTo({ top: 0, behavior: Guide.scrollBehavior() });
+      }
+
+      setKeys((event) => {
+        const target = event.target instanceof Element ? event.target : document.body;
+        if (target.closest("input, textarea, select, dialog") || event.ctrlKey || event.metaKey || event.altKey) return;
+        const key = event.key.toLowerCase();
+        const slot = "1234".indexOf(key) >= 0 ? "1234".indexOf(key) : "abcd".indexOf(key);
+        if (!answered && slot >= 0 && key.length === 1) {
+          const button = host.querySelectorAll(".option")[slot];
+          if (button) {
+            event.preventDefault();
+            button.click();
+          }
+        } else if (answered && event.key === "Enter" && !target.closest("button, a")) {
+          event.preventDefault();
+          advance();
+        }
+      });
+
+      renderQuestion();
+    }
+
+    setup();
+    return () => setKeys(null);
   };
 
   /* Statement Drills View */

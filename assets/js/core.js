@@ -48,7 +48,8 @@ window.Guide = window.Guide || {};
     clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
     copy: '<rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/>',
     flag: '<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>',
-    lightbulb: '<path d="M9 18h6M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7V16h8v-1.3A7 7 0 0 0 12 2Z"/>'
+    lightbulb: '<path d="M9 18h6M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7V16h8v-1.3A7 7 0 0 0 12 2Z"/>',
+    sigma: '<path d="M18 5V4H6l6.5 8L6 20h12v-1"/>'
   };
 
   Guide.icon = function icon(name, extraClass) {
@@ -80,7 +81,7 @@ window.Guide = window.Guide || {};
 
   /* Stored Data Groups for Resetting */
   const DATA_GROUPS = {
-    progress: ["modulesDone", "flashState", "drillsDone", "checklist", "quizBest", "plan", "mockRatings", "caseLab"],
+    progress: ["modulesDone", "flashState", "drillsDone", "checklist", "quizBest", "formulaQuizBest", "formulaMastery", "plan", "mockRatings", "caseLab"],
     notes: ["story"],
     settings: ["interviewParisDate", "interviewParisTime", "theme"]
   };
@@ -163,6 +164,19 @@ window.Guide = window.Guide || {};
     }
     return false;
   }
+
+  /* Inline TeX Rendering for Quiz Prompts and Options */
+  Guide.renderMath = function renderMath(root) {
+    root.querySelectorAll("[data-tex]").forEach((node) => {
+      if (node.dataset.rendered) return;
+      const tex = node.dataset.tex;
+      if (!renderTex(tex, node, node.dataset.display === "true")) {
+        node.textContent = tex;
+        node.classList.add("is-plain");
+      }
+      node.dataset.rendered = "true";
+    });
+  };
 
   Guide.renderFormulas = function renderFormulas(root) {
     root.querySelectorAll("[data-f]").forEach((node) => {
@@ -315,6 +329,17 @@ window.Guide = window.Guide || {};
     quizBest() {
       return Guide.store.get("quizBest", 0);
     },
+    formulaQuizBest() {
+      return Guide.store.get("formulaQuizBest", 0);
+    },
+    formulaMastery() {
+      return Guide.store.get("formulaMastery", {});
+    },
+    recordFormula(key, correct) {
+      const map = this.formulaMastery();
+      map[key] = correct ? "mastered" : "review";
+      Guide.store.set("formulaMastery", map);
+    },
     summary() {
       const modulesDone = Object.values(this.modules()).filter(Boolean).length;
       const flashKnown = Object.values(this.flash()).filter((state) => state === "known").length;
@@ -322,6 +347,7 @@ window.Guide = window.Guide || {};
       const checksDone = Object.values(this.checklist()).filter(Boolean).length;
       const storyDone = Object.values(this.story()).filter((text) => String(text).trim().split(/\s+/).length >= 25).length;
       const quizBest = this.quizBest();
+      const formulaBest = this.formulaQuizBest();
 
       const totals = {
         modules: Guide.modules.length,
@@ -336,10 +362,11 @@ window.Guide = window.Guide || {};
         0.2 * (checksDone / totals.checks) +
         0.15 * (flashKnown / totals.flash) +
         0.1 * (drillsDone / totals.drills) +
-        0.1 * (quizBest / 100) +
+        0.05 * (quizBest / 100) +
+        0.05 * (formulaBest / 100) +
         0.1 * (storyDone / totals.story);
 
-      return { modulesDone, flashKnown, drillsDone, checksDone, storyDone, quizBest, totals, score: Math.min(1, score) };
+      return { modulesDone, flashKnown, drillsDone, checksDone, storyDone, quizBest, formulaBest, totals, score: Math.min(1, score) };
     }
   };
 
