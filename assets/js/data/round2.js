@@ -73,7 +73,7 @@ Guide.plan2 = [
     label: "16 November",
     theme: "Guided Modelling · About 1.5 Hours",
     tasks: [
-      { text: "Model Builder From Start to Finish", href: "#/case/builder" },
+      { text: "Model Builder, Formula by Formula", href: "#/case/builder" },
       { text: "Debt Sizing Module as a Refresher", href: "#/study/debt" }
     ]
   },
@@ -83,7 +83,7 @@ Guide.plan2 = [
     label: "17 November",
     theme: "First Timed Attempt · About 1.5 Hours",
     tasks: [
-      { text: "Timed Case in Excel Within 45 Minutes", href: "#/case/timed" },
+      { text: "Timed Case Within 45 Minutes", href: "#/case/timed" },
       { text: "Compare Results With the Solution", href: "#/case/timed" },
       { text: "Present the Model Aloud in Three Minutes", href: "#/debrief" }
     ]
@@ -105,7 +105,7 @@ Guide.plan2 = [
     label: "19 November",
     theme: "Second Timed Attempt · About 1.5 Hours",
     tasks: [
-      { text: "Timed Case Again From the Blank Template", href: "#/case/timed" },
+      { text: "Timed Case Again, This Time in Excel", href: "#/case/timed" },
       { text: "Spot the Error Drill", href: "#/case/excel" },
       { text: "Debrief Questions in Timed Practice", href: "#/debrief" },
       { text: "Laptop and Excel Setup Check", href: "#/day" }

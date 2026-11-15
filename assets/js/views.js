@@ -60,7 +60,7 @@ window.Guide = window.Guide || {};
       const deviceDiffers = Guide.time.offsetMinutes(target) !== -target.getTimezoneOffset();
       note.textContent = timeSet
         ? deviceDiffers
-          ? `This device shows that moment as ${Guide.time.formatLocalTime(target)}.`
+          ? `Converted to this device's time zone, that moment is ${Guide.time.formatLocalTime(target)}.`
           : "Countdown follows Paris time automatically."
         : `Counting to ${config.assumedTime} Paris time until the confirmed start time is entered.`;
 
@@ -100,6 +100,51 @@ window.Guide = window.Guide || {};
   Guide.ring = ring;
   Guide.animateRings = animateRings;
   Guide.startCountdown = startCountdown;
+
+  /* Team Cards With Photos and an Initials Fallback */
+  const initials = (name) =>
+    name
+      .split(" ")
+      .filter((part) => /^[A-ZÀ-Ý]/.test(part))
+      .map((part) => part[0])
+      .slice(0, 2)
+      .join("");
+
+  Guide.teamMarkup = function teamMarkup(groupIds) {
+    return Guide.teamGroups
+      .filter((group) => groupIds.includes(group.id))
+      .map(
+        (group) => `
+        <h3 class="team-group">${group.label}</h3>
+        <div class="team-grid">
+          ${Guide.team
+            .filter((person) => person.group === group.id)
+            .map(
+              (person) => `
+            <div class="person">
+              <span class="avatar" data-initials="${initials(person.name)}"><img src="${person.photo}" alt="${escapeHtml(person.name)}" loading="lazy" decoding="async" referrerpolicy="no-referrer" width="96" height="96"></span>
+              <span class="person-name">${escapeHtml(person.name)}</span>
+              <span class="person-role">${escapeHtml(person.role)}</span>
+            </div>`
+            )
+            .join("")}
+        </div>`
+      )
+      .join("");
+  };
+
+  /* Missing Photos Fall Back to Initials */
+  document.addEventListener(
+    "error",
+    (event) => {
+      const image = event.target;
+      if (image instanceof HTMLImageElement && image.parentElement && image.parentElement.classList.contains("avatar")) {
+        image.parentElement.classList.add("is-fallback");
+        image.remove();
+      }
+    },
+    true
+  );
 
   /* Home Briefing View */
   Guide.views.home = function home(view) {
@@ -331,11 +376,8 @@ window.Guide = window.Guide || {};
 
       <section class="section reveal">
         <h2 class="section-title"><span class="num">05</span>Investment Team</h2>
-        <p>Philippe Ringenbach leads Neot as CEO. Round two pairs an Investment Director with an Investment Officer, so review the team members below once interviewer names are confirmed.</p>
-        <div class="grid grid-2">
-          <div class="card"><h4>Investment Directors</h4><ul><li>Francisco Elens Da Silva Passos</li><li>Maël Guégan</li><li>Victor Cabanes</li></ul></div>
-          <div class="card"><h4>Investment Officers</h4><ul><li>Agathe Laîné</li><li>Bachar Salamé</li><li>Paul Albespy</li><li>Xavier Rule</li></ul></div>
-        </div>
+        <p>Round two pairs an Investment Director with an Investment Officer, so knowing their faces makes the first minute far easier. Photos come from Neot's own team page, and the wider team appears below for context.</p>
+        ${Guide.teamMarkup(["directors", "officers", "wider"])}
       </section>
 
       <section class="section reveal">
@@ -460,6 +502,7 @@ window.Guide = window.Guide || {};
     view.classList.add("is-wide");
     view.innerHTML = `
       <header class="page-header" style="max-width:var(--content-w)">
+        ${ui.backLink("#/study", "Study Path")}
         <span class="eyebrow">${icon(module.icon)} Module ${index + 1} of ${Guide.modules.length}</span>
         <h1>${module.title}</h1>
         <div class="meta-row">${ui.tierPill(module.tier)}<span class="pill">${icon("clock", "inline-icon")} ${module.minutes} Minutes</span></div>
@@ -752,6 +795,7 @@ window.Guide = window.Guide || {};
         const { item, order } = questions[index];
         const module = moduleById(item.module);
         host.innerHTML = `
+          <button type="button" class="back-link" id="quiz-exit">${icon("arrowLeft")}<span>Back to Topics</span></button>
           <div class="card quiz-card">
             <div class="range-head small"><span>Question ${index + 1} of ${questions.length}</span><span>Score ${score}</span></div>
             <div class="meter" style="margin:0.5rem 0 1.4rem"><span style="width:${(index / questions.length) * 100}%"></span></div>
@@ -763,6 +807,7 @@ window.Guide = window.Guide || {};
             <div id="quiz-feedback"></div>
           </div>`;
 
+        host.querySelector("#quiz-exit").addEventListener("click", setup);
         host.querySelectorAll(".option").forEach((button) => {
           button.addEventListener("click", () => {
             const chosen = Number(button.dataset.option);
@@ -845,6 +890,7 @@ window.Guide = window.Guide || {};
 
     view.innerHTML = `
       <header class="page-header">
+        ${presetTopic && moduleById(presetTopic) ? ui.backLink(`#/study/${presetTopic}`, moduleById(presetTopic).short) : ""}
         <span class="eyebrow">${icon("sigma")} Practice</span>
         <h1>Formula Quiz</h1>
         <p class="lede">${bank.length} questions covering all ${Guide.formulaIndex.length} formulas in the guide. Each one asks you to recall an expression, recognise what it measures, complete a missing term or apply it to numbers.</p>
@@ -1028,6 +1074,7 @@ window.Guide = window.Guide || {};
         const score = results.filter((result) => result.correct).length;
 
         host.innerHTML = `
+          <button type="button" class="back-link" id="fq-exit">${icon("arrowLeft")}<span>Back to Formula Selection</span></button>
           <div class="card quiz-card">
             <div class="range-head small"><span><span class="fq-round">${escapeHtml(options.label)} · </span>Question ${index + 1} of ${questions.length}</span><span>Score ${score}</span></div>
             <div class="meter" style="margin:0.5rem 0 1.4rem"><span style="width:${(index / questions.length) * 100}%"></span></div>
@@ -1039,10 +1086,11 @@ window.Guide = window.Guide || {};
             </ul>
             <div id="fq-feedback"></div>
           </div>
-          <p class="small muted fq-keys">Press <kbd>1</kbd> to <kbd>4</kbd> or <kbd>A</kbd> to <kbd>D</kbd> to answer, then <kbd>Enter</kbd> to continue.</p>`;
+          <p class="small muted fq-keys">Press <kbd>1</kbd> to <kbd>4</kbd> or <kbd>A</kbd> to <kbd>D</kbd> to answer, <kbd>Enter</kbd> to continue and <kbd>Esc</kbd> to leave the round.</p>`;
 
         paint(host);
         if (host.getBoundingClientRect().top < 0) host.scrollIntoView({ behavior: "auto", block: "start" });
+        host.querySelector("#fq-exit").addEventListener("click", setup);
         host.querySelectorAll(".option").forEach((button) => button.addEventListener("click", () => choose(Number(button.dataset.option))));
       }
 
@@ -1115,6 +1163,11 @@ window.Guide = window.Guide || {};
       setKeys((event) => {
         const target = event.target instanceof Element ? event.target : document.body;
         if (target.closest("input, textarea, select, dialog") || event.ctrlKey || event.metaKey || event.altKey) return;
+        if (event.key === "Escape") {
+          event.preventDefault();
+          setup();
+          return;
+        }
         const key = event.key.toLowerCase();
         const slot = "1234".indexOf(key) >= 0 ? "1234".indexOf(key) : "abcd".indexOf(key);
         if (!answered && slot >= 0 && key.length === 1) {
@@ -1595,7 +1648,7 @@ window.Guide = window.Guide || {};
         ? items
             .map((item) => `<div class="lex-item"><span class="lex-fr" lang="fr">${highlight(item.fr, query)}</span><span class="lex-en">${highlight(item.en, query)}</span><span class="lex-def">${highlight(item.def, query)}</span></div>`)
             .join("")
-        : `<div class="card muted">No matching term.</div>`;
+        : `<div class="card muted">Nothing matches that search.</div>`;
     }
 
     input.addEventListener("input", render);
@@ -1611,7 +1664,7 @@ window.Guide = window.Guide || {};
 
 Dear [Name],
 
-Thank you for taking the time to speak with me today about the Investment Analyst internship. Our discussion of [specific topic] reinforced my enthusiasm for Neot's approach to financing low-carbon mobility.
+Thank you for taking the time to speak with me today about the Investment Analyst internship. Discussing [specific topic] reinforced my enthusiasm for Neot's approach to financing low-carbon mobility.
 
 Having worked on debt sizing and model review at Resonance Advisory, I would be delighted to contribute to the Neot e-motion platform from March 2027.
 
@@ -1718,7 +1771,7 @@ Ha Linh`;
     view.innerHTML = `
       <div class="card empty-state">
         <h1>Page Not Found</h1>
-        <p class="muted">That section does not exist.</p>
+        <p class="muted">Sorry, that section does not exist.</p>
         <a class="btn" href="#/">Return to the Briefing</a>
       </div>`;
   };

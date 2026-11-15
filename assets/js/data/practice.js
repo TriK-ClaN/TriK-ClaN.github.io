@@ -306,7 +306,7 @@ Guide.drills = [
     is: [["Income Statement", "Unchanged"]],
     cf: [["Increase in NWC", "−10"], ["Change in Cash", "−10"]],
     bs: [["Inventory", "+10"], ["Cash", "−10"], ["Total Assets", "Unchanged"]],
-    takeaway: "Any rise in working capital is a use of cash even though profit is unchanged."
+    takeaway: "Every rise in working capital uses cash, even though profit is unchanged."
   },
   {
     id: "interest",

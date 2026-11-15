@@ -13,7 +13,7 @@ Guide.interview = {
     {
       title: "Teams Screening",
       meta: "30 Minutes · Recruiter or Team Member",
-      summary: "Expect a conversational call focused on motivation and fit. Interviewers will want a crisp walkthrough of the CV and clear reasons for choosing Neot, delivered with evident fluency in French and English. One or two light technical questions may check the basics."
+      summary: "Expect a conversational call focused on motivation and fit. Interviewers will want a crisp walkthrough of the CV and clear reasons for choosing Neot, delivered with evident fluency in French and English. Expect one or two light technical questions to check the basics."
     },
     {
       title: "Technical and Fit Interview",
@@ -31,6 +31,28 @@ Guide.sources = [
   { label: "Neot e-motion Launch Press Release (20 May 2025)", url: "https://www.mirova.com/sites/default/files/2025-05/pr-neot-e-motion-mirova-alba-bdt-neot.pdf" },
   { label: "Neot e-motion €125m MUFG Financing (18 December 2025)", url: "https://www.neotcapital.com/en/neot-e-motion-secures-e125-million-in-financing-from-mufg-to-accelerate-the-development-of-low-carbon-mobility-in-europe/" },
   { label: "NGM €170m Refinancing (4 November 2025)", url: "https://www.neotcapital.com/en/neot-green-mobility-refinances-e170-million-of-debt-with-mufg-la-banque-postale-and-lbpam/" }
+];
+
+/* Investment Team With Photos From Neot's Team Page */
+Guide.team = [
+  { group: "directors", name: "Francisco Elens Da Silva Passos", role: "Investment Director", photo: "https://www.neotcapital.com/wp-content/uploads/2025/06/764ee68d-e0c4-4d95-ac6d-9952b61e4770-Francisco-500x382-c-center.webp" },
+  { group: "directors", name: "Maël Guégan", role: "Investment Director", photo: "https://www.neotcapital.com/wp-content/uploads/2025/06/51add587-8924-4a81-999f-fe461889b363-Mael-500x382-c-center.webp" },
+  { group: "directors", name: "Victor Cabanes", role: "Investment Director", photo: "https://www.neotcapital.com/wp-content/uploads/2025/04/7ab9bf46-c8e3-48ba-9466-64a740a0742e-Victor-500x382-c-center.webp" },
+  { group: "officers", name: "Agathe Laîné", role: "Investment Officer", photo: "https://www.neotcapital.com/wp-content/uploads/2025/06/85f757ad-9fdc-4eca-b8d3-e1beb8035a3d-Agathe-500x382-c-center.webp" },
+  { group: "officers", name: "Bachar Salamé", role: "Investment Officer", photo: "https://www.neotcapital.com/wp-content/uploads/2025/06/4b699bb9-4811-44d0-be14-eb03d7863ca6-Bachar-500x382-c-center.webp" },
+  { group: "officers", name: "Paul Albespy", role: "Investment Officer", photo: "https://www.neotcapital.com/wp-content/uploads/2025/06/963c3c23-db23-4eec-b92d-105bfeb6e89f-Paul-500x382-c-center.webp" },
+  { group: "officers", name: "Xavier Rule", role: "Investment Officer", photo: "https://www.neotcapital.com/wp-content/uploads/2025/06/5c577052-f3f0-4b75-85a4-c8443e423d28-Xavier-500x382-c-center.webp" },
+  { group: "wider", name: "Philippe Ringenbach", role: "Chief Executive Officer", photo: "https://www.neotcapital.com/wp-content/uploads/2025/06/9f3bd02d-4fc5-4e33-8abd-a5dffeceb1a8-PhilippeR-500x382-c-center.webp" },
+  { group: "wider", name: "Julien Bendao", role: "Investment Manager", photo: "https://www.neotcapital.com/wp-content/uploads/2025/06/65bf079d-33d6-4c16-9e16-4baa4085b1fd-Julien-500x382-c-center.webp" },
+  { group: "wider", name: "Florian Benard", role: "Financing Director", photo: "https://www.neotcapital.com/wp-content/uploads/2025/06/0789e9ec-467c-4c3b-b4a2-15cc18423b1a-FLorianB-500x382-c-center.webp" },
+  { group: "wider", name: "Quentin Anger", role: "Investment and Financing Officer", photo: "https://www.neotcapital.com/wp-content/uploads/2025/12/878f9378-7111-4261-a22e-2da40a3145d9-quentin-500x382-c-center.webp" },
+  { group: "wider", name: "Vincent Plancher", role: "Investment and Financing Officer", photo: "https://www.neotcapital.com/wp-content/uploads/2025/06/a0f3cf06-fa9d-4ce5-9d65-f341b4c65cd2-vincent2-500x382-c-center.webp" }
+];
+
+Guide.teamGroups = [
+  { id: "directors", label: "Investment Directors" },
+  { id: "officers", label: "Investment Officers" },
+  { id: "wider", label: "Leadership and Wider Investment Team" }
 ];
 
 /* Questions to Ask Interviewers */
@@ -169,7 +191,7 @@ Guide.story = [
     lang: "en",
     target: "60 Seconds",
     guidance: ["Strength Backed by an Example", "Real but Manageable Weakness", "Concrete Steps Already Taken"],
-    starter: "My strongest asset is rigour, which shows in…"
+    starter: "Rigour is my strongest asset, which shows in…"
   }
 ];
 

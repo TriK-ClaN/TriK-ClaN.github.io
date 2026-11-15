@@ -55,6 +55,7 @@ window.Guide = window.Guide || {};
 
   /* Shared Section Heading */
   const heading = (num, title) => `<h2 class="section-title"><span class="num">${num}</span>${title}</h2>`;
+  const backLink = Guide.ui.backLink;
 
   /* Plan Timeline With Saved Checkboxes */
   function planMarkup(plan, saved, today) {
@@ -375,8 +376,8 @@ window.Guide = window.Guide || {};
         ${heading("06", "Practice Path")}
         <div class="grid grid-3">
           <a class="card card-link" href="#/case/excel"><span class="card-icon">${icon("wrench")}</span><h3>Excel Toolkit</h3><p class="small">Functions in English and French, essential shortcuts and the Spot the Error drill.</p></a>
-          <a class="card card-link" href="#/case/builder"><span class="card-icon">${icon("sheet")}</span><h3>Model Builder</h3><p class="small">Build a bus lease model step by step in a live spreadsheet, with every answer checked.</p></a>
-          <a class="card card-link" href="#/case/timed"><span class="card-icon">${icon("timer")}</span><h3>Timed Case</h3><p class="small">Price a truck lease in your own Excel against a 45-minute clock, then check the results.</p></a>
+          <a class="card card-link" href="#/case/builder"><span class="card-icon">${icon("sheet")}</span><h3>Model Builder</h3><p class="small">Build a bus lease model formula by formula in a live spreadsheet, with every step checked.</p></a>
+          <a class="card card-link" href="#/case/timed"><span class="card-icon">${icon("timer")}</span><h3>Timed Case</h3><p class="small">Price a truck lease against a 45-minute clock, in the spreadsheet on the site or in your own Excel.</p></a>
         </div>
       </section>`;
   };
@@ -385,6 +386,7 @@ window.Guide = window.Guide || {};
   Guide.views.excelToolkit = function excelToolkit(view) {
     view.innerHTML = `
       <header class="page-header">
+        ${backLink("#/case", "Case Playbook")}
         <span class="eyebrow">${icon("wrench")} Modelling Case</span>
         <h1>Excel Toolkit</h1>
         <p class="lede">Only a handful of functions and shortcuts matter in a 45-minute case. Knowing them in both languages removes any surprise on Friday.</p>
@@ -507,6 +509,7 @@ window.Guide = window.Guide || {};
     function show() {
       const { item, options } = order[index];
       host.innerHTML = `
+        <button type="button" class="back-link" data-role="exit">${icon("arrowLeft")}<span>Leave the Drill</span></button>
         <div class="card quiz-card drill-card">
           <div class="mock-top">
             <span class="pill">${item.title}</span>
@@ -520,6 +523,7 @@ window.Guide = window.Guide || {};
           <div data-role="explain"></div>
         </div>`;
 
+      host.querySelector('[data-role="exit"]').addEventListener("click", intro);
       host.querySelector(".options").addEventListener("click", (event) => {
         const button = event.target.closest(".option");
         if (!button || button.disabled) return;
@@ -562,39 +566,55 @@ window.Guide = window.Guide || {};
       host.querySelector('[data-role="restart"]').addEventListener("click", start);
     }
 
-    host.innerHTML = `
-      <div class="card drill-intro reveal">
-        <p>Thirteen questions mix formula errors with function choices. Best score so far: <strong>${store.get("errorDrillBest", 0)}%</strong>.</p>
-        <button type="button" class="btn" data-role="begin">${icon("play")} Start the Drill</button>
-      </div>`;
-    host.querySelector('[data-role="begin"]').addEventListener("click", start);
+    function intro() {
+      host.innerHTML = `
+        <div class="card drill-intro">
+          <p>Thirteen questions mix formula errors with function choices. Best score so far: <strong>${store.get("errorDrillBest", 0)}%</strong>.</p>
+          <button type="button" class="btn" data-role="begin">${icon("play")} Start the Drill</button>
+        </div>`;
+      host.querySelector('[data-role="begin"]').addEventListener("click", start);
+    }
+
+    intro();
   }
 
   /* Model Builder View */
   Guide.views.builder = function builder(view) {
     view.classList.add("is-wide");
+    const engine = Guide.engine;
     const steps = Guide.builderSteps;
     const data = Guide.sheets.bus;
-    let state = progress.builder();
-    if (!state.done) state.done = {};
+    const state = progress.builder();
     let current = Math.min(state.current || 0, steps.length - 1);
+    let marks = {};
 
     view.innerHTML = `
       <header class="page-header">
+        ${backLink("#/case", "Case Playbook")}
         <span class="eyebrow">${icon("sheet")} Modelling Case</span>
         <h1>Model Builder</h1>
-        <p class="lede">Build a complete lease model for 40 electric buses, one cell at a time. Each step asks for a value in a highlighted cell, checks your answer and then fills in the whole row with the Excel formula behind it.</p>
+        <p class="lede">Build a complete lease model for 40 electric buses directly in the spreadsheet below, exactly as you would in Excel. Each step asks for formulas in highlighted cells, checks them, then copies them across the years to confirm they hold in every column.</p>
         <div class="btn-row">
           <a class="btn btn-ghost btn-sm" href="${encodeURI(Guide.caseFiles.busTemplate.href)}" download>${icon("download")} Blank Template</a>
           <a class="btn btn-ghost btn-sm" href="${encodeURI(Guide.caseFiles.busSolution.href)}" download>${icon("download")} Solution Workbook</a>
         </div>
       </header>
 
-      <div class="reveal">${heading("01", "Build the Model")}</div>
-      <div class="builder-steps" id="bd-steps" role="group" aria-label="Builder steps"></div>
-      <div id="bd-step"></div>
-      <div id="bd-sheet" class="builder-sheet"></div>
-      <p class="small muted">Inputs live on the Inputs tab, exactly as in the workbook. Select any built cell to read its formula.</p>
+      <section class="section">
+        <div class="reveal">${heading("01", "Build the Model")}</div>
+        <details class="accordion builder-howto">
+          <summary>${icon("info")} How the Spreadsheet Works ${icon("chevronDown", "chev")}</summary>
+          <div class="accordion-body">
+            <p>Select a highlighted cell, type a formula starting with an equals sign and press Enter. While typing, clicking another cell inserts its address, and switching to the Inputs tab lets you point at an input. F4 cycles the $ anchors of the reference before the cursor.</p>
+            <p>Formulas accept English or French function names, with commas or semicolons between arguments, and every function the case needs is supported, from IF and PMT to IRR and NPV. Only the cells for the current step can be edited, and anything you skip is filled with the model answer so later steps still calculate.</p>
+          </div>
+        </details>
+        <div class="builder-steps" id="bd-steps" role="group" aria-label="Builder steps"></div>
+        <div class="builder-layout">
+          <div id="bd-step"></div>
+          <div id="bd-sheet" class="builder-sheet"></div>
+        </div>
+      </section>
 
       <section class="section" id="bd-explorer-section">
         ${heading("02", "What-If Explorer")}
@@ -602,19 +622,49 @@ window.Guide = window.Guide || {};
         <div id="bd-explorer"></div>
       </section>`;
 
-    const baseVisible = new Set(data.rows.filter((row) => row.id === "year").flatMap((row) => Array.from({ length: data.years + 1 }, (_, i) => `${String.fromCharCode(67 + i)}${row.row}`)));
-    const sheet = Guide.createSheet(view.querySelector("#bd-sheet"), { caseId: "bus", visible: baseVisible });
+    /* Workbook Reflecting Progress and Entered Formulas */
+    const solution = (address) => (data.cells[address] ? data.cells[address][0] || data.cells[address][1] : null);
+    const rowOf = (address) => Number(address.replace(/^[A-Z]+/, ""));
+    const colOf = (address) => address.replace(/\d+/g, "");
 
-    function revealed(step) {
-      return (step.reveal || []).flatMap((entry) => sheet.cellAddresses(entry)).concat(step.target ? [step.target] : []);
+    /* Cells Owned by a Step Are Never Overwritten When Filling */
+    const owned = new Set(steps.flatMap((step) => (step.targets || []).map((target) => target.cell)));
+
+    function fillRow(cells, address) {
+      const formula = cells[address];
+      if (formula === undefined || formula === null) return;
+      const from = engine.colToNum(colOf(address));
+      Guide.rowColumns("bus", rowOf(address)).forEach((col) => {
+        const target = `${col}${rowOf(address)}`;
+        if (!owned.has(target)) cells[target] = engine.shiftFormula(formula, engine.colToNum(col) - from, 0);
+      });
     }
 
-    function visibleSet() {
-      const set = new Set(baseVisible);
-      steps.forEach((step) => {
-        if (state.done[step.id]) revealed(step).forEach((address) => set.add(address));
+    function modelCells(testStep) {
+      const cells = {};
+      const yearRow = data.rows.find((row) => row.id === "year").row;
+      for (let i = 0; i <= data.years; i += 1) cells[`${engine.numToCol(3 + i)}${yearRow}`] = i;
+      steps.forEach((step, index) => {
+        const built = state.done[step.id] || index < current || step === testStep;
+        const active = index === current;
+        if (step.targets) {
+          step.targets.forEach((target) => {
+            const entered = state.formulas[target.cell];
+            if (entered !== undefined && (built || active)) cells[target.cell] = entered;
+            else if (built && step !== testStep) cells[target.cell] = solution(target.cell);
+          });
+          if (built) step.targets.filter((target) => target.fill).forEach((target) => fillRow(cells, target.cell));
+        }
+        if (step.action && built) step.action.rows.forEach((row) => fillRow(cells, `${step.action.from}${row}`));
       });
-      return set;
+      return cells;
+    }
+
+    const workbook = Guide.caseWorkbook("bus");
+
+    function refreshWorkbook() {
+      workbook.sheets.Model = modelCells(null);
+      workbook.cache.clear();
     }
 
     function save() {
@@ -622,69 +672,221 @@ window.Guide = window.Guide || {};
       progress.saveBuilder(state);
     }
 
+    refreshWorkbook();
+
+    const grid = Guide.createGrid(view.querySelector("#bd-sheet"), {
+      caseId: "bus",
+      workbook,
+      hint: "Select a highlighted cell and type a formula.",
+      editable: (sheet, address) => sheet === "Model" && Boolean(steps[current].targets && steps[current].targets.some((t) => t.cell === address)),
+      cellState: (sheet, address) => {
+        if (sheet !== "Model") return null;
+        if (marks[address]) return marks[address];
+        const step = steps[current];
+        if (step.targets && step.targets.some((t) => t.cell === address)) return workbook.raw("Model", address) === null ? "target" : "active";
+        return null;
+      },
+      onCommit: (sheet, address, raw) => {
+        if (raw === null || raw === "") delete state.formulas[address];
+        else state.formulas[address] = raw;
+        delete marks[address];
+        save();
+        refreshWorkbook();
+        renderTargets();
+      }
+    });
+
+    /* Step Navigation Dots Grouped by Phase */
     function renderStepList() {
-      view.querySelector("#bd-steps").innerHTML = steps
-        .map((step, i) => `<button type="button" class="step-dot${state.done[step.id] ? " is-done" : ""}${i === current ? " is-current" : ""}" data-step="${i}" aria-label="Step ${i + 1}: ${escapeHtml(step.title)}" title="${escapeHtml(step.title)}">${state.done[step.id] ? icon("check") : i + 1}</button>`)
+      const phases = [...new Set(steps.map((step) => step.phase))];
+      view.querySelector("#bd-steps").innerHTML = phases
+        .map(
+          (phase) => `
+          <div class="step-group">
+            <span class="step-phase">${phase}</span>
+            <div class="step-dots">
+              ${steps
+                .map((step, i) => (step.phase === phase ? `<button type="button" class="step-dot${state.done[step.id] ? " is-done" : ""}${i === current ? " is-current" : ""}" data-step="${i}" aria-label="Step ${i + 1}: ${escapeHtml(step.title)}" title="${escapeHtml(step.title)}">${state.done[step.id] ? icon("check") : i + 1}</button>` : ""))
+                .join("")}
+            </div>
+          </div>`
+        )
         .join("");
     }
 
-    function cellFormat(address) {
-      const row = Number(address.replace(/^[A-Z]+/, ""));
-      const spec = data.rows.find((item) => item.row === row) || data.outputs.find((item) => item.row === row);
-      return spec ? spec.fmt : "eur";
+    function targetChip(target) {
+      const raw = workbook.raw("Model", target.cell);
+      const mark = marks[target.cell];
+      const status = mark === "good" ? "is-good" : mark === "bad" ? "is-bad" : raw !== null ? "is-entered" : "";
+      return `<button type="button" class="cell-chip ${status}" data-cell="${target.cell}">${icon(mark === "good" ? "check" : mark === "bad" ? "close" : "sheet", "inline-icon")} ${target.cell}${target.fill ? " · Fills Right" : ""}</button>`;
     }
 
-    function formulaNote(step) {
-      const cell = data.cells[step.target];
-      return cell && cell[0] ? `<p class="small builder-formula">Excel Formula in ${step.target}: <code>${escapeHtml(cell[0])}</code></p>` : "";
+    function renderTargets() {
+      const host = view.querySelector('[data-role="targets"]');
+      const step = steps[current];
+      if (host && step.targets) host.innerHTML = step.targets.map(targetChip).join("");
     }
 
-    function markDone(step, flash) {
-      const wasDone = state.done[step.id];
+    function header(step) {
+      const doneCount = Object.values(state.done).filter(Boolean).length;
+      const done = Boolean(state.done[step.id]);
+      return `
+        <div class="builder-top">
+          <span class="pill${done ? " pill-good" : ""}">${done ? `${icon("check", "inline-icon")} ` : ""}Step ${current + 1} of ${steps.length}</span>
+          <span class="small muted" data-role="count">${doneCount} of ${steps.length} Completed</span>
+        </div>
+        <div class="meter"><span style="width:${(doneCount / steps.length) * 100}%"></span></div>
+        <span class="step-phase-label">${step.phase}</span>
+        <h2 class="builder-title">${step.title}</h2>`;
+    }
+
+    function formulaList(step, entered) {
+      const rows = step.targets
+        .map((t) => {
+          const mine = state.formulas[t.cell];
+          const model = solution(t.cell);
+          const same = mine && String(mine).replace(/\s/g, "").toUpperCase() === String(model).replace(/\s/g, "").toUpperCase();
+          return `<li><span class="mono">${t.cell}</span> <code>${escapeHtml(entered && mine ? mine : model)}</code>${entered && mine && !same ? `<span class="small muted"> Model answer: <code>${escapeHtml(model)}</code></span>` : ""}</li>`;
+        })
+        .join("");
+      return `<ul class="formula-list">${rows}</ul>`;
+    }
+
+    function markDone(step) {
       state.done[step.id] = true;
       save();
+      refreshWorkbook();
+      grid.render();
       renderStepList();
-      if (step.target) {
-        sheet.update(visibleSet(), null);
-        if (flash && !wasDone) sheet.flash(revealed(step));
-        sheet.focusCell(step.target);
-      }
-      const nextButton = view.querySelector('[data-role="next"]');
-      if (nextButton) nextButton.classList.remove("btn-ghost");
-
-      /* Progress Header Refresh */
-      const doneCount = Object.values(state.done).filter(Boolean).length;
       const card = view.querySelector(".builder-card");
-      card.querySelector(".builder-top .small").textContent = `${doneCount} of ${steps.length} Completed`;
+      const doneCount = Object.values(state.done).filter(Boolean).length;
+      card.querySelector('[data-role="count"]').textContent = `${doneCount} of ${steps.length} Completed`;
       card.querySelector(".meter span").style.width = `${(doneCount / steps.length) * 100}%`;
       const pill = card.querySelector(".builder-top .pill");
       pill.classList.add("pill-good");
       pill.innerHTML = `${icon("check", "inline-icon")} Step ${current + 1} of ${steps.length}`;
+      const next = card.querySelector('[data-role="next"]');
+      next.classList.remove("btn-ghost");
+    }
+
+    /* Formula Checking With Copy-Across Validation */
+    function compare(address, test) {
+      const expected = data.cells[address][1];
+      const got = test.value("Model", address);
+      if (expected === "") return got === "" || got === null;
+      if (typeof got !== "number") return false;
+      return Math.abs(got - expected) <= 1e-6 + Math.abs(expected) * 1e-6;
+    }
+
+    function shown(test, address) {
+      return Guide.excelFormat(test.value("Model", address), (data.rows.find((r) => r.row === rowOf(address)) || data.outputs.find((o) => o.row === rowOf(address)) || {}).fmt);
+    }
+
+    function checkStep() {
+      grid.commit();
+      const step = steps[current];
+      const feedback = view.querySelector('[data-role="feedback"]');
+      marks = {};
+      const missing = step.targets.filter((t) => state.formulas[t.cell] === undefined);
+      if (missing.length) {
+        feedback.innerHTML = ui.callout("Cells Still Empty", `<p>Enter a formula in ${missing.map((t) => t.cell).join(" and ")} before checking.</p>`, "callout-amber", "alert");
+        return;
+      }
+      const values = step.targets.filter((t) => !String(state.formulas[t.cell]).startsWith("="));
+      if (values.length) {
+        values.forEach((t) => (marks[t.cell] = "bad"));
+        grid.render();
+        renderTargets();
+        feedback.innerHTML = ui.callout("Use a Formula", `<p>${values.map((t) => t.cell).join(" and ")} ${values.length > 1 ? "contain" : "contains"} a typed value. Start with an equals sign and link to the cells that drive the result, so the model updates when an input changes.</p>`, "callout-amber", "alert");
+        return;
+      }
+
+      const test = new engine.Workbook({ Inputs: workbook.sheets.Inputs, Model: modelCells(step) });
+      const problems = [];
+      step.targets.forEach((t) => {
+        if (!compare(t.cell, test)) {
+          marks[t.cell] = "bad";
+          problems.push(`<li><strong>${t.cell}</strong> returns <code>${escapeHtml(shown(test, t.cell))}</code>, which does not match the model. Recheck the cells it references.</li>`);
+          return;
+        }
+        if (t.fill) {
+          const broken = Guide.rowColumns("bus", rowOf(t.cell))
+            .map((col) => `${col}${rowOf(t.cell)}`)
+            .find((address) => !compare(address, test));
+          if (broken) {
+            marks[t.cell] = "bad";
+            problems.push(`<li><strong>${t.cell}</strong> is right, but the copy in <strong>${broken}</strong> returns <code>${escapeHtml(shown(test, broken))}</code> as <code>${escapeHtml(test.raw("Model", broken))}</code>. Add $ signs to the references that must stay fixed.</li>`);
+            return;
+          }
+        }
+        marks[t.cell] = "good";
+      });
+
+      if (problems.length) {
+        grid.render();
+        renderTargets();
+        feedback.innerHTML = ui.callout("Not Quite", `<ul>${problems.join("")}</ul>`, "callout-rose", "flag");
+        return;
+      }
+
+      const typed = step.targets.filter((t) => engine.hasHardcodedNumbers(state.formulas[t.cell]));
+      const note = typed.length ? `<p class="small">${typed.map((t) => t.cell).join(" and ")} ${typed.length > 1 ? "contain" : "contains"} typed numbers. Linking to the Inputs sheet instead keeps the model safe when an assumption changes.</p>` : "";
+      markDone(step);
+      renderTargets();
+      feedback.innerHTML = ui.callout("Correct", `<p>${step.explain}</p>${note}${formulaList(step, true)}`, "", "check");
+    }
+
+    function runAction() {
+      grid.commit();
+      const step = steps[current];
+      const feedback = view.querySelector('[data-role="feedback"]');
+      const test = new engine.Workbook({ Inputs: workbook.sheets.Inputs, Model: modelCells(step) });
+      /* Scan Column by Column So the First Broken Cell Is the Root Cause */
+      const columns = [...new Set(step.action.rows.flatMap((row) => Guide.rowColumns("bus", row)))].sort((a, b) => engine.colToNum(a) - engine.colToNum(b));
+      const broken = columns.flatMap((col) => step.action.rows.filter((row) => data.cells[`${col}${row}`]).map((row) => `${col}${row}`)).find((address) => !compare(address, test));
+      if (broken) {
+        feedback.innerHTML = ui.callout("Copy Breaks", `<p>After copying, <strong>${broken}</strong> holds <code>${escapeHtml(test.raw("Model", broken))}</code> and returns <code>${escapeHtml(shown(test, broken))}</code>. Return to the earlier debt steps and anchor the input references with $ signs, then copy again.</p>`, "callout-rose", "flag");
+        return;
+      }
+      markDone(step);
+      grid.select("Model", "M24");
+      feedback.innerHTML = ui.callout("Schedule Complete", `<p>${step.explain}</p>`, "", "check");
+    }
+
+    function revealStep() {
+      grid.commit();
+      const step = steps[current];
+      step.targets.forEach((t) => {
+        state.formulas[t.cell] = solution(t.cell);
+        marks[t.cell] = "good";
+      });
+      markDone(step);
+      renderTargets();
+      view.querySelector('[data-role="feedback"]').innerHTML = ui.callout("Model Answer", `<p>${step.explain}</p>${formulaList(step, false)}`, "callout-indigo", "info");
     }
 
     function renderStep() {
       const step = steps[current];
       const done = Boolean(state.done[step.id]);
-      const doneCount = Object.values(state.done).filter(Boolean).length;
       const host = view.querySelector("#bd-step");
       const last = current === steps.length - 1;
-
       let body;
+
       if (step.type === "choice") {
         const options = Guide.shuffle(step.options.map((text, i) => ({ text, correct: i === 0 })));
         body = `
           <p class="builder-ask">${step.ask}</p>
-          <ul class="options">${options.map((option, i) => `<li><button type="button" class="option" data-i="${i}" data-correct="${option.correct}"><span class="option-key">${"ABCD"[i]}</span><span>${option.text}</span></button></li>`).join("")}</ul>`;
-      } else {
-        const fmt = cellFormat(step.target);
+          <ul class="options">${options.map((option, i) => `<li><button type="button" class="option" data-correct="${option.correct}"><span class="option-key">${"ABCD"[i]}</span><span>${option.text}</span></button></li>`).join("")}</ul>`;
+      } else if (step.action) {
         body = `
-          <p class="builder-ask">${step.ask} <span class="cell-chip">${icon("sheet", "inline-icon")} Cell ${step.target}</span></p>
-          <form class="builder-form" novalidate>
-            <label class="visually-hidden" for="bd-answer">Answer for cell ${step.target}</label>
-            <input class="input mono" id="bd-answer" inputmode="decimal" autocomplete="off" placeholder="${UNIT_HINTS[fmt] || "Value"}">
-            <button type="submit" class="btn">${icon("check")} Check</button>
-          </form>
+          <p class="builder-ask">${step.ask}</p>
+          <div class="btn-row"><button type="button" class="btn" data-role="action">${icon("arrowRight")} ${step.action.label}</button><button type="button" class="btn btn-ghost btn-sm" data-role="hint">${icon("lightbulb")} Show Hint</button></div>`;
+      } else {
+        body = `
+          <p class="builder-ask">${step.ask}</p>
+          <div class="target-chips" data-role="targets"></div>
           <div class="btn-row builder-help">
+            <button type="button" class="btn" data-role="check">${icon("check")} Check Step</button>
             <button type="button" class="btn btn-ghost btn-sm" data-role="hint">${icon("lightbulb")} Show Hint</button>
             <button type="button" class="btn btn-ghost btn-sm" data-role="reveal">${icon("info")} Reveal Answer</button>
           </div>`;
@@ -692,12 +894,7 @@ window.Guide = window.Guide || {};
 
       host.innerHTML = `
         <div class="card builder-card">
-          <div class="builder-top">
-            <span class="pill${done ? " pill-good" : ""}">${done ? `${icon("check", "inline-icon")} ` : ""}Step ${current + 1} of ${steps.length}</span>
-            <span class="small muted">${doneCount} of ${steps.length} Completed</span>
-          </div>
-          <div class="meter"><span style="width:${(doneCount / steps.length) * 100}%"></span></div>
-          <h2 class="builder-title">${step.title}</h2>
+          ${header(step)}
           ${body}
           <div data-role="feedback" aria-live="polite"></div>
           <div class="builder-nav">
@@ -719,46 +916,30 @@ window.Guide = window.Guide || {};
             else if (node === button) node.classList.add("is-wrong");
           });
           feedback.innerHTML = ui.callout(correct ? "Correct" : "Not Quite", `<p>${step.explain}</p>`, correct ? "" : "callout-rose", correct ? "check" : "flag");
-          markDone(step, false);
+          markDone(step);
         });
       } else {
-        sheet.update(visibleSet(), done ? null : step.target);
-        sheet.focusCell(step.target);
-        const expected = data.cells[step.target][1];
-        const fmt = cellFormat(step.target);
-
-        if (done) {
-          feedback.innerHTML = ui.callout("Completed", `<p>Answer: <strong>${Guide.excelFormat(expected, fmt)}</strong>. ${step.explain}</p>${formulaNote(step)}`, "", "check");
+        renderTargets();
+        if (done && step.targets) feedback.innerHTML = ui.callout("Completed", `<p>${step.explain}</p>${formulaList(step, true)}`, "", "check");
+        if (done && step.action) feedback.innerHTML = ui.callout("Completed", `<p>${step.explain}</p>`, "", "check");
+        const chips = host.querySelector('[data-role="targets"]');
+        if (chips) {
+          chips.addEventListener("click", (event) => {
+            const chip = event.target.closest("[data-cell]");
+            if (chip) grid.select("Model", chip.dataset.cell);
+          });
         }
-
-        host.querySelector(".builder-form").addEventListener("submit", (event) => {
-          event.preventDefault();
-          const input = host.querySelector("#bd-answer");
-          const result = grade(input.value, expected, fmt);
-          if (result.status === "invalid") {
-            feedback.innerHTML = ui.callout("Enter a Number", "<p>Type the value only, for example 3.225 or 10.8%.</p>", "callout-amber", "alert");
-            return;
-          }
-          if (result.status === "correct" || result.status === "sign") {
-            const signNote = result.status === "sign" ? " Magnitude matches, although this model shows outflows as negative numbers." : "";
-            feedback.innerHTML = ui.callout("Correct", `<p><strong>${Guide.excelFormat(expected, fmt)}</strong>.${signNote} ${step.explain}</p>${formulaNote(step)}`, "", "check");
-            input.classList.add("is-right");
-            markDone(step, true);
-          } else {
-            input.classList.add("is-shake");
-            window.setTimeout(() => input.classList.remove("is-shake"), 400);
-            feedback.innerHTML = ui.callout("Not Quite", "<p>Check the inputs feeding this cell, or open the hint.</p>", "callout-rose", "flag");
-          }
-        });
-
+        const check = host.querySelector('[data-role="check"]');
+        if (check) check.addEventListener("mousedown", (event) => event.preventDefault());
+        if (check) check.addEventListener("click", checkStep);
+        const reveal = host.querySelector('[data-role="reveal"]');
+        if (reveal) reveal.addEventListener("click", revealStep);
+        const action = host.querySelector('[data-role="action"]');
+        if (action) action.addEventListener("click", runAction);
         host.querySelector('[data-role="hint"]').addEventListener("click", () => {
           feedback.innerHTML = ui.callout("Hint", `<p>${step.hint}</p>`, "callout-indigo", "lightbulb");
         });
-
-        host.querySelector('[data-role="reveal"]').addEventListener("click", () => {
-          feedback.innerHTML = ui.callout("Answer", `<p><strong>${Guide.excelFormat(expected, fmt)}</strong>. ${step.explain}</p>${formulaNote(step)}`, "callout-indigo", "info");
-          markDone(step, true);
-        });
+        if (step.targets) grid.select("Model", step.targets[0].cell, true);
       }
 
       host.querySelector('[data-role="prev"]').addEventListener("click", () => go(current - 1));
@@ -773,8 +954,12 @@ window.Guide = window.Guide || {};
 
     function go(index) {
       if (index < 0 || index >= steps.length) return;
+      grid.commit();
       current = index;
+      marks = {};
       save();
+      refreshWorkbook();
+      grid.render();
       renderStepList();
       renderStep();
     }
@@ -887,11 +1072,15 @@ window.Guide = window.Guide || {};
 
   /* Timed Case View */
   Guide.views.timedCase = function timedCase(view) {
+    view.classList.add("is-wide");
+    const engine = Guide.engine;
     const tc = Guide.timedCase;
     const files = Guide.caseFiles;
     const truck = Guide.sheets.truck;
     let lang = "en";
     let ticker = null;
+    let marks = {};
+    let lastTable = null;
 
     const inputRows = truck.inputs
       .filter((item) => item.key)
@@ -900,9 +1089,10 @@ window.Guide = window.Guide || {};
 
     view.innerHTML = `
       <header class="page-header">
+        ${backLink("#/case", "Case Playbook")}
         <span class="eyebrow">${icon("timer")} Modelling Case</span>
         <h1>Timed Case</h1>
-        <p class="lede">Rehearse Friday's 45 minutes in full. Download the template, start the clock and build the model in your own Excel, then check your results and compare your workbook with the solution.</p>
+        <p class="lede">Rehearse Friday's 45 minutes in full. Start the clock and build the model in the spreadsheet on this page, or in your own copy of Excel, then check every row against the solution.</p>
       </header>
 
       <section class="section reveal">
@@ -918,15 +1108,7 @@ window.Guide = window.Guide || {};
       </section>
 
       <section class="section reveal">
-        ${heading("02", "Practice Files")}
-        <div class="grid grid-2">
-          <a class="card card-link file-card" href="${encodeURI(files.truckTemplate.href)}" download><span class="card-icon">${icon("download")}</span><h3>Template Workbook</h3><p class="small">Inputs filled in, with the Model sheet's labels and empty cells to complete.</p></a>
-          <a class="card card-link file-card" href="${encodeURI(files.truckSolution.href)}" download><span class="card-icon">${icon("sheet")}</span><h3>Solution Workbook</h3><p class="small">Every formula, the solved rent and a live data table. Open it only after your attempt.</p></a>
-        </div>
-      </section>
-
-      <section class="section reveal">
-        ${heading("03", "Clock")}
+        ${heading("02", "Clock")}
         <div class="card clock-card">
           <div class="clock-face"><span class="clock-time" id="tc-time">45:00</span><span class="small muted" id="tc-phase">Ready When You Are</span></div>
           <div class="meter clock-meter"><span id="tc-bar" style="width:0%"></span></div>
@@ -938,9 +1120,16 @@ window.Guide = window.Guide || {};
         </div>
       </section>
 
+      <section class="section">
+        <div class="reveal">${heading("03", "Build It Here")}</div>
+        <p class="reveal">Labels and inputs are ready, exactly like the Excel template, with a placeholder rent of €1.30m. Type formulas into the hatched cells, fill them across the years, then solve the rent with Goal Seek. Work saves automatically in this browser.</p>
+        <div id="tc-grid"></div>
+        <div id="tc-panel" class="xl-panel" aria-live="polite"></div>
+      </section>
+
       <section class="section reveal">
         ${heading("04", "Check Your Results")}
-        <p>Enter the numbers from your workbook. Small rounding differences are accepted, including the slight imprecision of Goal Seek.</p>
+        <p>Enter the numbers from your model, or read them straight from the spreadsheet above. Small rounding differences are accepted, including the slight imprecision of Goal Seek in Excel.</p>
         <form class="card check-form" id="tc-form" novalidate>
           ${tc.checks
             .map(
@@ -954,6 +1143,7 @@ window.Guide = window.Guide || {};
             .join("")}
           <div class="btn-row">
             <button type="submit" class="btn">${icon("check")} Check Answers</button>
+            <button type="button" class="btn btn-ghost" id="tc-read">${icon("sheet")} Read From My Spreadsheet</button>
             <button type="button" class="btn btn-ghost" id="tc-show">${icon("info")} Show Solution Values</button>
           </div>
           <p class="small" id="tc-score" aria-live="polite"></p>
@@ -961,7 +1151,16 @@ window.Guide = window.Guide || {};
       </section>
 
       <section class="section reveal">
-        ${heading("05", "Solution Walkthrough")}
+        ${heading("05", "Working in Excel Instead")}
+        <p>Rehearsing once in your own Excel is worthwhile, since the real case runs on your laptop. Both files match the spreadsheet above cell for cell.</p>
+        <div class="grid grid-2">
+          <a class="card card-link file-card" href="${encodeURI(files.truckTemplate.href)}" download><span class="card-icon">${icon("download")}</span><h3>Template Workbook</h3><p class="small">Inputs filled in, with the Model sheet's labels and empty cells to complete.</p></a>
+          <a class="card card-link file-card" href="${encodeURI(files.truckSolution.href)}" download><span class="card-icon">${icon("sheet")}</span><h3>Solution Workbook</h3><p class="small">Every formula, the solved rent and a live data table. Open it only after your attempt.</p></a>
+        </div>
+      </section>
+
+      <section class="section reveal">
+        ${heading("06", "Solution Walkthrough")}
         <details class="accordion">
           <summary>Solved Model Sheet ${icon("chevronDown", "chev")}</summary>
           <div class="accordion-body"><div id="tc-sheet"></div></div>
@@ -1043,6 +1242,240 @@ window.Guide = window.Guide || {};
       paint();
     });
 
+    /* On-Site Workbook */
+    const saved = store.get("timedWorkbook", null);
+    const workbook = saved ? new engine.Workbook(saved) : Guide.caseWorkbook("truck", { inputs: { rent: 1.3 } });
+    const modelRows = new Set(truck.rows.filter((row) => row.id).map((row) => row.row));
+    const outputRows = new Set(truck.outputs.map((output) => output.row));
+    const lastCol = engine.numToCol(3 + truck.years);
+    const persist = () => store.set("timedWorkbook", workbook.sheets);
+
+    const grid = Guide.createGrid(view.querySelector("#tc-grid"), {
+      caseId: "truck",
+      workbook,
+      hint: "Double-click or type to edit. Enter confirms.",
+      toolbar: `
+        <button type="button" class="xl-tool" data-tool="fill">${icon("arrowRight")} Fill Right</button>
+        <button type="button" class="xl-tool" data-tool="seek">${icon("target")} Goal Seek</button>
+        <button type="button" class="xl-tool" data-tool="table">${icon("grid")} Data Table</button>
+        <button type="button" class="xl-tool" data-tool="check">${icon("check")} Check Model</button>
+        <button type="button" class="xl-tool xl-tool-quiet" data-tool="reset">${icon("refresh")} Reset</button>`,
+      editable: (sheet, address) => {
+        const row = Number(address.replace(/^[A-Z]+/, ""));
+        if (sheet === "Inputs") return truck.inputs.some((item) => item.key && item.row === row);
+        if (outputRows.has(row)) return address === `C${row}`;
+        return modelRows.has(row) && engine.colToNum(address.replace(/\d+/g, "")) <= engine.colToNum(lastCol);
+      },
+      cellState: (sheet, address) => (sheet === "Model" ? marks[address] || null : null),
+      onCommit: () => {
+        marks = {};
+        persist();
+      },
+      onFillRight: (sheet, address) => fillRight(sheet, address)
+    });
+
+    const panel = view.querySelector("#tc-panel");
+
+    function fillRight(sheet, address) {
+      const raw = workbook.raw(sheet, address);
+      if (sheet !== "Model" || typeof raw !== "string" || !raw.startsWith("=")) {
+        grid.hint("Select a Model cell containing a formula, then fill right.");
+        return;
+      }
+      const from = engine.colToNum(address.replace(/\d+/g, ""));
+      const row = Number(address.replace(/^[A-Z]+/, ""));
+      const entries = [];
+      for (let col = from + 1; col <= engine.colToNum(lastCol); col += 1) {
+        entries.push(["Model", `${engine.numToCol(col)}${row}`, engine.shiftFormula(raw, col - from, 0)]);
+      }
+      workbook.setMany(entries);
+      marks = {};
+      persist();
+      grid.render();
+      grid.hint(`Copied ${address} across to ${lastCol}${row}.`);
+    }
+
+    /* Goal Seek Panel */
+    function showSeek() {
+      panel.innerHTML = `
+        <div class="card tool-card">
+          <h3>${icon("target")} Goal Seek</h3>
+          <div class="tool-fields">
+            <label class="field"><span class="field-label">Set Cell</span><input class="input mono" data-field="target" placeholder="Model!C35"></label>
+            <label class="field"><span class="field-label">To Value</span><input class="input mono" data-field="goal" placeholder="10%"></label>
+            <label class="field"><span class="field-label">By Changing Cell</span><input class="input mono" data-field="changing" placeholder="Inputs!B11"></label>
+          </div>
+          <div class="btn-row"><button type="button" class="btn btn-sm" data-run="seek">${icon("play")} Solve</button><button type="button" class="btn btn-ghost btn-sm" data-close>${icon("close")} Close</button></div>
+          <div data-role="result"></div>
+        </div>`;
+    }
+
+    function runSeek() {
+      const field = (name) => panel.querySelector(`[data-field="${name}"]`).value;
+      const target = engine.parseAddress(field("target"), "Model");
+      const changing = engine.parseAddress(field("changing"), "Inputs");
+      const goal = parseAnswer(field("goal"), String(field("goal")).includes("%") ? "pct" : "num");
+      const result = panel.querySelector('[data-role="result"]');
+      if (!target || !changing || !Number.isFinite(goal)) {
+        result.innerHTML = ui.callout("Check the Fields", "<p>Enter two cell addresses such as Model!C35 and Inputs!B11, together with a target value.</p>", "callout-amber", "alert");
+        return;
+      }
+      const raw = workbook.raw(changing.sheet, changing.address);
+      if (typeof raw === "string" && raw.startsWith("=")) {
+        result.innerHTML = ui.callout("Input Required", "<p>Goal Seek can only change a cell that holds a typed value, never a formula.</p>", "callout-amber", "alert");
+        return;
+      }
+      const outcome = engine.goalSeek(workbook, target, changing, goal);
+      persist();
+      grid.render();
+      result.innerHTML = outcome.ok
+        ? ui.callout("Solution Found", `<p>${changing.sheet}!${changing.address} now equals <strong>${outcome.value.toFixed(6)}</strong>, which sets ${target.sheet}!${target.address} to the target.</p>`, "", "check")
+        : ui.callout("No Solution Found", "<p>Goal Seek could not reach the target. Check that the set cell really depends on the changing cell.</p>", "callout-rose", "flag");
+    }
+
+    /* Data Table Panel */
+    function showTable() {
+      panel.innerHTML = `
+        <div class="card tool-card">
+          <h3>${icon("grid")} Data Table</h3>
+          <div class="tool-fields">
+            <label class="field"><span class="field-label">Output Cell</span><input class="input mono" data-field="output" placeholder="Model!C35"></label>
+            <label class="field"><span class="field-label">Row Input Cell</span><input class="input mono" data-field="rowInput" placeholder="Inputs!B13"></label>
+            <label class="field"><span class="field-label">Row Values</span><input class="input mono" data-field="rowValues" placeholder="0%; 15%; 25%"></label>
+            <label class="field"><span class="field-label">Column Input Cell</span><input class="input mono" data-field="colInput" placeholder="Inputs!B11"></label>
+            <label class="field"><span class="field-label">Column Values</span><input class="input mono" data-field="colValues" placeholder="1.30; 1.35; 1.40; 1.45"></label>
+          </div>
+          <div class="btn-row"><button type="button" class="btn btn-sm" data-run="table">${icon("play")} Build Table</button><button type="button" class="btn btn-ghost btn-sm" data-close>${icon("close")} Close</button></div>
+          <div data-role="result"></div>
+        </div>`;
+    }
+
+    const parseList = (text) =>
+      String(text)
+        .split(/;|\s+|,\s+/)
+        .map((item) => item.trim())
+        .filter(Boolean)
+        .map((item) => parseAnswer(item, item.includes("%") ? "pct" : "num"));
+
+    function runTable() {
+      const field = (name) => panel.querySelector(`[data-field="${name}"]`).value;
+      const output = engine.parseAddress(field("output"), "Model");
+      const rowInput = engine.parseAddress(field("rowInput"), "Inputs");
+      const colInput = engine.parseAddress(field("colInput"), "Inputs");
+      const rowValues = parseList(field("rowValues"));
+      const colValues = parseList(field("colValues"));
+      const result = panel.querySelector('[data-role="result"]');
+      if (!output || !rowInput || !colInput || !rowValues.length || !colValues.length || [...rowValues, ...colValues].some((v) => !Number.isFinite(v))) {
+        result.innerHTML = ui.callout("Check the Fields", "<p>Enter three cell addresses and two lists of values separated by semicolons.</p>", "callout-amber", "alert");
+        return;
+      }
+      const values = engine.dataTable(workbook, output, rowInput, rowValues, colInput, colValues);
+      lastTable = { rowInput, colInput, rowValues, colValues, values };
+      const fmtOut = (value) => (typeof value === "number" ? `${(value * 100).toFixed(1)}%` : Guide.excelFormat(value, ""));
+      const fmtIn = (value) => (Math.abs(value) < 1 ? `${Math.round(value * 1000) / 10}%` : value.toFixed(2));
+      result.innerHTML = `
+        <div class="table-wrap">
+          <table class="center-table">
+            <thead><tr><th>${colInput.address} Down · ${rowInput.address} Across</th>${rowValues.map((v) => `<th class="num">${fmtIn(v)}</th>`).join("")}</tr></thead>
+            <tbody>${colValues.map((cv, i) => `<tr><td class="num">${fmtIn(cv)}</td>${values[i].map((v) => `<td class="num${typeof v === "number" && v >= 0.1 ? " is-pass" : ""}">${fmtOut(v)}</td>`).join("")}</tr>`).join("")}</tbody>
+          </table>
+        </div>
+        <p class="small muted">Values show the output cell as a percentage, with results at or above 10% highlighted.</p>`;
+    }
+
+    /* Row-by-Row Comparison With the Solution */
+    function checkModel() {
+      grid.commit();
+      const solution = Guide.caseWorkbook("truck", { solution: true });
+      solution.sheets.Inputs = Object.assign({}, workbook.sheets.Inputs);
+      solution.cache.clear();
+      marks = {};
+      const lines = [];
+      let good = 0;
+      const same = (a, b) => {
+        if (a === null) a = typeof b === "string" ? "" : 0;
+        if (typeof b === "string" || typeof a === "string") return String(a) === String(b);
+        if (typeof a !== "number" || typeof b !== "number") return false;
+        return Math.abs(a - b) <= 1e-6 + Math.abs(b) * 1e-6;
+      };
+      const specs = truck.rows.filter((row) => row.id && row.id !== "year").map((row) => ({ label: row.label, row: row.row, fmt: row.fmt, cols: Guide.rowColumns("truck", row.row) }));
+      truck.outputs.forEach((output) => specs.push({ label: output.label, row: output.row, fmt: output.fmt, cols: ["C"] }));
+      specs.forEach((spec) => {
+        const addresses = spec.cols.map((col) => `${col}${spec.row}`);
+        const empty = addresses.every((address) => workbook.raw("Model", address) === null);
+        const broken = addresses.find((address) => !same(workbook.value("Model", address), solution.value("Model", address)));
+        if (empty) {
+          lines.push(`<li class="row-check is-empty"><span>${icon("info")}</span><strong>${spec.label}</strong><span class="small muted">Not Built Yet</span></li>`);
+        } else if (broken) {
+          marks[broken] = "bad";
+          lines.push(`<li class="row-check is-bad"><span>${icon("close")}</span><strong>${spec.label}</strong><span class="small">${broken} shows <code>${escapeHtml(Guide.excelFormat(workbook.value("Model", broken), spec.fmt))}</code>, expected <code>${escapeHtml(Guide.excelFormat(solution.value("Model", broken), spec.fmt))}</code></span></li>`);
+        } else {
+          good += 1;
+          addresses.forEach((address) => (marks[address] = "good"));
+          lines.push(`<li class="row-check is-good"><span>${icon("check")}</span><strong>${spec.label}</strong><span class="small muted">Matches</span></li>`);
+        }
+      });
+      grid.render();
+      panel.innerHTML = `
+        <div class="card tool-card">
+          <h3>${icon("check")} Model Check · ${good} of ${specs.length} Rows Correct</h3>
+          <p class="small muted">Each row is compared with the solution using your current inputs, so the check stays valid whatever rent you test.</p>
+          <ul class="row-checks">${lines.join("")}</ul>
+          <div class="btn-row"><button type="button" class="btn btn-ghost btn-sm" data-close>${icon("close")} Close</button></div>
+        </div>`;
+    }
+
+    function confirmReset() {
+      panel.innerHTML = `
+        <div class="card tool-card">
+          <h3>${icon("refresh")} Reset the Spreadsheet</h3>
+          <p>Every formula you entered will be cleared and the rent returns to €1.30m. Clearing cannot be undone.</p>
+          <div class="btn-row"><button type="button" class="btn btn-danger btn-sm" data-run="reset">Clear My Work</button><button type="button" class="btn btn-ghost btn-sm" data-close>Keep Working</button></div>
+        </div>`;
+    }
+
+    view.querySelector("#tc-grid").addEventListener("click", (event) => {
+      const tool = event.target.closest("[data-tool]");
+      if (!tool) return;
+      const selected = grid.selected;
+      if (tool.dataset.tool === "fill") fillRight(selected.sheet, selected.address);
+      if (tool.dataset.tool === "seek") showSeek();
+      if (tool.dataset.tool === "table") showTable();
+      if (tool.dataset.tool === "check") checkModel();
+      if (tool.dataset.tool === "reset") confirmReset();
+    });
+
+    view.querySelector("#tc-grid").addEventListener("mousedown", (event) => {
+      if (event.target.closest("[data-tool]")) event.preventDefault();
+    });
+
+    panel.addEventListener("click", (event) => {
+      if (event.target.closest("[data-close]")) panel.innerHTML = "";
+      const run = event.target.closest("[data-run]");
+      if (!run) return;
+      if (run.dataset.run === "seek") runSeek();
+      if (run.dataset.run === "table") runTable();
+      if (run.dataset.run === "reset") {
+        const fresh = Guide.caseWorkbook("truck", { inputs: { rent: 1.3 } });
+        workbook.sheets = fresh.sheets;
+        workbook.cache.clear();
+        store.set("timedWorkbook", null);
+        marks = {};
+        panel.innerHTML = "";
+        grid.render();
+        grid.select("Model", "C9");
+      }
+    });
+
+    panel.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter") return;
+      const run = panel.querySelector("[data-run]");
+      if (run && event.target.matches("input")) {
+        event.preventDefault();
+        run.click();
+      }
+    });
+
     /* Result Checks */
     const form = view.querySelector("#tc-form");
     const savedAnswers = store.get("timedAnswers", {});
@@ -1063,11 +1496,10 @@ window.Guide = window.Guide || {};
           mark.dataset.state = "";
           return;
         }
-        const tol = check.id === "rent" ? 0.003 : null;
         let result = grade(input.value, check.value, check.unit);
-        if (tol !== null) {
+        if (check.id === "rent") {
           const value = parseAnswer(input.value, check.unit);
-          result = { status: Math.abs(value - check.value) <= tol ? "correct" : "wrong" };
+          result = { status: Math.abs(value - check.value) <= 0.003 ? "correct" : "wrong" };
         }
         const ok = result.status === "correct";
         if (ok) correct += 1;
@@ -1081,25 +1513,52 @@ window.Guide = window.Guide || {};
       view.querySelector("#tc-score").textContent = `${correct} of ${tc.checks.length} correct. Best so far: ${best} of ${tc.checks.length}.`;
     });
 
+    /* Copy Values From the On-Site Spreadsheet Into the Check Form */
+    view.querySelector("#tc-read").addEventListener("click", () => {
+      grid.commit();
+      const read = (sheet, address) => workbook.value(sheet, address);
+      const source = {
+        capex: read("Model", "C11"),
+        debt: read("Model", "C19"),
+        ds: read("Model", "D24"),
+        rent: read("Inputs", "B11"),
+        minDscr: read("Model", "C37"),
+        projectIrr: read("Model", "C36"),
+        perTruck: read("Model", "C43")
+      };
+      if (lastTable) {
+        const r = lastTable.rowValues.findIndex((v) => Math.abs(v) < 1e-9);
+        const c = lastTable.colValues.findIndex((v) => Math.abs(v - 1.4) < 1e-9);
+        if (r >= 0 && c >= 0) source.table = lastTable.values[c][r];
+      }
+      tc.checks.forEach((check) => {
+        const value = source[check.id];
+        const input = form.querySelector(`#tc-${check.id}`);
+        if (typeof value !== "number") return;
+        input.value = check.unit === "pct" ? `${(value * 100).toFixed(2)}%` : check.unit === "eur0" ? value.toFixed(0) : String(Number(value.toFixed(6)));
+      });
+      form.requestSubmit();
+    });
+
     view.querySelector("#tc-show").addEventListener("click", () => {
       tc.checks.forEach((check) => {
         const mark = form.querySelector(`[data-check="${check.id}"] .check-mark`);
         mark.dataset.state = "info";
-        mark.textContent = Guide.excelFormat(check.value, check.unit === "eur0" ? "eur0" : check.unit === "pct" ? "pct2" : check.unit);
+        mark.textContent = Guide.excelFormat(check.value, check.unit === "pct" ? "pct2" : check.unit);
       });
     });
 
     /* Solved Sheet Rendered on First Open */
     const sheetDetails = view.querySelector("#tc-sheet").closest("details");
-    sheetDetails.addEventListener(
-      "toggle",
-      () => {
-        if (sheetDetails.open && !view.querySelector("#tc-sheet .xl")) {
-          Guide.createSheet(view.querySelector("#tc-sheet"), { caseId: "truck", inputValues: { rent: 1.372096 } });
-        }
-      },
-      { once: false }
-    );
+    sheetDetails.addEventListener("toggle", () => {
+      if (sheetDetails.open && !view.querySelector("#tc-sheet .xl")) {
+        Guide.createGrid(view.querySelector("#tc-sheet"), {
+          caseId: "truck",
+          workbook: Guide.caseWorkbook("truck", { solution: true, inputs: { rent: 1.372096 } }),
+          showTodo: false
+        });
+      }
+    });
 
     renderBrief();
     paint();
@@ -1130,7 +1589,8 @@ window.Guide = window.Guide || {};
             <p class="small">Builds the models and prepares committee material day to day, which makes them your closest future colleague. Expect sharper technical questions on modelling, debt and your Resonance work.</p>
           </div>
         </div>
-        <p class="small muted">Names of the current Investment Directors and Investment Officers appear on the <a href="#/neot">Neot Profile</a>.</p>
+        <div class="card team-card">${Guide.teamMarkup(["directors", "officers"])}</div>
+        <p class="small muted">Photos come from Neot's team page, where the wider team also appears on the <a href="#/neot">Neot Profile</a>.</p>
       </section>
 
       <section class="section reveal">

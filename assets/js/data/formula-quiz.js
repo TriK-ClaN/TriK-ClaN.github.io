@@ -134,7 +134,7 @@ Guide.formulaQuiz = [
     id: "fq9",
     formula: "debtMin",
     type: "apply",
-    q: "DSCR-based capacity is €52m and the gearing cap is 60% of €75m eligible cost. No other limit applies. How much debt is sized?",
+    q: "DSCR-based capacity is €52m and the gearing cap is 60% of €75m eligible cost. Nothing else limits the debt. How much debt is sized?",
     options: ["€45.0m", "€52.0m", "€48.5m", "€97.0m"],
     explain: "Gearing allows 0.60 × 75 = €45m, which is below the €52m DSCR capacity. Gearing therefore binds, and the resulting DSCR settles comfortably above target."
   },
@@ -192,7 +192,7 @@ Guide.formulaQuiz = [
     type: "apply",
     q: "Three-month EURIBOR is 2.40% and the credit margin is 175 basis points. What is the all-in floating rate before hedging costs?",
     options: ["4.15%", "0.65%", "2.40%", "1.75%"],
-    explain: "All-in cost equals the reference rate plus the margin: 2.40% + 1.75% = 4.15%. Swaps or caps would add their own cost on top."
+    explain: "Adding the margin to the reference rate gives the all-in cost: 2.40% + 1.75% = 4.15%. Swaps or caps would add their own cost on top."
   },
 
   /* Modelling */
@@ -468,7 +468,7 @@ Guide.formulaQuiz = [
     id: "fq38",
     formula: "npv",
     type: "apply",
-    q: "Investing €100m today returns €60m in each of the next two years. At a 10% discount rate, what is the NPV?",
+    q: "Investing €100m today returns €60m in each of the next two years. Using a 10% discount rate, what is the NPV?",
     options: ["€4.13m", "€20.00m", "€9.09m", "−€4.13m"],
     explain: "Discounted inflows are 54.55 + 49.59 = €104.13m, so NPV equals €4.13m. Ignoring discounting overstates value at €20.00m."
   },
@@ -498,7 +498,7 @@ Guide.formulaQuiz = [
     id: "fq41",
     formula: "irrSingle",
     type: "recall",
-    q: "With one investment and one exit, which expression converts MOIC into IRR over n years?",
+    q: "Given one investment and one exit, which expression converts MOIC into IRR over n years?",
     math: true,
     options: [
       String.raw`\text{IRR} = \text{MOIC}^{\,1/n} - 1`,

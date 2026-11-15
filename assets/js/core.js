@@ -100,6 +100,8 @@ window.Guide = window.Guide || {};
       "mockRatings",
       "caseLab",
       "builder",
+      "modelBuilder",
+      "timedWorkbook",
       "timedBest",
       "timedTimer",
       "timedAnswers",
@@ -398,10 +400,11 @@ window.Guide = window.Guide || {};
 
     /* Second Interview Tracking */
     builder() {
-      return Guide.store.get("builder", { done: {}, current: 0 });
+      const state = Guide.store.get("modelBuilder", {});
+      return { done: state.done || {}, formulas: state.formulas || {}, current: state.current || 0 };
     },
     saveBuilder(state) {
-      Guide.store.set("builder", state);
+      Guide.store.set("modelBuilder", state);
       Guide.emit("progress");
     },
     checklist2() {
@@ -470,6 +473,9 @@ window.Guide = window.Guide || {};
 
   /* Shared Markup Builders */
   Guide.ui = {
+    backLink(href, label) {
+      return `<a class="back-link" href="${href}">${Guide.icon("arrowLeft")}<span>${label}</span></a>`;
+    },
     tierLabel(tier) {
       return { 1: "Tier 1 · Must Master", 2: "Tier 2 · Very Likely", 3: "Tier 3 · Stand Out" }[tier];
     },

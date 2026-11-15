@@ -635,7 +635,7 @@ window.Guide = window.Guide || {};
       <header class="page-header">
         <span class="eyebrow">${icon("calc")} Practice</span>
         <h1>Returns Lab</h1>
-        <p class="lede">Two quick experiments behind classic interview questions: why MOIC and IRR can disagree, and why leverage amplifies outcomes in both directions.</p>
+        <p class="lede">Explore two quick experiments behind classic interview questions, showing why MOIC and IRR can disagree and why leverage amplifies outcomes in both directions.</p>
       </header>
 
       <section class="section">

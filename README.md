@@ -5,7 +5,7 @@ Interactive preparation guide for the Neot Capital Investment Analyst internship
 ## Second Interview
 
 - **Briefing:** Countdown to Friday in Paris time, the two-hour agenda, readiness score and a daily plan
-- **Modelling Case:** Case Playbook, Excel Toolkit with English and French functions, a guided Model Builder in a live spreadsheet and a 45-minute Timed Case with downloadable workbooks verified in Excel
+- **Modelling Case:** Case Playbook, Excel Toolkit with English and French functions, a formula-by-formula Model Builder and a 45-minute Timed Case built in an on-site spreadsheet with Fill Right, Goal Seek, Data Table and Check Model tools, plus downloadable workbooks verified in Excel
 - **Conversations:** Discussion and Debrief question banks with spoken model answers, timed practice and self-ratings
 - **Revise:** Study Path, Formula Quiz and French Lexicon shared with the first section
 
@@ -27,7 +27,8 @@ assets/js/core.js          Icons, storage, Paris time, formulas and progress tra
 assets/js/data/            Study, practice, interview, case and workbook content
 assets/js/tools.js         Financial engine and interactive labs
 assets/js/views.js         First Interview views and shared practice components
-assets/js/sheet.js         Spreadsheet grid and bus lease engine
+assets/js/engine.js        Formula engine with Excel functions, Goal Seek and data tables
+assets/js/sheet.js         Editable spreadsheet grid and bus lease engine
 assets/js/round2.js        Second Interview views
 assets/js/app.js           Navigation, routing, theme, search and reset
 assets/files/              Practice workbooks with templates and solutions

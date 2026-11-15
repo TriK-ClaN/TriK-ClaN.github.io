@@ -23,159 +23,181 @@ Guide.casePlan = [
 Guide.builderSteps = [
   {
     id: "flags",
-    title: "Timeline and Indexation",
-    target: "F8",
-    reveal: ["leaseFlag", "debtFlag", "indexFactor"],
-    ask: "Calculate the indexation factor for Year 3.",
-    hint: "Rent and costs rise by 2% a year from Year 2, so Year 3 carries two years of indexation.",
-    explain: "Year 3 gives (1 + 2%) raised to the power of 2, which equals 1.0404. Wrapping the factor in the lease flag returns zero outside the lease, so one formula copies across every column without editing."
+    phase: "Timeline",
+    title: "Lease and Debt Flags",
+    targets: [
+      { cell: "D6", fill: true },
+      { cell: "D7", fill: true }
+    ],
+    ask: "Build the two period flags in D6 and D7. Each should return 1 in every year the lease or the debt is running and 0 otherwise.",
+    hint: "Combine IF with AND, comparing the year in D5 with the lease term in Inputs!B10 and the debt tenor in Inputs!B20. Anchor both input cells with $ signs, for example Inputs!$B$10, so the formula survives copying across.",
+    explain: "Flags let one formula work in every column. Testing whether the year sits between 1 and the ten-year term drives the lease flag, while the debt flag uses the nine-year tenor, so Year 10 carries no debt."
+  },
+  {
+    id: "index",
+    phase: "Timeline",
+    title: "Indexation Factor",
+    targets: [{ cell: "D8", fill: true }],
+    ask: "Calculate the indexation factor in D8, returning zero outside the lease.",
+    hint: "Raise 1 plus the indexation rate in Inputs!B13 to the power of the year minus 1, inside an IF that tests the lease flag in D6.",
+    explain: "Year 1 carries no uplift, so the factor equals 1.0000 before growing by 2% a year to 1.1951 in Year 10. Rent and costs both multiply by this one row."
   },
   {
     id: "capex",
+    phase: "Capex and Funding",
     title: "Capital Expenditure",
-    target: "C12",
-    reveal: ["assetCapex", "chargerCapex", "totalCapex"],
-    ask: "Calculate total capex at financial close.",
-    hint: "Multiply 40 buses by €0.50m, then add 20 chargers at €0.10m each.",
-    explain: "Buses cost €20.0m and chargers €2.0m, so total capex reaches €22.0m. Every capex formula links to the Inputs sheet, which keeps the model fully driven by blue inputs."
+    targets: [{ cell: "C10" }, { cell: "C11" }, { cell: "C12" }],
+    ask: "Calculate bus capex in C10, charger capex in C11 and their total in C12.",
+    hint: "Multiply each count on the Inputs sheet by its unit price, for example Inputs!$B$5*Inputs!$B$6, then add the two rows together in C12.",
+    explain: "Forty buses at €0.50m cost €20.0m and twenty chargers at €0.10m cost €2.0m, so total capex reaches €22.0m."
   },
   {
     id: "revenue",
-    title: "Lease Revenue",
-    target: "F14",
-    reveal: ["revenue", "opex"],
-    ask: "Calculate lease revenue in Year 3.",
-    hint: "Multiply the Year-1 rent by the Year 3 indexation factor.",
-    explain: "Year 3 revenue equals €3.10m multiplied by 1.0404, which gives €3.225m. Operating costs follow the same logic with a negative sign, so EBITDA becomes a simple sum."
+    phase: "Operations",
+    title: "Revenue and Costs",
+    targets: [
+      { cell: "D14", fill: true },
+      { cell: "D15", fill: true }
+    ],
+    ask: "Calculate lease revenue in D14 and operating costs in D15, showing costs as a negative number.",
+    hint: "Multiply the Year-1 rent in Inputs!B11 and the Year-1 costs in Inputs!B12 by the indexation factor in row 8. Placing a minus sign in front of the cost formula makes it an outflow.",
+    explain: "Revenue starts at €3.10m and grows with indexation. Showing costs as negative numbers turns every subtotal into a simple sum."
   },
   {
     id: "ebitda",
+    phase: "Operations",
     title: "EBITDA",
-    target: "D16",
-    reveal: ["ebitda"],
-    ask: "Calculate EBITDA in Year 1.",
-    hint: "Add revenue to the negative operating costs.",
-    explain: "Year 1 EBITDA equals €3.10m less €0.20m, which gives €2.90m. Keeping outflows negative means every subtotal is a plain addition, which is quicker to audit."
+    targets: [{ cell: "D16", fill: true }],
+    ask: "Calculate EBITDA in D16.",
+    hint: "Add revenue in D14 to the negative operating costs in D15.",
+    explain: "Year 1 EBITDA equals €3.10m less €0.20m, which gives €2.90m."
   },
   {
     id: "depreciation",
+    phase: "Operations",
     title: "Depreciation",
-    target: "D17",
-    reveal: ["depreciation"],
-    ask: "Calculate annual depreciation.",
-    hint: "Depreciate total capex on a straight-line basis over the ten-year lease, down to zero.",
-    explain: "Dividing €22.0m by ten years gives €2.2m a year, shown as a negative non-cash charge. Depreciation affects tax but never cash directly, which is why it sits above the tax line only."
+    targets: [{ cell: "D17", fill: true }],
+    ask: "Calculate depreciation in D17 on a straight-line basis over the lease term down to zero, shown as a negative number.",
+    hint: "Divide total capex in C12 by the term in Inputs!B10, then multiply by the lease flag. Write $C$12 rather than C12, otherwise copying right points at empty cells.",
+    explain: "Dividing €22.0m by ten years gives €2.2m a year. Anchoring $C$12 is what keeps every year pointing at the same capex figure."
   },
   {
     id: "residual",
+    phase: "Operations",
     title: "Residual Value",
-    target: "M18",
-    reveal: ["residual"],
-    ask: "Calculate the residual value received at the end of the lease.",
-    hint: "Apply the residual value percentage to total capex, in the final year only.",
-    explain: "Ten percent of €22.0m gives €2.2m, received in Year 10 only. Because the fleet is fully depreciated by then, the whole amount is a taxable gain in this case."
+    targets: [{ cell: "D18", fill: true }],
+    ask: "Bring in the residual value in D18, received in the final lease year only.",
+    hint: "Use IF to test whether the year in D5 equals the term in Inputs!B10, then apply the residual percentage in Inputs!B14 to total capex in $C$12. Return 0 in every other year.",
+    explain: "Ten percent of €22.0m gives €2.2m in Year 10 and nothing before. Because the fleet is fully depreciated by then, the whole amount is taxable later in the model."
   },
   {
     id: "drawdown",
+    phase: "Capex and Funding",
     title: "Debt Drawdown",
-    target: "C20",
-    reveal: ["drawdown", "C24"],
-    ask: "Calculate the senior debt drawn at financial close.",
-    hint: "Apply 70% gearing to total capex.",
-    explain: "Seventy percent of €22.0m gives €15.4m of debt, so equity funds the remaining €6.6m. Gearing is set as an input here, whereas a lender would also test the result against a DSCR constraint."
+    targets: [{ cell: "C20" }, { cell: "C24" }],
+    ask: "Calculate the debt drawn at financial close in C20, then set the Year 0 closing balance in C24 equal to it.",
+    hint: "Apply the gearing in Inputs!B18 to total capex in C12. Year 0's closing balance simply links to C20.",
+    explain: "Seventy percent of €22.0m gives €15.4m of debt, leaving €6.6m for equity. Year 0's closing balance then becomes the opening balance of Year 1."
   },
   {
     id: "interest",
-    title: "Interest",
-    target: "D22",
-    reveal: ["D21", "D22"],
-    ask: "Calculate interest in Year 1.",
-    hint: "Multiply the opening balance by the 4.5% interest rate.",
-    explain: "Year 1 interest equals €15.4m multiplied by 4.5%, which gives €0.693m. Using the opening balance rather than the closing balance keeps the model free of circular references."
+    phase: "Senior Debt",
+    title: "Opening Balance and Interest",
+    targets: [{ cell: "D21" }, { cell: "D22" }],
+    ask: "Start Year 1 of the debt schedule: link the opening balance in D21 to the previous closing balance, then calculate interest in D22.",
+    hint: "Opening balance points to C24. Interest multiplies the opening balance by the rate in Inputs!B19 and by the debt flag in D7.",
+    explain: "Interest of €0.693m is 4.5% of €15.4m. Calculating interest on the opening balance keeps the model free of circular references."
   },
   {
-    id: "debtService",
-    title: "Debt Service",
-    target: "D25",
-    reveal: ["D23", "D25"],
-    ask: "Calculate annual debt service on the nine-year annuity.",
-    hint: "Use PMT with the interest rate, the tenor and the drawdown entered as a negative value.",
-    explain: "PMT(4.5%, 9, −15.4) returns €2.119m, which stays constant every year. Row 23 takes principal as that payment minus interest, so debt service in row 25 adds the two back together and principal rises as interest falls."
+    id: "principal",
+    phase: "Senior Debt",
+    title: "Principal Repayment",
+    targets: [{ cell: "D23" }],
+    ask: "Calculate principal repayment in D23 for a nine-year annuity.",
+    hint: "PMT returns the constant annual payment from the rate in Inputs!B19, the tenor in Inputs!B20 and the drawdown entered as a negative, written -$C$20. Subtract interest in D22, and wrap the result in IF with the debt flag in D7.",
+    explain: "PMT returns €2.119m a year. Principal is that payment minus interest, so it starts at €1.426m and rises as interest falls."
   },
   {
     id: "closing",
-    title: "Closing Balance",
-    target: "D24",
-    reveal: ["opening", "interest", "principal", "closing", "debtService"],
-    ask: "Calculate the closing debt balance at the end of Year 1.",
-    hint: "Subtract Year 1 principal from the opening balance.",
-    explain: "Principal of €1.426m reduces the balance from €15.4m to €13.974m. Once the schedule is copied across, the balance reaches exactly zero in Year 9, which is the first check worth building."
+    phase: "Senior Debt",
+    title: "Closing Balance and Debt Service",
+    targets: [{ cell: "D24" }, { cell: "D25" }],
+    ask: "Complete Year 1 with the closing balance in D24 and total debt service in D25.",
+    hint: "Closing balance equals the opening balance minus principal. Debt service adds interest and principal.",
+    explain: "Debt falls to €13.974m after Year 1, while debt service stays constant at €2.119m, as an annuity should."
   },
   {
-    id: "taxable",
-    title: "Taxable Income",
-    target: "E27",
-    reveal: ["taxable"],
-    ask: "Calculate taxable income in Year 2.",
-    hint: "Start from EBITDA, add the negative depreciation, then deduct interest.",
-    explain: "Year 2 gives €2.958m minus €2.2m minus €0.629m, which equals €0.129m. Taxable income starts small because depreciation and interest absorb most of the EBITDA, then grows as interest falls."
+    id: "copyDebt",
+    phase: "Senior Debt",
+    title: "Copy the Schedule Across",
+    action: { label: "Fill D21:D25 Right", rows: [21, 22, 23, 24, 25], from: "D" },
+    ask: "Copy the Year 1 debt schedule in D21 to D25 across to Year 10.",
+    hint: "Excel users select D21:M25 and press Ctrl+R, or Ctrl+D in French Excel. Every input reference needs its $ signs for the copy to work.",
+    explain: "Once copied, the balance reaches exactly zero in Year 9 and Year 10 shows no debt service. Such a zero balance is the first check worth building into any model."
   },
   {
     id: "tax",
-    title: "Tax Paid",
-    target: "M28",
-    reveal: ["taxPaid"],
-    ask: "Calculate tax paid in Year 10.",
-    hint: "Year 10 has no interest, and the residual value is a taxable gain. Apply 25% inside a MAX function.",
-    explain: "Year 10 taxable income equals €3.466m of EBITDA plus the €2.2m residual value minus €2.2m of depreciation, so tax reaches €0.866m. MAX(0, …) floors tax at zero because the brief allows no loss carry-forward."
+    phase: "Tax and Cash Flows",
+    title: "Taxable Income and Tax",
+    targets: [
+      { cell: "D27", fill: true },
+      { cell: "D28", fill: true }
+    ],
+    ask: "Calculate taxable income in D27 and tax paid in D28, with no relief for tax losses.",
+    hint: "Taxable income adds EBITDA, the negative depreciation and the residual value, then deducts interest. Tax applies the rate in Inputs!B16 inside -MAX(0, …), so it can never turn into a refund.",
+    explain: "Year 1 taxable income is only €0.007m, because depreciation and interest absorb most of the EBITDA. MAX floors tax at zero, since the brief allows no loss carry-forward."
   },
   {
     id: "cfads",
-    title: "CFADS",
-    target: "D30",
-    reveal: ["cfads"],
-    ask: "Calculate CFADS in Year 1.",
-    hint: "Add EBITDA and the negative tax paid.",
-    explain: "CFADS equals €2.900m less €0.002m of tax, which gives €2.898m. Depreciation never appears here, because CFADS measures cash rather than profit."
+    phase: "Tax and Cash Flows",
+    title: "CFADS and DSCR",
+    targets: [
+      { cell: "D30", fill: true },
+      { cell: "D31", fill: true }
+    ],
+    ask: "Calculate CFADS in D30 and the DSCR in D31, returning a blank once the debt is repaid.",
+    hint: "CFADS adds EBITDA and the negative tax paid. Dividing CFADS by debt service inside IF(D25>0, …, \"\") gives the DSCR.",
+    explain: "Year 1 coverage is 1.37x. Returning a blank in Year 10 stops MIN from reporting a false minimum of zero."
   },
   {
-    id: "dscr",
-    title: "DSCR",
-    target: "D31",
-    reveal: ["dscr", "C38", "C39"],
-    ask: "Calculate the DSCR in Year 1.",
-    hint: "Divide CFADS by debt service, returning a blank when there is no debt.",
-    explain: "Year 1 gives €2.898m divided by €2.119m, which equals 1.37x. Returning a blank rather than zero after the debt matures stops MIN from reporting a false minimum of zero."
+    id: "equity",
+    phase: "Tax and Cash Flows",
+    title: "Equity Cash Flows",
+    targets: [{ cell: "C32" }, { cell: "D32", fill: true }],
+    ask: "Build equity cash flows: the investment in C32, then the annual flows from D32.",
+    hint: "Year 0 equals minus total capex plus the debt drawdown. From Year 1, take CFADS, deduct debt service and add the residual value.",
+    explain: "Shareholders invest €6.6m and receive €4.799m in Year 10, which includes the residual value with no debt service left to pay."
   },
   {
-    id: "equityCf",
-    title: "Equity Cash Flow",
-    target: "M32",
-    reveal: ["equityCf", "C40"],
-    ask: "Calculate the equity cash flow in Year 10.",
-    hint: "Take CFADS, deduct debt service, then add the residual value proceeds.",
-    explain: "Year 10 combines €2.599m of CFADS with the €2.2m residual value and no debt service, giving €4.799m. Year 0 shows the €6.6m equity investment as a negative flow, which IRR needs to find a sign change."
+    id: "project",
+    phase: "Tax and Cash Flows",
+    title: "Project Cash Flows",
+    targets: [{ cell: "C33" }, { cell: "D33", fill: true }],
+    ask: "Build unlevered project cash flows in C33 and from D33, recalculating tax without any interest deduction.",
+    hint: "Year 0 is minus total capex. From Year 1, take EBITDA, deduct MAX(0, (EBITDA + depreciation + residual value) × the tax rate in Inputs!$B$16), then add the residual value.",
+    explain: "Unlevered tax is higher because there is no interest deduction, which is why the project row recomputes tax instead of reusing row 28."
   },
   {
-    id: "equityIrr",
-    title: "Equity IRR",
-    target: "C36",
-    reveal: ["C36", "C41"],
-    ask: "Calculate the equity IRR.",
-    hint: "Apply IRR to the equity cash flow row from Year 0 to Year 10.",
-    explain: "IRR over the equity row returns 10.76%. Always include the Year 0 investment in the range, otherwise IRR has no sign change and fails."
+    id: "returns",
+    phase: "Returns and Checks",
+    title: "Returns",
+    targets: [{ cell: "C36" }, { cell: "C37" }, { cell: "C40" }],
+    ask: "Calculate equity IRR in C36, project IRR in C37 and the equity multiple in C40.",
+    hint: "Apply IRR to each cash flow row from column C to column M. Dividing the sum of the Year 1 to Year 10 equity flows by the Year 0 investment, made positive, gives the multiple.",
+    explain: "Equity IRR reaches 10.76% against a 6.30% project IRR, and the equity multiple comes to 1.94x."
   },
   {
-    id: "projectIrr",
-    title: "Project IRR",
-    target: "C37",
-    reveal: ["projectCf", "C37"],
-    ask: "Calculate the project IRR.",
-    hint: "Unlevered cash flows ignore debt entirely, and tax is recalculated without the interest deduction.",
-    explain: "Project IRR comes to 6.30%, well below the equity IRR. Unlevered tax is higher because there is no interest deduction, which is why the project cash flow row recomputes tax instead of reusing it."
+    id: "coverage",
+    phase: "Returns and Checks",
+    title: "Coverage and Checks",
+    targets: [{ cell: "C38" }, { cell: "C39" }, { cell: "C41" }],
+    ask: "Summarise coverage with the minimum DSCR in C38 and the average in C39, then confirm in C41 that the debt is fully repaid.",
+    hint: "MIN and AVERAGE over D31:M31 skip the blank in Year 10. Linking the check to the final closing balance in M24 completes the step.",
+    explain: "Minimum coverage of 1.37x falls in Year 1, and a zero in C41 confirms the debt schedule works."
   },
   {
     id: "whyDscr",
+    phase: "Insights",
     type: "choice",
     title: "Reading the DSCR Profile",
     ask: "Minimum DSCR occurs in Year 1. Why?",
@@ -189,6 +211,7 @@ Guide.builderSteps = [
   },
   {
     id: "whyIrr",
+    phase: "Insights",
     type: "choice",
     title: "Equity Versus Project Returns",
     ask: "Equity IRR of 10.8% sits well above project IRR of 6.3%. Why?",

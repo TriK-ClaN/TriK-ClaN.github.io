@@ -574,7 +574,7 @@ Guide.modules = [
         weak: "Discount the cash flows and add them up.",
         good: "Project FCFF and discount it at WACC, then add a terminal value and bridge to equity.",
         great:
-          "Project unlevered free cash flow over an explicit horizon and discount it at WACC. Adding a discounted terminal value gives enterprise value, and subtracting net debt gives equity value. For a fleet with a finite contract, replace the perpetuity with a residual value and test sensitivity to WACC and residual assumptions."
+          "Project unlevered free cash flow over an explicit horizon and discount it at WACC. Adding a discounted terminal value gives enterprise value, and subtracting net debt gives equity value. Fleets with a finite contract call for a residual value in place of the perpetuity, together with sensitivities to WACC and the residual assumption."
       }
     ],
     traps: [
@@ -679,7 +679,7 @@ Guide.modules = [
     summary: "Due diligence and risk allocation, then investment committee reasoning and counterparty credit.",
     takeaways: [
       "Contracts and counterparties define an infrastructure asset's risk.",
-      "For every risk, identify who controls it and who bears it before estimating the economic impact.",
+      "Every risk deserves two questions before its economic impact is estimated: who controls it and who bears it.",
       "Always close “Would you invest?” with a clear recommendation."
     ],
     sections: [
