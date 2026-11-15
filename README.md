@@ -1,8 +1,15 @@
 # Neot Interview Guide
 
-Interactive preparation guide for the Neot Capital Investment Analyst internship interview.
+Interactive preparation guide for the Neot Capital Investment Analyst internship interviews, organised into a Second Interview section that opens by default and the original First Interview section.
 
-## Contents
+## Second Interview
+
+- **Briefing:** Countdown to Friday in Paris time, the two-hour agenda, readiness score and a daily plan
+- **Modelling Case:** Case Playbook, Excel Toolkit with English and French functions, a guided Model Builder in a live spreadsheet and a 45-minute Timed Case with downloadable workbooks verified in Excel
+- **Conversations:** Discussion and Debrief question banks with spoken model answers, timed practice and self-ratings
+- **Revise:** Study Path, Formula Quiz and French Lexicon shared with the first section
+
+## First Interview
 
 - **Briefing:** Paris-time interview countdown, readiness score, study path and a three-day plan
 - **Neot Profile and Role Decoder:** Company facts, platform debt financing, recent transactions and the offer translated into evidence to bring
@@ -17,10 +24,13 @@ Interactive preparation guide for the Neot Capital Investment Analyst internship
 index.html                 Entry point
 assets/css/styles.css      Design system with light and dark themes
 assets/js/core.js          Icons, storage, Paris time, formulas and progress tracking
-assets/js/data/            Formula, study, practice, interview and reference content
+assets/js/data/            Study, practice, interview, case and workbook content
 assets/js/tools.js         Financial engine and interactive labs
-assets/js/views.js         Page views
+assets/js/views.js         First Interview views and shared practice components
+assets/js/sheet.js         Spreadsheet grid and bus lease engine
+assets/js/round2.js        Second Interview views
 assets/js/app.js           Navigation, routing, theme, search and reset
+assets/files/              Practice workbooks with templates and solutions
 ```
 
 The site is fully static and needs no build step. Formulas are typeset with KaTeX, and progress and notes are stored locally in the browser.

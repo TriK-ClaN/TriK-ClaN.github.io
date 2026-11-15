@@ -49,7 +49,14 @@ window.Guide = window.Guide || {};
     copy: '<rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/>',
     flag: '<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>',
     lightbulb: '<path d="M9 18h6M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7V16h8v-1.3A7 7 0 0 0 12 2Z"/>',
-    sigma: '<path d="M18 5V4H6l6.5 8L6 20h12v-1"/>'
+    sigma: '<path d="M18 5V4H6l6.5 8L6 20h12v-1"/>',
+    sheet: '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/>',
+    wrench: '<path d="M14.7 6.3a4 4 0 0 0 5 5L21 13l-8 8-3-3 8-8-1.3-1.3a4 4 0 0 1-5-5L13 2l2 2-1.7 2.3Z"/>',
+    timer: '<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6M12 2v3"/>',
+    users: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14.2a5 5 0 0 1 5.5 4.8"/>',
+    presentation: '<rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M12 16v4M8 20h8"/><path d="m8 12 3-3 2 2 3-3"/>',
+    layout: '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 9v12"/>',
+    route: '<circle cx="6" cy="19" r="2.5"/><circle cx="18" cy="5" r="2.5"/><path d="M8.5 19H16a3.5 3.5 0 0 0 0-7H8a3.5 3.5 0 0 1 0-7h7.5"/>'
   };
 
   Guide.icon = function icon(name, extraClass) {
@@ -81,9 +88,29 @@ window.Guide = window.Guide || {};
 
   /* Stored Data Groups for Resetting */
   const DATA_GROUPS = {
-    progress: ["modulesDone", "flashState", "drillsDone", "checklist", "quizBest", "formulaQuizBest", "formulaMastery", "plan", "mockRatings", "caseLab"],
+    progress: [
+      "modulesDone",
+      "flashState",
+      "drillsDone",
+      "checklist",
+      "quizBest",
+      "formulaQuizBest",
+      "formulaMastery",
+      "plan",
+      "mockRatings",
+      "caseLab",
+      "builder",
+      "timedBest",
+      "timedTimer",
+      "timedAnswers",
+      "errorDrillBest",
+      "discussionRatings",
+      "debriefRatings",
+      "checklist2",
+      "plan2"
+    ],
     notes: ["story"],
-    settings: ["interviewParisDate", "interviewParisTime", "theme"]
+    settings: ["interviewParisDate", "interviewParisTime", "interview2ParisDate", "interview2ParisTime", "round", "theme"]
   };
 
   Guide.resetData = function resetData(groups) {
@@ -367,7 +394,67 @@ window.Guide = window.Guide || {};
         0.1 * (storyDone / totals.story);
 
       return { modulesDone, flashKnown, drillsDone, checksDone, storyDone, quizBest, formulaBest, totals, score: Math.min(1, score) };
+    },
+
+    /* Second Interview Tracking */
+    builder() {
+      return Guide.store.get("builder", { done: {}, current: 0 });
+    },
+    saveBuilder(state) {
+      Guide.store.set("builder", state);
+      Guide.emit("progress");
+    },
+    checklist2() {
+      return Guide.store.get("checklist2", {});
+    },
+    setCheck2(id, value) {
+      const map = this.checklist2();
+      map[id] = value;
+      Guide.store.set("checklist2", map);
+      Guide.emit("progress");
+    },
+    ratings(key) {
+      return Guide.store.get(key, {});
+    },
+    summary2() {
+      const strong = (key) => Object.values(this.ratings(key)).filter((rating) => rating === "Solid" || rating === "Nailed It").length;
+      const builderDone = Object.values(this.builder().done).filter(Boolean).length;
+      const checksDone = Object.values(this.checklist2()).filter(Boolean).length;
+      const timedBest = Guide.store.get("timedBest", 0);
+      const drillBest = Guide.store.get("errorDrillBest", 0);
+      const discussionStrong = strong("discussionRatings");
+      const debriefStrong = strong("debriefRatings");
+
+      const totals = {
+        builder: Guide.builderSteps.length,
+        checks: Guide.checklist2.length,
+        timed: Guide.timedCase.checks.length,
+        discussion: Guide.discussionPool().length,
+        debrief: Guide.debrief.items.length
+      };
+
+      const score =
+        0.3 * (builderDone / totals.builder) +
+        0.2 * (timedBest / totals.timed) +
+        0.1 * (drillBest / 100) +
+        0.15 * Math.min(1, discussionStrong / totals.discussion) +
+        0.1 * Math.min(1, debriefStrong / totals.debrief) +
+        0.15 * (checksDone / totals.checks);
+
+      return { builderDone, checksDone, timedBest, drillBest, discussionStrong, debriefStrong, totals, score: Math.min(1, score) };
     }
+  };
+
+  /* Discussion Pool Combining New and First-Round Questions */
+  Guide.discussionPool = function discussionPool() {
+    if (Guide.discussionPool.cache) return Guide.discussionPool.cache;
+    const reused = Object.keys(Guide.discussion.reuse)
+      .map((id) => Guide.mock.find((item) => item.id === id))
+      .filter(Boolean)
+      .map((item) => Object.assign({}, item, { cat: Guide.discussion.reuse[item.id], lang: item.cat === "fr" ? "fr" : "" }));
+    const fresh = Guide.discussion.items.map((item) => Object.assign({}, item, { lang: item.cat === "fr" ? "fr" : "" }));
+    Guide.discussionPool.cache = fresh.concat(reused);
+    return Guide.discussionPool.cache;
   };
 
   /* Minimal Event Bus */

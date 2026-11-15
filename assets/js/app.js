@@ -4,12 +4,48 @@
 
   const { icon, store, progress, escapeHtml } = Guide;
 
-  /* Navigation Structure */
-  const NAV = [
+  /* Second Interview Navigation */
+  const NAV_SECOND = [
     {
       title: "Overview",
       items: [
         { href: "#/", label: "Briefing", icon: "home" },
+        { href: "#/day", label: "Interview Day", icon: "calendar" },
+        { href: "#/neot", label: "Neot Profile", icon: "building" }
+      ]
+    },
+    {
+      title: "Modelling Case",
+      items: [
+        { href: "#/case", label: "Case Playbook", icon: "route" },
+        { href: "#/case/excel", label: "Excel Toolkit", icon: "wrench" },
+        { href: "#/case/builder", label: "Model Builder", icon: "sheet" },
+        { href: "#/case/timed", label: "Timed Case", icon: "timer" }
+      ]
+    },
+    {
+      title: "Conversations",
+      items: [
+        { href: "#/discussion", label: "Discussion", icon: "users" },
+        { href: "#/debrief", label: "Debrief", icon: "presentation" }
+      ]
+    },
+    {
+      title: "Revise",
+      items: [
+        { href: "#/study", label: "Study Path", icon: "book" },
+        { href: "#/practice/formulas", label: "Formula Quiz", icon: "sigma" },
+        { href: "#/lexicon", label: "French Lexicon", icon: "globe" }
+      ]
+    }
+  ];
+
+  /* First Interview Navigation */
+  const NAV_FIRST = [
+    {
+      title: "Overview",
+      items: [
+        { href: "#/first", label: "Briefing", icon: "home" },
         { href: "#/neot", label: "Neot Profile", icon: "building" },
         { href: "#/role", label: "Role Decoder", icon: "briefcase" }
       ]
@@ -44,7 +80,15 @@
 
   /* Route Table */
   const ROUTES = {
-    "": { view: "home", title: "Briefing" },
+    "": { view: "home2", title: "Second Interview" },
+    day: { view: "day2", title: "Interview Day" },
+    case: { view: "casePlaybook", title: "Case Playbook" },
+    "case/excel": { view: "excelToolkit", title: "Excel Toolkit" },
+    "case/builder": { view: "builder", title: "Model Builder" },
+    "case/timed": { view: "timedCase", title: "Timed Case" },
+    discussion: { view: "discussion", title: "Discussion" },
+    debrief: { view: "debrief", title: "Debrief" },
+    first: { view: "home", title: "First Interview" },
     neot: { view: "neot", title: "Neot Profile" },
     role: { view: "role", title: "Role Decoder" },
     study: { view: "study", title: "Study Path" },
@@ -61,15 +105,42 @@
   };
 
   const SITE_TITLE = "Neot Interview Guide";
+  const NAV_BY_ROUND = { 1: NAV_FIRST, 2: NAV_SECOND };
+  const hrefsOf = (nav) => new Set(nav.flatMap((group) => group.items.map((item) => item.href)));
+  const HREFS = { 1: hrefsOf(NAV_FIRST), 2: hrefsOf(NAV_SECOND) };
+  let round = store.get("round", 2) === 1 ? 1 : 2;
   let cleanup = null;
   let revealObserver = null;
   let lastPath = null;
+
+  /* Current Navigation Key for the Hash */
+  function currentKey() {
+    const hash = window.location.hash || "#/";
+    const parts = hash.replace(/^#\/?/, "").split("/");
+    if (!parts[0]) return "#/";
+    if (parts[0] === "study" && parts[1]) return `#/study/${parts[1]}`;
+    return `#/${parts.slice(0, parts[0] === "practice" || parts[0] === "case" ? 2 : 1).join("/")}`;
+  }
+
+  /* Interview Round Owning the Current Page */
+  function syncRound() {
+    const key = currentKey();
+    const inFirst = HREFS[1].has(key);
+    const inSecond = HREFS[2].has(key) || key.startsWith("#/study/");
+    const next = inSecond && !inFirst ? 2 : inFirst && !inSecond ? 1 : round;
+    if (next !== round) {
+      round = next;
+      store.set("round", round);
+      renderNav();
+      renderReadiness();
+    }
+  }
 
   /* Sidebar Rendering */
   function renderNav() {
     const done = progress.modules();
     const nav = document.getElementById("nav");
-    nav.innerHTML = NAV.map(
+    nav.innerHTML = NAV_BY_ROUND[round].map(
       (group) => `
       <div>
         <p class="nav-group-title">${group.title}</p>
@@ -85,23 +156,26 @@
         </ul>
       </div>`
     ).join("");
+    document.querySelectorAll("[data-round]").forEach((link) => {
+      if (Number(link.dataset.round) === round) link.setAttribute("aria-current", "true");
+      else link.removeAttribute("aria-current");
+    });
     highlightNav();
   }
 
   function highlightNav() {
-    const hash = window.location.hash || "#/";
-    const parts = hash.replace(/^#\/?/, "").split("/");
-    const current = parts[0] === "study" && parts[1] ? `#/study/${parts[1]}` : hash.split("/").slice(0, parts[0] === "practice" ? 3 : 2).join("/") || "#/";
-    document.querySelectorAll(".nav-link").forEach((link) => {
-      const href = link.getAttribute("href");
-      const active = href === current || (href === "#/" && (current === "#" || current === "#/"));
-      if (active) link.setAttribute("aria-current", "page");
+    const key = currentKey();
+    const links = [...document.querySelectorAll(".nav-link")];
+    const exact = links.some((link) => link.getAttribute("href") === key);
+    const target = exact ? key : key.startsWith("#/study/") ? "#/study" : key;
+    links.forEach((link) => {
+      if (link.getAttribute("href") === target) link.setAttribute("aria-current", "page");
       else link.removeAttribute("aria-current");
     });
   }
 
   function renderReadiness() {
-    const summary = progress.summary();
+    const summary = round === 2 ? progress.summary2() : progress.summary();
     const percent = Math.round(summary.score * 100);
     document.getElementById("readiness-value").textContent = `${percent}%`;
     document.getElementById("readiness-fill").style.width = `${percent}%`;
@@ -160,6 +234,7 @@
     const samePage = route.path === lastPath && route.view === "module";
 
     closeNav();
+    syncRound();
     highlightNav();
 
     /* Same Module, Different Section: Scroll Only */
@@ -250,7 +325,28 @@
   /* Search Index */
   function buildIndex() {
     const entries = [];
-    NAV.forEach((group) => group.items.forEach((item) => entries.push({ kind: "Page", title: item.label, text: group.title, href: item.href })));
+    const seen = new Set();
+    [
+      ["Second Interview", NAV_SECOND],
+      ["First Interview", NAV_FIRST]
+    ].forEach(([section, nav]) =>
+      nav.forEach((group) =>
+        group.items.forEach((item) => {
+          if (seen.has(item.href)) return;
+          seen.add(item.href);
+          entries.push({ kind: "Page", title: item.label, text: `${section} · ${group.title}`, href: item.href });
+        })
+      )
+    );
+    Guide.discussion.items.forEach((item) => entries.push({ kind: "Discussion", title: item.q, text: item.answer.join(" ").replace(/\[\[|\]\]/g, ""), href: "#/discussion" }));
+    Guide.debrief.items.forEach((item) => entries.push({ kind: "Debrief", title: item.q, text: item.answer.join(" "), href: "#/debrief" }));
+    Guide.excelFunctions.forEach((fn) => entries.push({ kind: "Excel", title: `${fn.en} · ${fn.fr}`, text: `${fn.purpose}. ${fn.note}`, href: "#/case/excel" }));
+    Guide.builderSteps.forEach((step) => entries.push({ kind: "Model Builder", title: step.title, text: step.explain, href: "#/case/builder" }));
+    Guide.casePlan.forEach((phase) => entries.push({ kind: "Case Playbook", title: phase.title, text: phase.text, href: "#/case" }));
+    entries.push(
+      { kind: "Excel", title: "Goal Seek", text: "Solves one input so that one output hits a target, such as the rent that delivers a 10% equity IRR.", href: "#/case/excel" },
+      { kind: "Excel", title: "Data Table", text: "Recalculates an output across a grid of inputs for sensitivities.", href: "#/case/excel" }
+    );
     Guide.modules.forEach((module) => {
       module.sections.forEach((section) => {
         entries.push({ kind: module.short, title: section.title, text: Guide.stripHtml(section.html), href: `#/study/${module.id}/${section.id}` });

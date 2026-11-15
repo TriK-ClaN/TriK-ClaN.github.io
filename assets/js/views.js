@@ -34,7 +34,10 @@ window.Guide = window.Guide || {};
   }
 
   /* Paris-Time Countdown */
-  function startCountdown(root) {
+  const FIRST_ROUND_COUNTDOWN = { dateKey: "interviewParisDate", timeKey: "interviewParisTime", defaultDate: "", assumedTime: "" };
+
+  function startCountdown(root, settings) {
+    const config = Object.assign({}, FIRST_ROUND_COUNTDOWN, { defaultDate: Guide.interview.defaultDate, assumedTime: Guide.interview.assumedTime }, settings);
     const dateInput = root.querySelector("#interview-date");
     const timeInput = root.querySelector("#interview-time");
     const units = root.querySelector("#countdown-units");
@@ -42,13 +45,13 @@ window.Guide = window.Guide || {};
     const summary = root.querySelector("#countdown-summary");
     const note = root.querySelector("#countdown-note");
 
-    dateInput.value = store.get("interviewParisDate", Guide.interview.defaultDate);
-    timeInput.value = store.get("interviewParisTime", "");
+    dateInput.value = store.get(config.dateKey, config.defaultDate);
+    timeInput.value = store.get(config.timeKey, "");
 
     function tick() {
-      const dateText = dateInput.value || Guide.interview.defaultDate;
+      const dateText = dateInput.value || config.defaultDate;
       const timeSet = Boolean(timeInput.value);
-      const timeText = timeSet ? timeInput.value : Guide.interview.assumedTime;
+      const timeText = timeSet ? timeInput.value : config.assumedTime;
       const target = Guide.time.parisToDate(dateText, timeText);
       const zone = Guide.time.zoneLabel(target);
 
@@ -59,7 +62,7 @@ window.Guide = window.Guide || {};
         ? deviceDiffers
           ? `This device shows that moment as ${Guide.time.formatLocalTime(target)}.`
           : "Countdown follows Paris time automatically."
-        : `Counting to ${Guide.interview.assumedTime} Paris time until the confirmed start time is entered.`;
+        : `Counting to ${config.assumedTime} Paris time until the confirmed start time is entered.`;
 
       const diff = target.getTime() - Date.now();
       if (diff <= 0) {
@@ -81,17 +84,22 @@ window.Guide = window.Guide || {};
     }
 
     dateInput.addEventListener("change", () => {
-      store.set("interviewParisDate", dateInput.value);
+      store.set(config.dateKey, dateInput.value);
       tick();
     });
     timeInput.addEventListener("change", () => {
-      store.set("interviewParisTime", timeInput.value);
+      store.set(config.timeKey, timeInput.value);
       tick();
     });
 
     tick();
     return window.setInterval(tick, 30000);
   }
+
+  /* Shared Helpers for the Second Interview Views */
+  Guide.ring = ring;
+  Guide.animateRings = animateRings;
+  Guide.startCountdown = startCountdown;
 
   /* Home Briefing View */
   Guide.views.home = function home(view) {
@@ -124,9 +132,9 @@ window.Guide = window.Guide || {};
         </svg>
         <div class="hero-grid">
           <div>
-            <span class="eyebrow">${icon("spark")} Neot Capital · Investment Analyst Internship</span>
+            <span class="eyebrow">${icon("spark")} Neot Capital · First Interview</span>
             <h1>Ready for Neot, Ha Linh.</h1>
-            <p class="lede">Everything needed to walk into Wednesday's interview with confidence, combining about ${Math.round(totalMinutes() / 60)} hours of focused study with spoken model answers to rehearse. All of it builds on the strengths Resonance has already given you.</p>
+            <p class="lede">Preparation for the first interview, combining about ${Math.round(totalMinutes() / 60)} hours of focused study with spoken model answers to rehearse. Most of it remains valuable for Friday, especially the study modules and the Formula Quiz.</p>
             <div class="btn-row" style="margin-top:1.25rem">
               <a class="btn" href="#/study/project-finance">Start With Tier 1 ${icon("arrowRight")}</a>
               <a class="btn btn-ghost" href="#/practice/mock">${icon("mic")} Practise Interview Answers</a>
@@ -172,7 +180,7 @@ window.Guide = window.Guide || {};
             .map((stage) => `<div class="card stage"><h3>${stage.title}</h3><p class="small muted">${stage.meta}</p><p>${stage.summary}</p></div>`)
             .join("")}
         </div>
-        ${ui.callout("Which Round Is Wednesday?", "<p>Prepare for both. Screening calls reward a sharp pitch and genuine knowledge of Neot, while the technical round rewards depth in project finance and judgement on EV fleets.</p>", "callout-indigo", "info")}
+        ${ui.callout("First Round Complete", '<p>Congratulations on reaching the second round. Friday\'s two-hour interview adds a modelling case on Excel, and its dedicated section covers every part of the agenda. <a href="#/">Open the Second Interview</a></p>', "callout-indigo", "info")}
       </section>
 
       <section class="section">
@@ -1233,56 +1241,57 @@ window.Guide = window.Guide || {};
       .map((paragraph) => `<p>${paragraph.replace(/\[\[(.+?)\]\]/g, '<span class="fill-in" title="Personalise this detail">$1</span>')}</p>`)
       .join("");
     const note = item.note ? `<p class="answer-note">${icon("pen", "inline-icon")} ${item.note}</p>` : "";
-    const lang = item.cat === "fr" ? ' lang="fr"' : "";
+    const lang = item.cat === "fr" || item.lang === "fr" ? ' lang="fr"' : "";
     return `<div class="model-answer"${lang}>${paragraphs}</div>${note}`;
   }
 
   function pointsHtml(item) {
-    const lang = item.cat === "fr" ? ' lang="fr"' : "";
-    return `<div class="listen-for"><h4>${item.cat === "fr" ? "Points attendus" : "What They Listen For"}</h4><ul class="tag-list"${lang}>${item.points.map((point) => `<li>${point}</li>`).join("")}</ul></div>`;
+    const french = item.cat === "fr" || item.lang === "fr";
+    const lang = french ? ' lang="fr"' : "";
+    return `<div class="listen-for"><h4>${french ? "Points attendus" : "What They Listen For"}</h4><ul class="tag-list"${lang}>${item.points.map((point) => `<li>${point}</li>`).join("")}</ul></div>`;
   }
 
   Guide.answerHtml = answerHtml;
 
-  /* Mock Interview View */
-  Guide.views.mock = function mock(view) {
+  /* Reusable Timed Question Practice */
+  Guide.questionPractice = function questionPractice(host, config) {
+    const items = config.items;
+    const categories = config.categories;
+    const ratingsKey = config.ratingsKey;
     let mode = "practice";
     let category = "all";
     let queue = [];
     let current = null;
     let timer = null;
     let elapsed = 0;
-    let duration = 90;
+    let duration = config.duration || 90;
 
-    view.innerHTML = `
-      <header class="page-header">
-        <span class="eyebrow">${icon("mic")} Practice</span>
-        <h1>Mock Interview</h1>
-        <p class="lede">Answer each question aloud against the clock, then compare your response with a spoken model answer. Highlighted details in the model answers are placeholders for your own examples.</p>
-      </header>
+    const isFrench = (item) => item.cat === "fr" || item.lang === "fr";
+
+    host.innerHTML = `
       <div class="toolbar">
-        <div class="segmented" role="group" aria-label="Mode" id="mock-mode">
+        <div class="segmented" role="group" aria-label="Mode" data-role="mode">
           <button type="button" data-mode="practice" aria-pressed="true">${icon("clock", "inline-icon")} Timed Practice</button>
           <button type="button" data-mode="bank" aria-pressed="false">${icon("book", "inline-icon")} Answer Bank</button>
         </div>
       </div>
       <div class="toolbar">
-        <div class="segmented" role="group" aria-label="Question category" id="mock-cat">
+        <div class="segmented" role="group" aria-label="Question category" data-role="cat">
           <button type="button" data-cat="all">All</button>
-          ${Guide.mockCategories.map((cat) => `<button type="button" data-cat="${cat.id}">${cat.label}</button>`).join("")}
+          ${categories.map((cat) => `<button type="button" data-cat="${cat.id}">${cat.label}</button>`).join("")}
         </div>
       </div>
-      <div id="mock-host"></div>`;
+      <div data-role="stage"></div>`;
 
-    const host = view.querySelector("#mock-host");
+    const stage = host.querySelector('[data-role="stage"]');
 
     function syncButtons() {
-      view.querySelectorAll("#mock-cat button").forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.cat === category)));
-      view.querySelectorAll("#mock-mode button").forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.mode === mode)));
+      host.querySelectorAll('[data-role="cat"] button').forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.cat === category)));
+      host.querySelectorAll('[data-role="mode"] button').forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.mode === mode)));
     }
 
     function filtered() {
-      return Guide.mock.filter((item) => category === "all" || item.cat === category);
+      return items.filter((item) => category === "all" || item.cat === category);
     }
 
     function stopTimer() {
@@ -1291,7 +1300,7 @@ window.Guide = window.Guide || {};
     }
 
     function renderTimer() {
-      const node = host.querySelector(".timer");
+      const node = stage.querySelector(".timer");
       if (!node) return;
       const remaining = duration - elapsed;
       const shown = Math.abs(remaining);
@@ -1303,18 +1312,19 @@ window.Guide = window.Guide || {};
     /* Answer Bank Mode */
     function renderBank() {
       stopTimer();
-      const groups = Guide.mockCategories.filter((cat) => category === "all" || cat.id === category);
-      host.innerHTML = groups
+      const groups = categories.filter((cat) => category === "all" || cat.id === category);
+      stage.innerHTML = groups
         .map((cat) => {
-          const items = Guide.mock.filter((item) => item.cat === cat.id);
+          const group = items.filter((item) => item.cat === cat.id);
+          if (!group.length) return "";
           return `
             <section class="section">
               <h2 class="bank-title">${cat.label}</h2>
-              ${items
+              ${group
                 .map(
                   (item) => `
                 <details class="accordion">
-                  <summary${item.cat === "fr" ? ' lang="fr"' : ""}>${item.q} ${icon("chevronDown", "chev")}</summary>
+                  <summary${isFrench(item) ? ' lang="fr"' : ""}>${item.q} ${icon("chevronDown", "chev")}</summary>
                   <div class="accordion-body">
                     ${answerHtml(item)}
                     ${pointsHtml(item)}
@@ -1334,12 +1344,12 @@ window.Guide = window.Guide || {};
       elapsed = 0;
       if (!queue.length) queue = Guide.shuffle(filtered());
       current = queue.shift();
-      const cat = Guide.mockCategories.find((item) => item.id === current.cat);
-      const ratings = store.get("mockRatings", {});
+      const cat = categories.find((item) => item.id === current.cat);
+      const ratings = store.get(ratingsKey, {});
       const key = current.id;
-      const lang = current.cat === "fr" ? ' lang="fr"' : "";
+      const lang = isFrench(current) ? ' lang="fr"' : "";
 
-      host.innerHTML = `
+      stage.innerHTML = `
         <div class="card mock-card">
           <div class="mock-top">
             <span class="pill">${cat.label}</span>
@@ -1347,21 +1357,21 @@ window.Guide = window.Guide || {};
           </div>
           <p class="mock-q"${lang}>${current.q}</p>
           <div class="btn-row">
-            <button type="button" class="btn" id="mock-timer">${icon("play")} Start Timer</button>
-            <div class="segmented" role="group" aria-label="Answer length" id="mock-duration">
-              ${[60, 90, 120].map((seconds) => `<button type="button" data-seconds="${seconds}" aria-pressed="${seconds === duration}">${seconds}s</button>`).join("")}
+            <button type="button" class="btn" data-role="timer">${icon("play")} Start Timer</button>
+            <div class="segmented" role="group" aria-label="Answer length" data-role="duration">
+              ${[60, 90, 120, 180].map((seconds) => `<button type="button" data-seconds="${seconds}" aria-pressed="${seconds === duration}">${seconds < 120 ? `${seconds}s` : `${seconds / 60} min`}</button>`).join("")}
             </div>
-            <button type="button" class="btn btn-ghost" id="mock-reveal">${icon("lightbulb")} Reveal Model Answer</button>
-            <button type="button" class="btn btn-ghost" id="mock-next">Next Question ${icon("arrowRight")}</button>
+            <button type="button" class="btn btn-ghost" data-role="reveal">${icon("lightbulb")} Reveal Model Answer</button>
+            <button type="button" class="btn btn-ghost" data-role="next">Next Question ${icon("arrowRight")}</button>
           </div>
-          <div id="mock-answer"></div>
-          <p class="small muted mock-remaining">${queue.length} more questions in this round.${ratings[key] ? ` Last self-rating: ${ratings[key]}.` : ""}</p>
+          <div data-role="answer"></div>
+          <p class="small muted mock-remaining">${queue.length === 1 ? "One more question" : `${queue.length} more questions`} in this round.${ratings[key] ? ` Last self-rating: ${ratings[key]}.` : ""}</p>
         </div>
         ${ui.callout("How to Compare", "<p>Judge your answer on structure and substance rather than wording. Check whether you opened with a clear headline and covered the listening points, then whether you finished on a judgement or recommendation.</p>", "callout-indigo", "lightbulb")}`;
 
       renderTimer();
 
-      host.querySelector("#mock-timer").addEventListener("click", (event) => {
+      stage.querySelector('[data-role="timer"]').addEventListener("click", (event) => {
         const button = event.currentTarget;
         if (timer) {
           stopTimer();
@@ -1375,41 +1385,42 @@ window.Guide = window.Guide || {};
         }
       });
 
-      host.querySelector("#mock-duration").addEventListener("click", (event) => {
+      stage.querySelector('[data-role="duration"]').addEventListener("click", (event) => {
         const button = event.target.closest("button[data-seconds]");
         if (!button) return;
         duration = Number(button.dataset.seconds);
-        host.querySelectorAll("#mock-duration button").forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
+        stage.querySelectorAll('[data-role="duration"] button').forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
         renderTimer();
       });
 
-      host.querySelector("#mock-reveal").addEventListener("click", () => {
+      stage.querySelector('[data-role="reveal"]').addEventListener("click", () => {
         stopTimer();
-        host.querySelector("#mock-timer").innerHTML = `${icon("play")} Resume`;
-        host.querySelector("#mock-answer").innerHTML = `
+        stage.querySelector('[data-role="timer"]').innerHTML = `${icon("play")} Resume`;
+        stage.querySelector('[data-role="answer"]').innerHTML = `
           <div class="keypoints">
             <h3>Model Answer</h3>
             ${answerHtml(current)}
             ${pointsHtml(current)}
             <div class="btn-row rate-row">
               <span class="small muted">Rate Your Answer</span>
-              <div class="segmented" role="group" aria-label="Self-rating" id="mock-rate">
+              <div class="segmented" role="group" aria-label="Self-rating" data-role="rate">
                 ${["Needs Work", "Solid", "Nailed It"].map((label) => `<button type="button" data-rate="${label}" aria-pressed="${ratings[key] === label}">${label}</button>`).join("")}
               </div>
               <a class="btn btn-ghost btn-sm" href="${current.link}">Revise This Topic ${icon("arrowRight")}</a>
             </div>
           </div>`;
-        host.querySelector("#mock-rate").addEventListener("click", (event) => {
+        stage.querySelector('[data-role="rate"]').addEventListener("click", (event) => {
           const button = event.target.closest("button[data-rate]");
           if (!button) return;
-          const all = store.get("mockRatings", {});
+          const all = store.get(ratingsKey, {});
           all[key] = button.dataset.rate;
-          store.set("mockRatings", all);
-          host.querySelectorAll("#mock-rate button").forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
+          store.set(ratingsKey, all);
+          Guide.emit("progress");
+          stage.querySelectorAll('[data-role="rate"] button').forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
         });
       });
 
-      host.querySelector("#mock-next").addEventListener("click", nextQuestion);
+      stage.querySelector('[data-role="next"]').addEventListener("click", nextQuestion);
     }
 
     function render() {
@@ -1422,14 +1433,14 @@ window.Guide = window.Guide || {};
       }
     }
 
-    view.querySelector("#mock-cat").addEventListener("click", (event) => {
+    host.querySelector('[data-role="cat"]').addEventListener("click", (event) => {
       const button = event.target.closest("button[data-cat]");
       if (!button) return;
       category = button.dataset.cat;
       render();
     });
 
-    view.querySelector("#mock-mode").addEventListener("click", (event) => {
+    host.querySelector('[data-role="mode"]').addEventListener("click", (event) => {
       const button = event.target.closest("button[data-mode]");
       if (!button) return;
       mode = button.dataset.mode;
@@ -1438,6 +1449,23 @@ window.Guide = window.Guide || {};
 
     render();
     return stopTimer;
+  };
+
+  /* Mock Interview View */
+  Guide.views.mock = function mock(view) {
+    view.innerHTML = `
+      <header class="page-header">
+        <span class="eyebrow">${icon("mic")} Practice</span>
+        <h1>Mock Interview</h1>
+        <p class="lede">Answer each question aloud against the clock, then compare your response with a spoken model answer. Highlighted details in the model answers are placeholders for your own examples.</p>
+      </header>
+      <div id="mock-host"></div>`;
+
+    return Guide.questionPractice(view.querySelector("#mock-host"), {
+      items: Guide.mock,
+      categories: Guide.mockCategories,
+      ratingsKey: "mockRatings"
+    });
   };
 
   /* Story Builder View */
