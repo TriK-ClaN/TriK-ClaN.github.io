@@ -31,6 +31,13 @@
       ]
     },
     {
+      title: "Technical Focus",
+      items: [
+        { href: "#/battery", label: "Battery Questions", icon: "bolt" },
+        { href: "#/formulas", label: "Formula Sheet", icon: "calc" }
+      ]
+    },
+    {
       title: "Revise",
       items: [
         { href: "#/study", label: "Study Path", icon: "book" },
@@ -88,6 +95,8 @@
     "case/timed": { view: "timedCase", title: "Timed Case" },
     discussion: { view: "discussion", title: "Discussion" },
     debrief: { view: "debrief", title: "Debrief" },
+    battery: { view: "batteryQuestions", title: "Battery Questions" },
+    formulas: { view: "formulaSheet", title: "Formula Sheet" },
     first: { view: "home", title: "First Interview" },
     neot: { view: "neot", title: "Neot Profile" },
     role: { view: "role", title: "Role Decoder" },
@@ -342,6 +351,8 @@
     Guide.debrief.items.forEach((item) => entries.push({ kind: "Debrief", title: item.q, text: item.answer.join(" "), href: "#/debrief" }));
     Guide.excelFunctions.forEach((fn) => entries.push({ kind: "Excel", title: `${fn.en} · ${fn.fr}`, text: `${fn.purpose}. ${fn.note}`, href: "#/case/excel" }));
     Guide.builderSteps.forEach((step) => entries.push({ kind: "Model Builder", title: step.title, text: step.explain, href: "#/case/builder" }));
+    Guide.batteryQuestions.forEach((item) => entries.push({ kind: "Battery", title: item.q, text: item.answer.join(" "), href: "#/battery" }));
+    Guide.sheetFormulas.forEach((formula) => entries.push({ kind: "Formula Sheet", title: formula.name, text: formula.note, href: "#/formulas" }));
     Guide.casePlan.forEach((phase) => entries.push({ kind: "Case Playbook", title: phase.title, text: phase.text, href: "#/case" }));
     entries.push(
       { kind: "Excel", title: "Goal Seek", text: "Solves one input so that one output hits a target, such as the rent that delivers a 10% equity IRR.", href: "#/case/excel" },

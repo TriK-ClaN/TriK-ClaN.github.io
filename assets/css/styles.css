@@ -4865,6 +4865,14 @@ tr.is-differs td {
     gap: 3px;
   }
 
+  .sheet-eq .katex {
+    font-size: 0.9em;
+  }
+
+  .sheet-example .katex {
+    font-size: 0.82em;
+  }
+
   .dscr-value {
     font-size: 0.62rem;
   }
@@ -4955,6 +4963,185 @@ tr.is-differs td {
   text-align: justify;
   -webkit-hyphens: auto;
   hyphens: auto;
+}
+
+/* Battery Questions */
+.theme-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.9rem;
+  align-items: start;
+}
+
+.theme-card .card-icon {
+  margin-bottom: 0;
+}
+
+.theme-card h3 {
+  margin-bottom: 0.25rem;
+}
+
+.theme-card p {
+  margin: 0;
+}
+
+.source-list li {
+  margin-bottom: 0.4rem;
+}
+
+/* Formula Sheet */
+.sheet-toolbar {
+  display: grid;
+  gap: 0.75rem;
+  margin-bottom: 0.6rem;
+}
+
+.sheet-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.sheet-search {
+  flex: 1;
+  min-width: 220px;
+  margin: 0;
+}
+
+#sheet-recall[aria-pressed="true"] {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+}
+
+.sheet-group-title .num svg {
+  width: 18px;
+  height: 18px;
+  transform: translateY(2px);
+}
+
+.sheet-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr));
+  gap: 0.9rem;
+}
+
+.sheet-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  min-width: 0;
+}
+
+.sheet-name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.sheet-body {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0.75rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  color: inherit;
+  text-align: center;
+  cursor: default;
+}
+
+.sheet-eq {
+  display: block;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+}
+
+.sheet-eq .katex-display {
+  margin: 0;
+}
+
+.sheet-eq .katex {
+  font-size: 1.02em;
+}
+
+.sheet-cover {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  border-radius: inherit;
+  background: var(--surface-2);
+  color: var(--accent-strong);
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+.sheet-cover svg {
+  width: 17px;
+  height: 17px;
+}
+
+.is-recall .sheet-body {
+  min-height: 64px;
+  cursor: pointer;
+}
+
+.is-recall .sheet-card:not(.is-revealed) .sheet-cover {
+  display: flex;
+}
+
+.is-recall .sheet-card:not(.is-revealed) .sheet-eq {
+  visibility: hidden;
+}
+
+.is-recall .sheet-card:not(.is-revealed) .sheet-where,
+.is-recall .sheet-card:not(.is-revealed) .sheet-example {
+  display: none;
+}
+
+.sheet-where {
+  margin: 0;
+  font-size: 0.82rem;
+}
+
+.sheet-note {
+  margin: 0;
+  color: var(--text-2);
+}
+
+.sheet-example {
+  margin-top: auto;
+  padding: 0.55rem 0.6rem 0.4rem;
+  border-left: 3px solid var(--accent);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  background: var(--accent-soft);
+  overflow-x: auto;
+  text-align: center;
+}
+
+.sheet-example .katex-display {
+  margin: 0.2rem 0 0;
+}
+
+.sheet-example .katex {
+  font-size: 0.92em;
+}
+
+.sheet-example-label {
+  display: block;
+  color: var(--accent-strong);
+  font-size: 0.7rem;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-align: left;
+  text-transform: uppercase;
 }
 
 /* Stacked Labs on Medium Screens */

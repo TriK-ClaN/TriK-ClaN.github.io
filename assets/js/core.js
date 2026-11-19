@@ -108,6 +108,8 @@ window.Guide = window.Guide || {};
       "errorDrillBest",
       "discussionRatings",
       "debriefRatings",
+      "batteryRatings",
+      "sheetRecall",
       "checklist2",
       "plan2"
     ],

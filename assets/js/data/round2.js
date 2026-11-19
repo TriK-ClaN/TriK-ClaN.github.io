@@ -108,6 +108,7 @@ Guide.plan2 = [
       { text: "Timed Case Again, This Time in Excel", href: "#/case/timed" },
       { text: "Spot the Error Drill", href: "#/case/excel" },
       { text: "Debrief Questions in Timed Practice", href: "#/debrief" },
+      { text: "Battery Questions and Quick Calculations", href: "#/battery" },
       { text: "Laptop and Excel Setup Check", href: "#/day" }
     ]
   },
@@ -117,6 +118,7 @@ Guide.plan2 = [
     label: "20 November",
     theme: "Interview Day · Light Review",
     tasks: [
+      { text: "Formula Sheet in Recall Mode", href: "#/formulas" },
       { text: "Model Presentation Script Once Aloud", href: "#/debrief" },
       { text: "Pitch Rehearsal in Both Languages", href: "#/discussion" },
       { text: "Interview Day Checklist", href: "#/day" }
