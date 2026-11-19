@@ -54,7 +54,7 @@ Guide.formulaQuiz = [
       String.raw`\dfrac{\text{Debt}}{\text{Debt} + \text{Equity}}`,
       String.raw`\dfrac{\text{Debt}}{\text{Equity}}`,
       String.raw`\dfrac{\text{Equity}}{\text{Debt} + \text{Equity}}`,
-      String.raw`\dfrac{\text{Net debt}}{\text{EBITDA}}`
+      String.raw`\dfrac{\text{Net Debt}}{\text{EBITDA}}`
     ],
     explain: "Gearing expresses debt as a share of total funding. Debt divided by equity is the separate debt-to-equity ratio, while net debt over EBITDA is a corporate leverage multiple."
   },
@@ -76,7 +76,7 @@ Guide.formulaQuiz = [
       String.raw`\dfrac{\text{CFADS}_t}{\text{Interest}_t + \text{Principal}_t}`,
       String.raw`\dfrac{\text{CFADS}_t}{\text{Principal}_t}`,
       String.raw`\dfrac{\text{EBITDA}_t}{\text{Interest}_t + \text{Principal}_t}`,
-      String.raw`\dfrac{\text{NPV of CFADS}}{\text{Outstanding debt}}`
+      String.raw`\dfrac{\text{NPV of CFADS}}{\text{Outstanding Debt}}`
     ],
     explain: "DSCR divides CFADS by total scheduled debt service, meaning interest plus principal. EBITDA overstates available cash, and the NPV-based expression is LLCR."
   },
@@ -93,7 +93,7 @@ Guide.formulaQuiz = [
     formula: "llcr",
     type: "recognise",
     q: "Which coverage ratio does this expression define?",
-    tex: String.raw`\dfrac{\begin{array}{c}\text{NPV of CFADS over the} \\ \text{remaining loan life}\end{array}}{\text{Outstanding debt}}`,
+    tex: String.raw`\dfrac{\begin{array}{c}\text{NPV of CFADS Over the} \\ \text{Remaining Loan Life}\end{array}}{\text{Outstanding Debt}}`,
     options: ["LLCR", "PLCR", "DSCR", "Interest Cover Ratio"],
     explain: "Loan life coverage compares discounted CFADS up to final maturity with the debt still outstanding, which makes it a whole-of-life solvency test."
   },
@@ -102,7 +102,7 @@ Guide.formulaQuiz = [
     formula: "plcr",
     type: "complete",
     q: "Which term completes the PLCR formula?",
-    tex: String.raw`\text{PLCR} = \dfrac{\begin{array}{c}\text{NPV of CFADS over the} \\ \text{remaining } \boxed{\;?\;}\end{array}}{\text{Outstanding debt}}`,
+    tex: String.raw`\text{PLCR} = \dfrac{\begin{array}{c}\text{NPV of CFADS Over the} \\ \text{Remaining } \boxed{\;?\;}\end{array}}{\text{Outstanding Debt}}`,
     options: ["Project Life", "Loan Life", "Swap Tenor", "Construction Period"],
     explain: "PLCR extends the horizon to the remaining project life, so it captures tail cash flows after debt maturity and usually sits at or above LLCR."
   },
@@ -123,10 +123,10 @@ Guide.formulaQuiz = [
     q: "When several sizing limits apply, which expression gives the senior debt amount?",
     math: true,
     options: [
-      String.raw`\min \left\{ \begin{array}{l} \text{DSCR capacity} \\ \text{Gearing cap} \times \text{Cost} \\ \text{Other limits} \end{array} \right.`,
-      String.raw`\max \left\{ \begin{array}{l} \text{DSCR capacity} \\ \text{Gearing cap} \times \text{Cost} \\ \text{Other limits} \end{array} \right.`,
-      String.raw`\begin{aligned} & \text{DSCR capacity} \\ & + \text{Gearing cap} \times \text{Cost} \end{aligned}`,
-      String.raw`\tfrac{1}{2} \left( \begin{array}{l} \text{DSCR capacity} \\ {} + \text{Gearing cap} \times \text{Cost} \end{array} \right)`
+      String.raw`\min \left\{ \begin{array}{l} \text{DSCR Capacity} \\ \text{Gearing Cap} \times \text{Cost} \\ \text{Other Limits} \end{array} \right.`,
+      String.raw`\max \left\{ \begin{array}{l} \text{DSCR Capacity} \\ \text{Gearing Cap} \times \text{Cost} \\ \text{Other Limits} \end{array} \right.`,
+      String.raw`\begin{aligned} & \text{DSCR Capacity} \\ & + \text{Gearing Cap} \times \text{Cost} \end{aligned}`,
+      String.raw`\tfrac{1}{2} \left( \begin{array}{l} \text{DSCR Capacity} \\ {} + \text{Gearing Cap} \times \text{Cost} \end{array} \right)`
     ],
     explain: "Every limit must hold at once, so the lowest one binds. Lenders never offer more than the tightest constraint permits."
   },
@@ -145,10 +145,10 @@ Guide.formulaQuiz = [
     q: "Under sculpting, which expression gives permitted debt service in period t?",
     math: true,
     options: [
-      String.raw`\text{DS}_t = \dfrac{\text{CFADS}_t}{\text{DSCR}_{\text{target}}}`,
-      String.raw`\text{DS}_t = \text{CFADS}_t \times \text{DSCR}_{\text{target}}`,
-      String.raw`\text{DS}_t = \text{CFADS}_t - \text{DSCR}_{\text{target}}`,
-      String.raw`\text{DS}_t = \dfrac{\text{Interest}_t}{\text{DSCR}_{\text{target}}}`
+      String.raw`\text{DS}_t = \dfrac{\text{CFADS}_t}{\text{DSCR}_{\text{Target}}}`,
+      String.raw`\text{DS}_t = \text{CFADS}_t \times \text{DSCR}_{\text{Target}}`,
+      String.raw`\text{DS}_t = \text{CFADS}_t - \text{DSCR}_{\text{Target}}`,
+      String.raw`\text{DS}_t = \dfrac{\text{Interest}_t}{\text{DSCR}_{\text{Target}}}`
     ],
     explain: "Rearranging the DSCR definition shows that debt service equals CFADS divided by the target ratio, which holds coverage constant in every period."
   },
@@ -165,7 +165,7 @@ Guide.formulaQuiz = [
     formula: "sculpt",
     type: "recognise",
     q: "Under debt sculpting, what does this expression calculate for each period?",
-    tex: String.raw`\dfrac{\text{CFADS}_t}{\text{DSCR}_{\text{target}}}`,
+    tex: String.raw`\dfrac{\text{CFADS}_t}{\text{DSCR}_{\text{Target}}}`,
     options: ["Permitted Debt Service", "Principal Repayment", "Interest Payable", "Debt Capacity"],
     explain: "Dividing CFADS by the target ratio gives the most debt service the period can bear. Principal is what remains once interest is deducted from that amount."
   },
@@ -174,7 +174,7 @@ Guide.formulaQuiz = [
     formula: "capacity",
     type: "complete",
     q: "Which rate completes the debt capacity formula?",
-    tex: String.raw`\text{Debt capacity} = \sum_{t=1}^{n} \dfrac{\text{DS}_t}{\left(1 + \boxed{\;?\;}\right)^{t}}`,
+    tex: String.raw`\text{Debt Capacity} = \sum_{t=1}^{n} \dfrac{\text{DS}_t}{\left(1 + \boxed{\;?\;}\right)^{t}}`,
     options: ["Cost of Debt", "WACC", "Cost of Equity", "Long-Term Growth Rate"],
     explain: "Permitted debt service is the lender's cash flow, so it is discounted at the all-in cost of debt to find the loan amount it can support."
   },
@@ -201,7 +201,7 @@ Guide.formulaQuiz = [
     formula: "debtRoll",
     type: "complete",
     q: "Which term completes the debt roll-forward check?",
-    tex: String.raw`\begin{aligned} \text{Closing debt} = {} & \text{Opening debt} \\ & + \boxed{\;?\;} - \text{Repayment} \end{aligned}`,
+    tex: String.raw`\begin{aligned} \text{Closing Debt} = {} & \text{Opening Debt} \\ & + \boxed{\;?\;} - \text{Repayment} \end{aligned}`,
     options: ["Drawdown", "Interest Paid", "CFADS", "Capex"],
     explain: "Debt balances move only through new drawdowns and repayments. Interest paid flows through the income statement and cash flow, not the principal balance."
   },
@@ -236,9 +236,9 @@ Guide.formulaQuiz = [
     q: "Under the indirect method, which expression gives cash flow from operations?",
     math: true,
     options: [
-      String.raw`\text{Net income} + \text{Non-cash charges} - \Delta\,\text{NWC}`,
-      String.raw`\text{Net income} + \text{Non-cash charges} + \Delta\,\text{NWC}`,
-      String.raw`\text{Net income} - \text{Non-cash charges} - \Delta\,\text{NWC}`,
+      String.raw`\text{Net Income} + \text{Non-Cash Charges} - \Delta\,\text{NWC}`,
+      String.raw`\text{Net Income} + \text{Non-Cash Charges} + \Delta\,\text{NWC}`,
+      String.raw`\text{Net Income} - \text{Non-Cash Charges} - \Delta\,\text{NWC}`,
       String.raw`\text{EBITDA} - \text{Capex}`
     ],
     explain: "Non-cash charges such as depreciation are added back, while any increase in working capital absorbs cash and is deducted."
@@ -275,10 +275,10 @@ Guide.formulaQuiz = [
     q: "Which expression gives the enterprise value bridge?",
     math: true,
     options: [
-      String.raw`\text{Equity value} + \text{Net debt} + \text{Other debt-like claims}`,
-      String.raw`\text{Equity value} - \text{Net debt} - \text{Other debt-like claims}`,
-      String.raw`\text{Equity value} + \text{Gross debt} + \text{Cash}`,
-      String.raw`\text{Net debt} - \text{Equity value}`
+      String.raw`\text{Equity Value} + \text{Net Debt} + \text{Other Debt-Like Claims}`,
+      String.raw`\text{Equity Value} - \text{Net Debt} - \text{Other Debt-Like Claims}`,
+      String.raw`\text{Equity Value} + \text{Gross Debt} + \text{Cash}`,
+      String.raw`\text{Net Debt} - \text{Equity Value}`
     ],
     explain: "Enterprise value belongs to all capital providers, so claims senior to equity are added to equity value. Cash reduces net debt rather than adding to it."
   },
@@ -300,7 +300,7 @@ Guide.formulaQuiz = [
       String.raw`\text{EBIT}\,(1 - T) + \text{D\&A} - \text{Capex} - \Delta\,\text{NWC}`,
       String.raw`\text{EBIT} + \text{D\&A} + \text{Capex} + \Delta\,\text{NWC}`,
       String.raw`\text{EBITDA}\,(1 - T) - \text{Capex}`,
-      String.raw`\text{Net income} + \text{D\&A} - \text{Capex} - \text{Debt repayment}`
+      String.raw`\text{Net Income} + \text{D\&A} - \text{Capex} - \text{Debt Repayment}`
     ],
     explain: "FCFF starts from operating profit after tax, adds back non-cash charges and deducts reinvestment. Financing flows stay out because FCFF belongs to all capital providers."
   },
@@ -435,7 +435,7 @@ Guide.formulaQuiz = [
     formula: "exitMultiple",
     type: "recognise",
     q: "Which terminal value method does this expression describe?",
-    tex: String.raw`\text{TV}_n = \text{EBITDA}_n \times \text{Exit multiple}`,
+    tex: String.raw`\text{TV}_n = \text{EBITDA}_n \times \text{Exit Multiple}`,
     options: ["Exit Multiple Method", "Gordon Growth Method", "Residual Value Method", "Liquidation Value Method"],
     explain: "Applying a market multiple to final-year EBITDA imports current pricing, whereas the Gordon growth method relies on a perpetual growth assumption."
   },
@@ -479,10 +479,10 @@ Guide.formulaQuiz = [
     q: "Which expression defines the multiple on invested capital?",
     math: true,
     options: [
-      String.raw`\dfrac{\text{Total equity proceeds}}{\text{Equity invested}}`,
-      String.raw`\dfrac{\text{Equity invested}}{\text{Total equity proceeds}}`,
-      String.raw`\dfrac{\text{Proceeds} - \text{Equity invested}}{\text{Holding period}}`,
-      String.raw`\text{IRR} \times \text{Holding period}`
+      String.raw`\dfrac{\text{Total Equity Proceeds}}{\text{Equity Invested}}`,
+      String.raw`\dfrac{\text{Equity Invested}}{\text{Total Equity Proceeds}}`,
+      String.raw`\dfrac{\text{Proceeds} - \text{Equity Invested}}{\text{Holding Period}}`,
+      String.raw`\text{IRR} \times \text{Holding Period}`
     ],
     explain: "MOIC compares everything returned to equity with everything invested. Timing plays no part, which is why it is always read alongside IRR."
   },

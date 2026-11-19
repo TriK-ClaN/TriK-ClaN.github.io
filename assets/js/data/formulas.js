@@ -15,52 +15,52 @@ Guide.formulas = {
     plain: "DSCR = €13m / €10m = 1.30x"
   },
   llcr: {
-    tex: String.raw`\text{LLCR} = \dfrac{\begin{array}{c}\text{NPV of CFADS over the} \\ \text{remaining loan life}\end{array}}{\text{Outstanding debt}}`,
-    plain: "LLCR = NPV of CFADS over the remaining loan life / Outstanding debt"
+    tex: String.raw`\text{LLCR} = \dfrac{\begin{array}{c}\text{NPV of CFADS Over the} \\ \text{Remaining Loan Life}\end{array}}{\text{Outstanding Debt}}`,
+    plain: "LLCR = NPV of CFADS Over the Remaining Loan Life / Outstanding Debt"
   },
   plcr: {
-    tex: String.raw`\text{PLCR} = \dfrac{\begin{array}{c}\text{NPV of CFADS over the} \\ \text{remaining project life}\end{array}}{\text{Outstanding debt}}`,
-    plain: "PLCR = NPV of CFADS over the remaining project life / Outstanding debt"
+    tex: String.raw`\text{PLCR} = \dfrac{\begin{array}{c}\text{NPV of CFADS Over the} \\ \text{Remaining Project Life}\end{array}}{\text{Outstanding Debt}}`,
+    plain: "PLCR = NPV of CFADS Over the Remaining Project Life / Outstanding Debt"
   },
   debtMin: {
-    tex: String.raw`\text{Debt} = \min \left\{ \begin{array}{l} \text{DSCR-based capacity} \\ \text{Gearing cap} \times \text{Eligible cost} \\ \text{Other limits} \end{array} \right.`,
-    plain: "Debt = MIN(DSCR capacity; Gearing cap × Cost; Other limits)"
+    tex: String.raw`\text{Debt} = \min \left\{ \begin{array}{l} \text{DSCR-Based Capacity} \\ \text{Gearing Cap} \times \text{Eligible Cost} \\ \text{Other Limits} \end{array} \right.`,
+    plain: "Debt = MIN(DSCR Capacity; Gearing Cap × Cost; Other Limits)"
   },
   sculpt: {
-    tex: String.raw`\begin{aligned} \text{DS}_t &= \dfrac{\text{CFADS}_t}{\text{DSCR}_{\text{target}}} \\[6pt] \text{Principal}_t &= \text{DS}_t - \text{Interest}_t \end{aligned}`,
+    tex: String.raw`\begin{aligned} \text{DS}_t &= \dfrac{\text{CFADS}_t}{\text{DSCR}_{\text{Target}}} \\[6pt] \text{Principal}_t &= \text{DS}_t - \text{Interest}_t \end{aligned}`,
     plain: "DS(t) = CFADS(t) / Target DSCR; Principal(t) = DS(t) − Interest(t)"
   },
   capacity: {
-    tex: String.raw`\text{Debt capacity} = \sum_{t=1}^{n} \dfrac{\text{DS}_t}{(1 + r_d)^{t}}`,
-    plain: "Debt capacity = Σ DS(t) / (1 + rd)^t"
+    tex: String.raw`\text{Debt Capacity} = \sum_{t=1}^{n} \dfrac{\text{DS}_t}{(1 + r_d)^{t}}`,
+    plain: "Debt Capacity = Σ DS(t) / (1 + rd)^t"
   },
   capacityExample: {
     tex: String.raw`\dfrac{10}{1.05} + \dfrac{11}{1.05^{2}} + \dfrac{12}{1.05^{3}} = \text{€}29.87\text{m}`,
     plain: "10 / 1.05 + 11 / 1.05² + 12 / 1.05³ = €29.87m"
   },
   allIn: {
-    tex: String.raw`r_{\text{all-in}} = \text{EURIBOR} + \text{Credit margin}`,
-    plain: "All-in rate = EURIBOR + Credit margin"
+    tex: String.raw`r_{\text{All-In}} = \text{EURIBOR} + \text{Credit Margin}`,
+    plain: "All-In Rate = EURIBOR + Credit Margin"
   },
   debtRoll: {
-    tex: String.raw`\begin{aligned} \text{Closing debt} = {} & \text{Opening debt} \\ & + \text{Drawdown} - \text{Repayment} \end{aligned}`,
-    plain: "Closing debt = Opening debt + Drawdown − Repayment"
+    tex: String.raw`\begin{aligned} \text{Closing Debt} = {} & \text{Opening Debt} \\ & + \text{Drawdown} - \text{Repayment} \end{aligned}`,
+    plain: "Closing Debt = Opening Debt + Drawdown − Repayment"
   },
   balance: {
     tex: String.raw`\text{Assets} = \text{Liabilities} + \text{Equity}`,
     plain: "Assets = Liabilities + Equity"
   },
   cfo: {
-    tex: String.raw`\begin{aligned} \text{CFO} = {} & \text{Net income} + \text{Non-cash charges} \\ & - \Delta\,\text{NWC} \end{aligned}`,
-    plain: "CFO = Net income + Non-cash charges − ΔNWC"
+    tex: String.raw`\begin{aligned} \text{CFO} = {} & \text{Net Income} + \text{Non-Cash Charges} \\ & - \Delta\,\text{NWC} \end{aligned}`,
+    plain: "CFO = Net Income + Non-Cash Charges − ΔNWC"
   },
   nwc: {
     tex: String.raw`\text{NWC} \approx \text{Receivables} + \text{Inventory} - \text{Payables}`,
     plain: "NWC ≈ Receivables + Inventory − Payables"
   },
   ev: {
-    tex: String.raw`\begin{aligned} \text{EV} = {} & \text{Equity value} + \text{Net debt} \\ & + \text{Other debt-like claims} \end{aligned}`,
-    plain: "EV = Equity value + Net debt + Other debt-like claims"
+    tex: String.raw`\begin{aligned} \text{EV} = {} & \text{Equity Value} + \text{Net Debt} \\ & + \text{Other Debt-Like Claims} \end{aligned}`,
+    plain: "EV = Equity Value + Net Debt + Other Debt-Like Claims"
   },
   fcff: {
     tex: String.raw`\begin{aligned} \text{FCFF} = {} & \text{EBIT}\,(1 - T) + \text{D\&A} \\ & - \text{Capex} - \Delta\,\text{NWC} \end{aligned}`,
@@ -102,8 +102,8 @@ Guide.formulas = {
     plain: "TV(n) = FCF(n+1) / (WACC − g)"
   },
   exitMultiple: {
-    tex: String.raw`\text{TV}_n = \text{EBITDA}_n \times \text{Exit multiple}`,
-    plain: "TV(n) = EBITDA(n) × Exit multiple"
+    tex: String.raw`\text{TV}_n = \text{EBITDA}_n \times \text{Exit Multiple}`,
+    plain: "TV(n) = EBITDA(n) × Exit Multiple"
   },
   npv: {
     tex: String.raw`\text{NPV} = \sum_{t=0}^{n} \dfrac{\text{CF}_t}{(1 + r)^{t}}`,
@@ -114,11 +114,11 @@ Guide.formulas = {
     plain: "Σ CF(t) / (1 + IRR)^t = 0"
   },
   moic: {
-    tex: String.raw`\text{MOIC} = \dfrac{\text{Total equity proceeds}}{\text{Equity invested}}`,
-    plain: "MOIC = Total equity proceeds / Equity invested"
+    tex: String.raw`\text{MOIC} = \dfrac{\text{Total Equity Proceeds}}{\text{Equity Invested}}`,
+    plain: "MOIC = Total Equity Proceeds / Equity Invested"
   },
   irrSingle: {
-    tex: String.raw`\begin{aligned} \text{IRR} &= \text{MOIC}^{\,1/n} - 1 \\[4pt] \text{Three years:}\quad 2.0^{1/3} - 1 &= 26.0\% \\[4pt] \text{Fifteen years:}\quad 2.0^{1/15} - 1 &= 4.7\% \end{aligned}`,
+    tex: String.raw`\begin{aligned} \text{IRR} &= \text{MOIC}^{\,1/n} - 1 \\[4pt] \text{Three Years:}\quad 2.0^{1/3} - 1 &= 26.0\% \\[4pt] \text{Fifteen Years:}\quad 2.0^{1/15} - 1 &= 4.7\% \end{aligned}`,
     plain: "IRR = MOIC^(1/n) − 1; 2.0^(1/3) − 1 = 26.0%; 2.0^(1/15) − 1 = 4.7%"
   },
   el: {
@@ -131,8 +131,8 @@ Guide.formulas = {
     ]
   },
   tco: {
-    tex: String.raw`\begin{aligned} \text{TCO} = {} & \text{Purchase} + \text{Financing} \\ & + \text{Energy} + \text{Maintenance} \\ & + \text{Insurance} + \text{Taxes} \\ & - \text{Residual value} \end{aligned}`,
-    plain: "TCO = Purchase + Financing + Energy + Maintenance + Insurance + Taxes − Residual value"
+    tex: String.raw`\begin{aligned} \text{TCO} = {} & \text{Purchase} + \text{Financing} \\ & + \text{Energy} + \text{Maintenance} \\ & + \text{Insurance} + \text{Taxes} \\ & - \text{Residual Value} \end{aligned}`,
+    plain: "TCO = Purchase + Financing + Energy + Maintenance + Insurance + Taxes − Residual Value"
   },
   indexation: {
     tex: String.raw`\text{Revenue}_t = \text{Revenue}_{t-1} \times (1 + i)`,

@@ -44,7 +44,7 @@ window.Guide = window.Guide || {};
       <section class="section reveal">
         ${heading("01", "How Batteries Change the Model")}
         <div class="grid grid-2 theme-grid">
-          ${themes.map((theme) => `<div class="card theme-card"><span class="card-icon">${icon(theme.icon)}</span><div><h3>${theme.title}</h3><p class="small">${theme.text}</p></div></div>`).join("")}
+          ${themes.map((theme) => `<div class="card theme-card"><span class="card-icon">${icon(theme.icon)}</span><h3>${theme.title}</h3><p class="small">${theme.text}</p></div>`).join("")}
         </div>
         ${ui.callout("Neot's Battery Offer", "<p>Neot e-motion describes Battery-as-a-Service as battery supply including a performance guarantee, end-of-life optimisation, advice and technical expertise. Retrofit-as-a-Service adds battery integration with performance guarantees and long-term asset monitoring, and the LinkByCar partnership uses vehicle data to anticipate battery lifespan.</p>", "callout-indigo", "building")}
       </section>

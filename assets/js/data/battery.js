@@ -18,14 +18,14 @@ Guide.sheetFormulas = [
     id: "ebitda",
     group: "income",
     name: "EBITDA",
-    tex: String.raw`\text{EBITDA} = \text{Revenue} - \text{Operating costs}`,
+    tex: String.raw`\text{EBITDA} = \text{Revenue} - \text{Operating Costs}`,
     note: "Lessors earn revenue from the lease or Battery-as-a-Service fee, while operating costs cover insurance, asset management and any battery maintenance Neot carries."
   },
   {
     id: "depreciation",
     group: "income",
     name: "Straight-Line Depreciation",
-    tex: String.raw`\text{Depreciation} = \dfrac{\text{Cost} - \text{Residual value}}{\text{Useful life}}`,
+    tex: String.raw`\text{Depreciation} = \dfrac{\text{Cost} - \text{Residual Value}}{\text{Useful Life}}`,
     note: "Batteries usually wear out before the chassis, so a fleet model often runs one schedule for vehicles and a shorter one for batteries."
   },
   {
@@ -54,7 +54,7 @@ Guide.sheetFormulas = [
     id: "netIncome",
     group: "income",
     name: "Net Income",
-    tex: String.raw`\text{Net income} = \text{EBT} - \text{Tax}`,
+    tex: String.raw`\text{Net Income} = \text{EBT} - \text{Tax}`,
     note: "Net income starts the cash flow statement, but lenders size debt on cash rather than profit."
   },
   {
@@ -68,7 +68,7 @@ Guide.sheetFormulas = [
     id: "cfo",
     group: "cash",
     name: "Operating Cash Flow",
-    tex: String.raw`\begin{aligned} \text{CFO} = {} & \text{Net income} + \text{Non-cash charges} \\ & - \Delta\,\text{NWC} \end{aligned}`,
+    tex: String.raw`\begin{aligned} \text{CFO} = {} & \text{Net Income} + \text{Non-Cash Charges} \\ & - \Delta\,\text{NWC} \end{aligned}`,
     note: "Adding back depreciation converts profit into cash before investment and financing flows."
   },
   {
@@ -82,21 +82,21 @@ Guide.sheetFormulas = [
     id: "cfads",
     group: "cash",
     name: "CFADS",
-    tex: String.raw`\begin{aligned} \text{CFADS} = {} & \text{EBITDA} - \text{Tax paid} \\ & - \Delta\,\text{NWC} \\ & - \text{Maintenance capex} \end{aligned}`,
+    tex: String.raw`\begin{aligned} \text{CFADS} = {} & \text{EBITDA} - \text{Tax Paid} \\ & - \Delta\,\text{NWC} \\ & - \text{Maintenance Capex} \end{aligned}`,
     note: "Battery replacements not funded from a reserve hit CFADS in the year they are paid, which is where coverage breaks."
   },
   {
     id: "equityCf",
     group: "cash",
     name: "Cash Flow to Equity",
-    tex: String.raw`\begin{aligned} \text{CF to equity} = {} & \text{CFADS} - \text{Debt service} \\ & - \text{Reserve funding} \\ & + \text{Reserve release} \end{aligned}`,
+    tex: String.raw`\begin{aligned} \text{CF to Equity} = {} & \text{CFADS} - \text{Debt Service} \\ & - \text{Reserve Funding} \\ & + \text{Reserve Release} \end{aligned}`,
     note: "Reserve contributions for future battery replacements come out of distributions, so they lower equity returns in early years."
   },
   {
     id: "projectCf",
     group: "cash",
     name: "Unlevered Project Cash Flow",
-    tex: String.raw`\begin{aligned} \text{Project CF} = {} & \text{EBITDA} - \text{Unlevered tax} \\ & - \text{Capex} - \Delta\,\text{NWC} \end{aligned}`,
+    tex: String.raw`\begin{aligned} \text{Project CF} = {} & \text{EBITDA} - \text{Unlevered Tax} \\ & - \text{Capex} - \Delta\,\text{NWC} \end{aligned}`,
     note: "Battery capex at close and at mid-life both belong here, together with the residual value at the end."
   },
   {
@@ -110,14 +110,14 @@ Guide.sheetFormulas = [
     id: "debtMin",
     group: "debt",
     name: "Debt Sizing Constraint",
-    tex: String.raw`\text{Debt} = \min \left\{ \begin{array}{l} \text{DSCR capacity} \\ \text{Gearing cap} \times \text{Cost} \\ \text{Other limits} \end{array} \right.`,
+    tex: String.raw`\text{Debt} = \min \left\{ \begin{array}{l} \text{DSCR Capacity} \\ \text{Gearing Cap} \times \text{Cost} \\ \text{Other Limits} \end{array} \right.`,
     note: "Battery life often appears among the other limits, since lenders avoid a tenor that outlasts the first battery."
   },
   {
     id: "capacity",
     group: "debt",
     name: "Debt Capacity",
-    tex: String.raw`\text{Debt capacity} = \sum_{t=1}^{n} \dfrac{\text{DS}_t}{(1 + r_d)^{t}}`,
+    tex: String.raw`\text{Debt Capacity} = \sum_{t=1}^{n} \dfrac{\text{DS}_t}{(1 + r_d)^{t}}`,
     where: [[String.raw`r_d`, "All-In Cost of Debt"]],
     note: "Permitted debt service in each period, discounted at the cost of debt, gives the maximum loan."
   },
@@ -125,7 +125,7 @@ Guide.sheetFormulas = [
     id: "annuityDebt",
     group: "debt",
     name: "Debt Capacity With Flat CFADS",
-    tex: String.raw`\text{Debt}_{\max} = \dfrac{\text{CFADS}}{\text{DSCR}_{\text{target}}} \times \dfrac{1 - (1 + r)^{-n}}{r}`,
+    tex: String.raw`\text{Debt}_{\text{Max}} = \dfrac{\text{CFADS}}{\text{DSCR}_{\text{Target}}} \times \dfrac{1 - (1 + r)^{-n}}{r}`,
     note: "Dividing CFADS by the target ratio, then multiplying by the annuity factor, gives a quick mental check for a level lease payment.",
     example: String.raw`\dfrac{2.6}{1.30} \times \dfrac{1 - 1.05^{-8}}{0.05} = 2.0 \times 6.463 = \text{€}12.93\text{m}`
   },
@@ -133,7 +133,7 @@ Guide.sheetFormulas = [
     id: "sculpt",
     group: "debt",
     name: "Sculpted Debt Service",
-    tex: String.raw`\begin{aligned} \text{DS}_t &= \dfrac{\text{CFADS}_t}{\text{DSCR}_{\text{target}}} \\[6pt] \text{Principal}_t &= \text{DS}_t - \text{Interest}_t \end{aligned}`,
+    tex: String.raw`\begin{aligned} \text{DS}_t &= \dfrac{\text{CFADS}_t}{\text{DSCR}_{\text{Target}}} \\[6pt] \text{Principal}_t &= \text{DS}_t - \text{Interest}_t \end{aligned}`,
     note: "Sculpting lowers debt service in a battery replacement year instead of letting coverage collapse."
   },
   {
@@ -147,21 +147,21 @@ Guide.sheetFormulas = [
     id: "interest",
     group: "debt",
     name: "Periodic Interest",
-    tex: String.raw`\text{Interest}_t = \text{Opening balance}_t \times r`,
+    tex: String.raw`\text{Interest}_t = \text{Opening Balance}_t \times r`,
     note: "Using the opening balance keeps the model free of circular references."
   },
   {
     id: "debtRoll",
     group: "debt",
     name: "Debt Roll-Forward",
-    tex: String.raw`\begin{aligned} \text{Closing debt} = {} & \text{Opening debt} \\ & + \text{Drawdown} \\ & - \text{Repayment} \end{aligned}`,
+    tex: String.raw`\begin{aligned} \text{Closing Debt} = {} & \text{Opening Debt} \\ & + \text{Drawdown} \\ & - \text{Repayment} \end{aligned}`,
     note: "Drawdowns follow vehicle deliveries in a fleet deal, while a revolving facility can fund batteries before term debt takes over."
   },
   {
     id: "allIn",
     group: "debt",
     name: "All-In Cost of Debt",
-    tex: String.raw`r_{\text{all-in}} = \text{EURIBOR} + \text{Credit margin}`,
+    tex: String.raw`r_{\text{All-In}} = \text{EURIBOR} + \text{Credit Margin}`,
     note: "Hedged deals swap EURIBOR into a fixed rate, adding the swap rate and its credit spread instead."
   },
   {
@@ -175,41 +175,41 @@ Guide.sheetFormulas = [
     id: "minAvg",
     group: "coverage",
     name: "Minimum and Average DSCR",
-    tex: String.raw`\begin{aligned} \text{DSCR}_{\min} &= \min_t \ \text{DSCR}_t \\[4pt] \text{DSCR}_{\text{avg}} &= \dfrac{1}{n} \sum_{t=1}^{n} \text{DSCR}_t \end{aligned}`,
+    tex: String.raw`\begin{aligned} \text{DSCR}_{\text{Min}} &= \min_t \ \text{DSCR}_t \\[4pt] \text{DSCR}_{\text{Avg}} &= \dfrac{1}{n} \sum_{t=1}^{n} \text{DSCR}_t \end{aligned}`,
     note: "Lock-up and default tests look at the minimum, which in a battery fleet is often the replacement year."
   },
   {
     id: "llcr",
     group: "coverage",
     name: "LLCR",
-    tex: String.raw`\text{LLCR} = \dfrac{\begin{array}{c}\text{NPV of CFADS over the} \\ \text{remaining loan life}\end{array}}{\text{Outstanding debt}}`,
+    tex: String.raw`\text{LLCR} = \dfrac{\begin{array}{c}\text{NPV of CFADS Over the} \\ \text{Remaining Loan Life}\end{array}}{\text{Outstanding Debt}}`,
     note: "Healthy LLCR with a weak single-year DSCR signals a timing problem, such as a lumpy battery cost, rather than too much debt."
   },
   {
     id: "plcr",
     group: "coverage",
     name: "PLCR",
-    tex: String.raw`\text{PLCR} = \dfrac{\begin{array}{c}\text{NPV of CFADS over the} \\ \text{remaining project life}\end{array}}{\text{Outstanding debt}}`,
+    tex: String.raw`\text{PLCR} = \dfrac{\begin{array}{c}\text{NPV of CFADS Over the} \\ \text{Remaining Project Life}\end{array}}{\text{Outstanding Debt}}`,
     note: "Covering cash flows after debt maturity, PLCR captures second-life battery value and re-leasing."
   },
   {
     id: "dsra",
     group: "coverage",
     name: "DSRA Target Balance",
-    tex: String.raw`\text{DSRA target} = \sum_{\text{next 6 months}} \text{Debt service}`,
+    tex: String.raw`\text{DSRA Target} = \sum_{\text{Next 6 Months}} \text{Debt Service}`,
     note: "Six months of forward debt service is common, though each facility agreement sets its own period."
   },
   {
     id: "reserve",
     group: "coverage",
     name: "Battery Replacement Reserve",
-    tex: String.raw`\begin{aligned} \text{Contribution} = {} & \text{Replacement cost} \\ & \times \dfrac{r}{(1 + r)^{n} - 1} \end{aligned}`,
+    tex: String.raw`\begin{aligned} \text{Contribution} = {} & \text{Replacement Cost} \\ & \times \dfrac{r}{(1 + r)^{n} - 1} \end{aligned}`,
     where: [
       [String.raw`r`, "Interest Earned on the Reserve"],
       [String.raw`n`, "Years Until Replacement"]
     ],
     note: "Under sinking-fund logic, equal contributions plus interest build exactly the replacement cost by the target year.",
-    example: String.raw`120\text{k} \times \dfrac{0.03}{1.03^{8} - 1} = \text{€}13.5\text{k per bus per year}`
+    example: String.raw`120\text{k} \times \dfrac{0.03}{1.03^{8} - 1} = \text{€}13.5\text{k per Bus per Year}`
   },
   {
     id: "npv",
@@ -229,7 +229,7 @@ Guide.sheetFormulas = [
     id: "moic",
     group: "returns",
     name: "MOIC",
-    tex: String.raw`\text{MOIC} = \dfrac{\text{Total equity proceeds}}{\text{Equity invested}}`,
+    tex: String.raw`\text{MOIC} = \dfrac{\text{Total Equity Proceeds}}{\text{Equity Invested}}`,
     note: "MOIC ignores timing, so a large residual value at the end can flatter it relative to IRR."
   },
   {
@@ -254,15 +254,15 @@ Guide.sheetFormulas = [
     id: "rent",
     group: "returns",
     name: "Lease or Battery-as-a-Service Fee",
-    tex: String.raw`\begin{aligned} \text{Annual fee} = {} & \left(\text{Cost} - \dfrac{\text{RV}}{(1 + r)^{n}}\right) \\ & \times \dfrac{r}{1 - (1 + r)^{-n}} \end{aligned}`,
+    tex: String.raw`\begin{aligned} \text{Annual Fee} = {} & \left(\text{Cost} - \dfrac{\text{RV}}{(1 + r)^{n}}\right) \\ & \times \dfrac{r}{1 - (1 + r)^{-n}} \end{aligned}`,
     note: "Level payments recover the cost not covered by the discounted residual value, together with the required return.",
-    example: String.raw`\begin{aligned} & \left(120 - \dfrac{12}{1.06^{8}}\right) \times \dfrac{0.06}{1 - 1.06^{-8}} \\[4pt] & = \text{€}18.1\text{k per year} \end{aligned}`
+    example: String.raw`\begin{aligned} & \left(120 - \dfrac{12}{1.06^{8}}\right) \times \dfrac{0.06}{1 - 1.06^{-8}} \\[4pt] & = \text{€}18.1\text{k per Year} \end{aligned}`
   },
   {
     id: "soh",
     group: "battery",
     name: "State of Health",
-    tex: String.raw`\text{SOH}_t = \dfrac{\text{Usable capacity}_t}{\text{Nameplate capacity}}`,
+    tex: String.raw`\text{SOH}_t = \dfrac{\text{Usable Capacity}_t}{\text{Nameplate Capacity}}`,
     note: "Warranties usually guarantee a minimum SOH, commonly in the 70% to 80% range, for a set number of years or cycles."
   },
   {
@@ -279,21 +279,21 @@ Guide.sheetFormulas = [
     name: "Years to End of First Life",
     tex: String.raw`t_{\text{EoL}} = \dfrac{\ln\left(\text{SOH}_{\text{EoL}}\right)}{\ln(1 - d)}`,
     note: "Solving for t shows when the replacement capex lands in the model.",
-    example: String.raw`\dfrac{\ln(0.80)}{\ln(0.975)} = 8.8 \text{ years}`
+    example: String.raw`\dfrac{\ln(0.80)}{\ln(0.975)} = 8.8 \text{ Years}`
   },
   {
     id: "cycles",
     group: "battery",
     name: "Equivalent Full Cycles",
-    tex: String.raw`\text{Full cycles} = \dfrac{\text{Energy throughput (kWh)}}{\text{Usable capacity (kWh)}}`,
+    tex: String.raw`\text{Full Cycles} = \dfrac{\text{Energy Throughput (kWh)}}{\text{Usable Capacity (kWh)}}`,
     note: "Many warranties cap cycles as well as years, so heavy daily use can end coverage early.",
-    example: String.raw`\dfrac{300}{400} \times 365 = 274 \text{ cycles per year}`
+    example: String.raw`\dfrac{300}{400} \times 365 = 274 \text{ Cycles per Year}`
   },
   {
     id: "batteryCost",
     group: "battery",
     name: "Battery Cost",
-    tex: String.raw`\begin{aligned} \text{Battery cost} = {} & \text{Capacity (kWh)} \\ & \times \text{Price (€/kWh)} \end{aligned}`,
+    tex: String.raw`\begin{aligned} \text{Battery Cost} = {} & \text{Capacity (kWh)} \\ & \times \text{Price (€/kWh)} \end{aligned}`,
     note: "Battery packs make up a large share of an electric bus's price, which is why replacement timing dominates the model."
   },
   {
@@ -307,7 +307,7 @@ Guide.sheetFormulas = [
     id: "rv",
     group: "battery",
     name: "Battery Residual Value",
-    tex: String.raw`\begin{aligned} \text{RV} = {} & \text{Capacity} \times \text{SOH} \\ & \times \text{Second-life price (€/kWh)} \end{aligned}`,
+    tex: String.raw`\begin{aligned} \text{RV} = {} & \text{Capacity} \times \text{SOH} \\ & \times \text{Second-Life Price (€/kWh)} \end{aligned}`,
     note: "Second-life storage and recycling give batteries value after transport use, but lenders usually haircut it heavily.",
     example: String.raw`400 \times 0.75 \times 40 = \text{€}12{,}000`
   },
@@ -315,14 +315,14 @@ Guide.sheetFormulas = [
     id: "tco",
     group: "battery",
     name: "Total Cost of Ownership",
-    tex: String.raw`\begin{aligned} \text{TCO} = {} & \text{Purchase} + \text{Financing} \\ & + \text{Energy} + \text{Maintenance} \\ & + \text{Insurance} + \text{Taxes} \\ & - \text{Residual value} \end{aligned}`,
+    tex: String.raw`\begin{aligned} \text{TCO} = {} & \text{Purchase} + \text{Financing} \\ & + \text{Energy} + \text{Maintenance} \\ & + \text{Insurance} + \text{Taxes} \\ & - \text{Residual Value} \end{aligned}`,
     note: "Battery-as-a-Service turns the battery purchase into a fee, which changes TCO timing without changing the total."
   },
   {
     id: "parity",
     group: "battery",
     name: "TCO Breakeven Distance",
-    tex: String.raw`\text{Breakeven km} = \dfrac{\text{Upfront premium}}{\text{Saving per km}}`,
+    tex: String.raw`\text{Breakeven km} = \dfrac{\text{Upfront Premium}}{\text{Saving per km}}`,
     note: "High-mileage routes reach parity first, which is why utilisation drives which fleets electrify."
   },
   {
@@ -337,7 +337,7 @@ Guide.sheetFormulas = [
     id: "leverage",
     group: "credit",
     name: "Net Debt to EBITDA",
-    tex: String.raw`\text{Leverage} = \dfrac{\text{Net debt}}{\text{EBITDA}}`,
+    tex: String.raw`\text{Leverage} = \dfrac{\text{Net Debt}}{\text{EBITDA}}`,
     note: "Leverage measures how stretched the operator paying the lease already is."
   },
   {
@@ -483,7 +483,7 @@ Guide.batteryQuestions = [
     q: "How would you size a battery replacement reserve?",
     answer: [
       "Starting from the expected replacement cost and date, I would set equal annual contributions that, together with interest earned, build the full amount by the replacement year. Taking a €120,000 pack in eight years with 3% interest, contributions come to about €13,500 per bus per year, against €15,000 with no interest.",
-      "Most structures fund the reserve after senior debt service and before distributions, so it reduces equity cash flow rather than the DSCR. Some lenders also require the reserve to be on target before any dividend is paid."
+      "Many structures fund the reserve after senior debt service and before distributions, so it reduces equity cash flow rather than the DSCR, although conservative lenders deduct contributions from CFADS instead. Lenders also commonly require the reserve to be on target before any dividend is paid."
     ],
     points: ["Sinking-Fund Logic", "Worked Figure", "Position in the Waterfall", "Distribution Condition"],
     link: "#/formulas"
@@ -593,7 +593,7 @@ Guide.batteryQuestions = [
     q: "Suppose a 400 kWh pack delivers 300 kWh a day. How many full cycles is that a year, and how long until a 4,000-cycle warranty limit?",
     answer: [
       "Each day uses 300 divided by 400, or 0.75 equivalent full cycles, which comes to about 274 cycles over 365 days. Reaching 4,000 cycles would therefore take roughly 14.6 years.",
-      "Here the calendar limit, typically eight to twelve years, binds first. Running double shifts at 1.5 cycles a day would instead hit the cycle limit in about 7.3 years, so duty cycle decides which warranty term matters."
+      "Here the calendar limit binds first, since bus battery warranties typically run for six to twelve years. Running double shifts at 1.5 cycles a day would instead hit the cycle limit in about 7.3 years, so duty cycle decides which warranty term matters."
     ],
     points: ["0.75 Cycles per Day", "274 Cycles per Year", "14.6 Years", "Calendar Versus Cycle Limit"],
     link: "#/formulas"
@@ -625,7 +625,7 @@ Guide.batteryQuestions = [
     cat: "numbers",
     q: "Forty buses each need a €120,000 battery in Year 8. What annual reserve contribution is required if the account earns 3%?",
     answer: [
-      "Equal contributions growing at 3% for eight years accumulate 8.892 times the annual payment. Dividing €120,000 by 8.892 gives about €13,500 per bus, or roughly €540,000 a year for the fleet.",
+      "Equal annual contributions earning 3% over eight years accumulate to 8.892 times the yearly payment. Dividing €120,000 by 8.892 gives about €13,500 per bus, or roughly €540,000 a year for the fleet.",
       "Without interest the figure would be €15,000 per bus, or €600,000 a year. Either way, those amounts come out of equity distributions, which lowers early returns but protects the minimum DSCR."
     ],
     points: ["Future Value Annuity Factor", "€13,500 per Bus", "€540,000 for the Fleet", "Effect on Distributions"],
