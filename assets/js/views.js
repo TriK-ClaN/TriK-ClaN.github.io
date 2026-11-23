@@ -46,7 +46,7 @@ window.Guide = window.Guide || {};
     const note = root.querySelector("#countdown-note");
 
     dateInput.value = store.get(config.dateKey, config.defaultDate);
-    timeInput.value = store.get(config.timeKey, "");
+    timeInput.value = store.get(config.timeKey, config.defaultTime || "");
 
     function tick() {
       const dateText = dateInput.value || config.defaultDate;

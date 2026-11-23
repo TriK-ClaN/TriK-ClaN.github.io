@@ -85,8 +85,41 @@
     }
   ];
 
+  /* Soper Interview Navigation */
+  const NAV_SOPER = [
+    {
+      title: "Overview",
+      items: [
+        { href: "#/soper", label: "Briefing", icon: "home" },
+        { href: "#/soper/group", label: "Company and Team", icon: "building" }
+      ]
+    },
+    {
+      title: "Practice",
+      items: [{ href: "#/soper/questions", label: "Interview Questions", icon: "mic" }]
+    },
+    {
+      title: "Study",
+      items: [
+        { href: "#/soper/primer", label: "Energy and Finance Primer", icon: "book" },
+        { href: "#/soper/formulas", label: "Formula Sheet", icon: "calc" }
+      ]
+    }
+  ];
+
+  /* Company Branding per Guide */
+  const BRANDS = {
+    neot: { title: "Neot Interview Guide", sub: "Investment Analyst · Mobility", footer: "Interview preparation guide for the Neot Capital Investment Analyst internship, November 2026. Company facts come from Neot's public materials, so confirm any figure before quoting it." },
+    soper: { title: "Soper Interview Guide", sub: "Chargé d'Affaires · Holding", footer: "Interview preparation guide for the Soper chargé d'affaires internship, November 2026. Company facts come from public announcements and press coverage, so confirm any figure before quoting it." }
+  };
+
   /* Route Table */
   const ROUTES = {
+    soper: { view: "soperHome", title: "Soper Briefing" },
+    "soper/group": { view: "soperGroup", title: "Company and Team" },
+    "soper/questions": { view: "soperQuestions", title: "Interview Questions" },
+    "soper/primer": { view: "soperPrimer", title: "Energy and Finance Primer" },
+    "soper/formulas": { view: "soperFormulas", title: "Soper Formula Sheet" },
     "": { view: "home2", title: "Second Interview" },
     day: { view: "day2", title: "Interview Day" },
     case: { view: "casePlaybook", title: "Case Playbook" },
@@ -113,11 +146,14 @@
     "interview-day": { view: "interviewDay", title: "Interview Day" }
   };
 
-  const SITE_TITLE = "Neot Interview Guide";
-  const NAV_BY_ROUND = { 1: NAV_FIRST, 2: NAV_SECOND };
+  /* Round 3 Is the Soper Guide */
+  const SOPER = 3;
+  const NAV_BY_ROUND = { 1: NAV_FIRST, 2: NAV_SECOND, 3: NAV_SOPER };
   const hrefsOf = (nav) => new Set(nav.flatMap((group) => group.items.map((item) => item.href)));
-  const HREFS = { 1: hrefsOf(NAV_FIRST), 2: hrefsOf(NAV_SECOND) };
-  let round = store.get("round", 2) === 1 ? 1 : 2;
+  const HREFS = { 1: hrefsOf(NAV_FIRST), 2: hrefsOf(NAV_SECOND), 3: hrefsOf(NAV_SOPER) };
+  const savedRound = store.get("round", 2);
+  let round = [1, 2, SOPER].includes(savedRound) ? savedRound : 2;
+  const brand = () => BRANDS[round === SOPER ? "soper" : "neot"];
   let cleanup = null;
   let revealObserver = null;
   let lastPath = null;
@@ -128,15 +164,14 @@
     const parts = hash.replace(/^#\/?/, "").split("/");
     if (!parts[0]) return "#/";
     if (parts[0] === "study" && parts[1]) return `#/study/${parts[1]}`;
-    return `#/${parts.slice(0, parts[0] === "practice" || parts[0] === "case" ? 2 : 1).join("/")}`;
+    return `#/${parts.slice(0, ["practice", "case", "soper"].includes(parts[0]) ? 2 : 1).join("/")}`;
   }
 
   /* Interview Round Owning the Current Page */
   function syncRound() {
     const key = currentKey();
-    const inFirst = HREFS[1].has(key);
-    const inSecond = HREFS[2].has(key) || key.startsWith("#/study/");
-    const next = inSecond && !inFirst ? 2 : inFirst && !inSecond ? 1 : round;
+    const owners = [1, 2, SOPER].filter((id) => HREFS[id].has(key) || (id === 2 && key.startsWith("#/study/")));
+    const next = owners.length && !owners.includes(round) ? owners[0] : round;
     if (next !== round) {
       round = next;
       store.set("round", round);
@@ -169,7 +204,25 @@
       if (Number(link.dataset.round) === round) link.setAttribute("aria-current", "true");
       else link.removeAttribute("aria-current");
     });
+    renderBrand();
     highlightNav();
+  }
+
+  /* Company Toggle and Branding */
+  function renderBrand() {
+    const company = round === SOPER ? "soper" : "neot";
+    document.body.dataset.company = company;
+    document.querySelectorAll("[data-company]").forEach((link) => {
+      if (link.dataset.company === company) link.setAttribute("aria-current", "true");
+      else link.removeAttribute("aria-current");
+    });
+    document.querySelectorAll(".brand-title").forEach((node) => {
+      node.textContent = brand().title;
+    });
+    document.querySelectorAll(".brand-sub").forEach((node) => {
+      node.textContent = brand().sub;
+    });
+    document.querySelectorAll("a.brand").forEach((link) => link.setAttribute("href", company === "soper" ? "#/soper" : "#/"));
   }
 
   function highlightNav() {
@@ -184,7 +237,7 @@
   }
 
   function renderReadiness() {
-    const summary = round === 2 ? progress.summary2() : progress.summary();
+    const summary = round === SOPER ? Guide.soperSummary() : round === 2 ? progress.summary2() : progress.summary();
     const percent = Math.round(summary.score * 100);
     document.getElementById("readiness-value").textContent = `${percent}%`;
     document.getElementById("readiness-fill").style.width = `${percent}%`;
@@ -270,13 +323,13 @@
 
     view.insertAdjacentHTML(
       "beforeend",
-      `<footer class="site-footer">Interview preparation guide for the Neot Capital Investment Analyst internship, November 2026. Company facts come from Neot's public materials, so confirm any figure before quoting it.</footer>`
+      `<footer class="site-footer">${brand().footer}</footer>`
     );
 
     decorateCallouts(view);
     Guide.renderFormulas(view);
     observeReveals(view);
-    document.title = route.title ? `${route.title} · ${SITE_TITLE}` : SITE_TITLE;
+    document.title = route.title ? `${route.title} · ${brand().title}` : brand().title;
 
     if (!(route.view === "module" && route.args[1])) {
       window.scrollTo({ top: 0, behavior: "auto" });
@@ -336,6 +389,7 @@
     const entries = [];
     const seen = new Set();
     [
+      ["Soper", NAV_SOPER],
       ["Second Interview", NAV_SECOND],
       ["First Interview", NAV_FIRST]
     ].forEach(([section, nav]) =>
@@ -347,6 +401,10 @@
         })
       )
     );
+    Guide.soperQuestions.forEach((item) => entries.push({ kind: "Soper Question", title: item.q, text: item.answer.join(" "), href: "#/soper/questions" }));
+    Guide.soperFormulas.forEach((formula) => entries.push({ kind: "Soper Formula", title: formula.name, text: formula.note, href: "#/soper/formulas" }));
+    Guide.soperBios.forEach((bio) => entries.push({ kind: "Soper Team", title: bio.name, text: bio.text, href: "#/soper/group" }));
+    Guide.soperPrimer.concepts.concat(Guide.soperPrimer.holding).forEach((item) => entries.push({ kind: "Soper Primer", title: item.title, text: item.text, href: "#/soper/primer" }));
     Guide.discussion.items.forEach((item) => entries.push({ kind: "Discussion", title: item.q, text: item.answer.join(" ").replace(/\[\[|\]\]/g, ""), href: "#/discussion" }));
     Guide.debrief.items.forEach((item) => entries.push({ kind: "Debrief", title: item.q, text: item.answer.join(" "), href: "#/debrief" }));
     Guide.excelFunctions.forEach((fn) => entries.push({ kind: "Excel", title: `${fn.en} · ${fn.fr}`, text: `${fn.purpose}. ${fn.note}`, href: "#/case/excel" }));
@@ -502,6 +560,9 @@
   /* Initialisation */
   function init() {
     if ("scrollRestoration" in window.history) window.history.scrollRestoration = "manual";
+
+    /* Reopen the Soper Guide When It Was Last in Use */
+    if (!window.location.hash && round === SOPER) window.location.replace("#/soper");
     renderNav();
     renderReadiness();
     initTheme();

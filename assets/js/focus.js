@@ -73,12 +73,23 @@ window.Guide = window.Guide || {};
     });
   };
 
-  /* Formula Sheet View */
+  /* Neot Formula Sheet View */
   Guide.views.formulaSheet = function formulaSheet(view) {
+    Guide.renderFormulaSheet(view, {
+      groups: Guide.sheetGroups,
+      formulas: Guide.sheetFormulas,
+      recallKey: "sheetRecall",
+      lede: "Every formula worth knowing for a battery-backed fleet financing, from the income statement through debt sizing to battery health and residual value. Each card adds one line on why it matters for Neot.",
+      callout: '<p>Recall Mode hides each formula until you select it, which turns the sheet into a quick self-test. The <a href="#/practice/formulas">Formula Quiz</a> then drills the core project finance formulas with multiple-choice questions.</p>'
+    });
+  };
+
+  /* Shared Formula Sheet Renderer */
+  Guide.renderFormulaSheet = function renderFormulaSheet(view, config) {
     view.classList.add("is-wide");
-    const groups = Guide.sheetGroups;
-    const formulas = Guide.sheetFormulas;
-    let recall = Boolean(store.get("sheetRecall", false));
+    const groups = config.groups;
+    const formulas = config.formulas;
+    let recall = Boolean(store.get(config.recallKey, false));
 
     const card = (formula) => `
       <article class="card sheet-card" data-id="${formula.id}" data-group="${formula.group}" data-search="${escapeHtml(`${formula.name} ${formula.note}`.toLowerCase())}">
@@ -96,7 +107,7 @@ window.Guide = window.Guide || {};
       <header class="page-header">
         <span class="eyebrow">${icon("calc")} Technical Focus</span>
         <h1>Formula Sheet</h1>
-        <p class="lede">Every formula worth knowing for a battery-backed fleet financing, from the income statement through debt sizing to battery health and residual value. Each card adds one line on why it matters for Neot.</p>
+        <p class="lede">${config.lede}</p>
       </header>
 
       <div class="sheet-toolbar">
@@ -123,7 +134,7 @@ window.Guide = window.Guide || {};
           .join("")}
       </div>
 
-      ${ui.callout("Practise Recall", '<p>Recall Mode hides each formula until you select it, which turns the sheet into a quick self-test. The <a href="#/practice/formulas">Formula Quiz</a> then drills the core project finance formulas with multiple-choice questions.</p>', "", "lightbulb")}`;
+      ${ui.callout("Practise Recall", config.callout, "", "lightbulb")}`;
 
     const host = view.querySelector("#sheet-host");
     const query = view.querySelector("#sheet-query");
@@ -156,7 +167,7 @@ window.Guide = window.Guide || {};
 
     view.querySelector("#sheet-recall").addEventListener("click", (event) => {
       recall = !recall;
-      store.set("sheetRecall", recall);
+      store.set(config.recallKey, recall);
       event.currentTarget.setAttribute("aria-pressed", String(recall));
       host.classList.toggle("is-recall", recall);
       host.querySelectorAll(".sheet-card.is-revealed").forEach((node) => node.classList.remove("is-revealed"));

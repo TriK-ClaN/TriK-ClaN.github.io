@@ -1,6 +1,14 @@
-# Neot Interview Guide
+# Interview Guides
 
-Interactive preparation guide for the Neot Capital Investment Analyst internship interviews, organised into a Second Interview section that opens by default and the original First Interview section.
+Interactive preparation guides for internship interviews. A company toggle at the top of the sidebar switches between the Neot Capital guide, with its Second and First Interview sections, and the Soper guide.
+
+## Soper
+
+- **Briefing:** Paris-time countdown, Soper in sixty seconds, the four pôles, recent timeline, the role decoded against Ha Linh's experience, messages to land and questions to ask
+- **Company and Team:** Photos and biographies of the likely interviewers and group leadership, MGH Energy with the L'Ardoise and Janassim fact tables, Sunti and the founder story
+- **Interview Questions:** Motivation, experience, company, technical, quick calculation and French questions with spoken model answers, timed practice and self-ratings
+- **Energy and Finance Primer:** e-Fuel production chain, ReFuelEU mandates, key energy concepts, holding and fund mechanics, public funding tools and French terms
+- **Formula Sheet:** 28 formulas across project business plans, energy, valuation, private equity funds and budget control, with Recall Mode
 
 ## Second Interview
 
@@ -28,6 +36,8 @@ assets/js/core.js          Icons, storage, Paris time, formulas and progress tra
 assets/js/data/            Study, practice, interview, case and workbook content
 assets/js/tools.js         Financial engine and interactive labs
 assets/js/views.js         First Interview views and shared practice components
+assets/js/soper.js         Soper guide views
+assets/img/soper/          Soper team photos
 assets/js/engine.js        Formula engine with Excel functions, Goal Seek and data tables
 assets/js/sheet.js         Editable spreadsheet grid and bus lease engine
 assets/js/round2.js        Second Interview views

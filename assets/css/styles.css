@@ -5495,3 +5495,275 @@ tr.is-differs td {
     display: block !important;
   }
 }
+
+/* Company Toggle */
+.company-switch + .neot-rounds {
+  margin-top: -0.55rem;
+}
+
+body[data-company="soper"] .neot-rounds {
+  display: none;
+}
+
+/* Soper Briefing */
+.soper-prose {
+  margin-top: 1.1rem;
+}
+
+.soper-cards {
+  margin-top: 0.2rem;
+}
+
+.soper-timeline {
+  position: relative;
+  display: grid;
+  gap: 0.7rem;
+  margin-bottom: 1rem;
+  padding-left: 1.1rem;
+  border-left: 2px solid var(--border);
+}
+
+.soper-event {
+  position: relative;
+  display: grid;
+  grid-template-columns: 7.2rem minmax(0, 1fr);
+  align-items: start;
+  gap: 0.9rem;
+}
+
+.soper-event::before {
+  content: "";
+  position: absolute;
+  top: 0.45rem;
+  left: calc(-1.1rem - 6px);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 3px var(--bg);
+}
+
+.soper-event .pill {
+  justify-content: center;
+}
+
+.soper-event h3 {
+  margin: 0 0 0.2rem;
+  font-size: 1rem;
+}
+
+.soper-event p,
+.soper-bios p,
+.soper-ask p {
+  margin: 0;
+  text-align: justify;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+.soper-table th,
+.soper-table td {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.soper-asks {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.soper-ask {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+}
+
+.soper-ask .num {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+
+.soper-ask p + p {
+  margin-top: 0.3rem;
+}
+
+.soper-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  color: inherit;
+  text-align: center;
+  text-decoration: none;
+  transition: border-color 0.15s, transform 0.15s;
+}
+
+.soper-step:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.soper-step h3,
+.soper-step p {
+  margin: 0;
+}
+
+.soper-readiness {
+  margin-top: 0.9rem;
+  text-align: center;
+}
+
+/* Soper Company Page */
+.soper-bios {
+  columns: 2 280px;
+  column-gap: 0.85rem;
+  margin: 1.2rem 0 1rem;
+}
+
+.soper-bios .card {
+  margin: 0 0 0.85rem;
+  break-inside: avoid;
+}
+
+.soper-bios h3 {
+  margin: 0 0 0.35rem;
+  text-align: center;
+}
+
+.soper-projects {
+  margin: 1rem 0;
+}
+
+.soper-project {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.soper-project h3 {
+  margin: 0;
+  text-align: center;
+}
+
+.soper-facts {
+  display: grid;
+  grid-template-columns: minmax(6.5rem, auto) minmax(0, 1fr);
+  gap: 0.45rem 0.9rem;
+  width: 100%;
+  margin: 0.3rem 0 0;
+  font-size: 0.88rem;
+}
+
+.soper-facts dt {
+  color: var(--accent-strong);
+  font-weight: 600;
+  text-align: right;
+}
+
+.soper-facts dd {
+  margin: 0;
+}
+
+/* Soper Primer */
+.soper-chain {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 0.75rem;
+  margin: 0 0 1rem;
+  padding: 0;
+  list-style: none;
+  counter-reset: chain;
+}
+
+.soper-chain li {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  text-align: center;
+  counter-increment: chain;
+}
+
+.soper-chain li::before {
+  content: counter(chain);
+  position: absolute;
+  top: 0.55rem;
+  left: 0.7rem;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+}
+
+.soper-chain h3,
+.soper-chain p {
+  margin: 0;
+}
+
+@media (max-width: 640px) {
+  .soper-event {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.4rem;
+  }
+
+  .soper-event .pill {
+    justify-self: start;
+  }
+
+  .soper-facts {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.1rem;
+    text-align: center;
+  }
+
+  .soper-facts dt {
+    margin-top: 0.4rem;
+    text-align: center;
+  }
+
+  /* Missions Table Stacks Into Cards */
+  .soper-stack thead {
+    display: none;
+  }
+
+  .soper-stack,
+  .soper-stack tbody,
+  .soper-stack tr,
+  .soper-stack td {
+    display: block;
+    width: 100%;
+  }
+
+  .soper-stack tr {
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .soper-stack tr:last-child {
+    border-bottom: 0;
+  }
+
+  .soper-stack td {
+    padding: 0.25rem 0.9rem;
+    border: 0;
+  }
+
+  .soper-stack td + td::before {
+    content: attr(data-label);
+    display: block;
+    color: var(--accent-strong);
+    font-size: 0.72rem;
+    font-weight: 650;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+}

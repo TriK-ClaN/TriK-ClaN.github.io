@@ -111,10 +111,12 @@ window.Guide = window.Guide || {};
       "batteryRatings",
       "sheetRecall",
       "checklist2",
-      "plan2"
+      "plan2",
+      "soperRatings",
+      "soperSheetRecall"
     ],
     notes: ["story"],
-    settings: ["interviewParisDate", "interviewParisTime", "interview2ParisDate", "interview2ParisTime", "round", "theme"]
+    settings: ["interviewParisDate", "interviewParisTime", "interview2ParisDate", "interview2ParisTime", "soperParisDate", "soperParisTime", "round", "theme"]
   };
 
   Guide.resetData = function resetData(groups) {
